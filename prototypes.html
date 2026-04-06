@@ -823,7 +823,27 @@ async function loadComments(protoId) {
   }
 }
 
-function renderComments(protoId, comments) {
+const COMMENTS_PREVIEW = 3; // show this many on first open; "show all" reveals the rest
+
+function renderCommentItem(c, protoId) {
+  const initials = c.author.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
+  const time = c.createdAt
+    ? new Date(c.createdAt).toLocaleDateString('en-US', { month:'short', day:'numeric', hour:'numeric', minute:'2-digit' })
+    : '';
+  return `<li class="comment-item">
+    <div class="comment-avatar">${escapeHtml(initials)}</div>
+    <div class="comment-content">
+      <div class="comment-meta">
+        <span class="comment-author">${escapeHtml(c.author)}</span>
+        <span class="comment-time">${escapeHtml(time)}</span>
+      </div>
+      <div class="comment-text">${escapeHtml(c.text)}</div>
+    </div>
+    <button class="comment-delete" onclick="deleteComment('${escapeAttr(c.id)}','${escapeAttr(protoId)}')" title="Delete note">✕</button>
+  </li>`;
+}
+
+function renderComments(protoId, comments, showAll = false) {
   const list = document.getElementById(`cl-${protoId}`);
   if (!list) return;
   if (comments.length === 0) {
@@ -831,23 +851,20 @@ function renderComments(protoId, comments) {
     return;
   }
   const sorted = [...comments].sort((a,b) => (a.createdAt||0) - (b.createdAt||0));
-  list.innerHTML = sorted.map(c => {
-    const initials = c.author.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
-    const time = c.createdAt
-      ? new Date(c.createdAt).toLocaleDateString('en-US', { month:'short', day:'numeric', hour:'numeric', minute:'2-digit' })
-      : '';
-    return `<li class="comment-item">
-      <div class="comment-avatar">${escapeHtml(initials)}</div>
-      <div class="comment-content">
-        <div class="comment-meta">
-          <span class="comment-author">${escapeHtml(c.author)}</span>
-          <span class="comment-time">${escapeHtml(time)}</span>
-        </div>
-        <div class="comment-text">${escapeHtml(c.text)}</div>
-      </div>
-      <button class="comment-delete" onclick="deleteComment('${escapeAttr(c.id)}','${escapeAttr(protoId)}')" title="Delete note">✕</button>
+  const hidden = sorted.length - COMMENTS_PREVIEW;
+  const toShow = (showAll || hidden <= 0) ? sorted : sorted.slice(-COMMENTS_PREVIEW);
+
+  let html = '';
+  if (!showAll && hidden > 0) {
+    html += `<li style="padding:6px 0;list-style:none;">
+      <button onclick="renderComments('${escapeAttr(protoId)}', _loadedComments['${escapeAttr(protoId)}'] || [], true)"
+        style="background:none;border:none;font-family:inherit;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-softer);cursor:pointer;padding:0;">
+        ↑ Show ${hidden} earlier note${hidden===1?'':'s'}
+      </button>
     </li>`;
-  }).join('');
+  }
+  html += toShow.map(c => renderCommentItem(c, protoId)).join('');
+  list.innerHTML = html;
 }
 
 async function postComment(protoId) {
