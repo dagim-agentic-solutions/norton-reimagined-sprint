@@ -239,6 +239,32 @@
     .problems-grid { grid-template-columns: 1fr; }
     .placeholder .skeleton { grid-template-columns: 1fr; }
   }
+
+  /* Business Health section — responsive overrides */
+  .bh-grid-4 { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; }
+  .bh-grid-3 { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+  .bh-grid-5 { display:grid; grid-template-columns:repeat(5,1fr); gap:12px; }
+  .bh-grid-2 { display:grid; grid-template-columns:1fr 1.6fr; gap:24px; align-items:start; }
+  .bh-card   { background:var(--card); border:1px solid var(--line); border-radius:8px; padding:28px 32px; margin-bottom:18px; overflow:hidden; }
+  .bh-tile   { background:var(--paper); border:1px solid var(--line); border-radius:6px; padding:16px 14px; min-width:0; }
+  .bh-stat-tile { background:var(--card); border:1px solid var(--line); border-radius:8px; padding:22px 20px; min-width:0; }
+  .bh-callout { padding:16px 20px; background:var(--paper); border-left:4px solid var(--yellow); border-radius:0 6px 6px 0; }
+  .bh-callout-red { padding:18px 20px; background:var(--paper); border-left:4px solid var(--red); border-radius:0 6px 6px 0; }
+  .bh-callout-amber { padding:18px 20px; background:var(--paper); border-left:4px solid var(--amber); border-radius:0 6px 6px 0; }
+  .bh-table  { width:100%; border-collapse:collapse; font-size:13px; font-family:inherit; table-layout:fixed; }
+  .bh-table th, .bh-table td { word-break:break-word; }
+  @media (max-width: 860px) {
+    .bh-grid-4 { grid-template-columns: repeat(2,1fr); }
+    .bh-grid-5 { grid-template-columns: repeat(2,1fr); }
+    .bh-grid-3 { grid-template-columns: repeat(2,1fr); }
+    .bh-grid-2 { grid-template-columns: 1fr; }
+    .bh-card   { padding: 20px 18px; }
+  }
+  @media (max-width: 540px) {
+    .bh-grid-4 { grid-template-columns: 1fr; }
+    .bh-grid-5 { grid-template-columns: 1fr; }
+    .bh-grid-3 { grid-template-columns: 1fr; }
+  }
 </style>
 </head>
 <body>
@@ -473,23 +499,23 @@
     </div>
 
     <!-- SUB-BLOCK 2: Top-line stat row -->
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px;">
-      <div style="background:var(--card);border:1px solid var(--line);border-radius:8px;padding:22px 20px;">
+    <div class="bh-grid-4" style="margin-bottom:18px;">
+      <div class="bh-stat-tile">
         <div style="font-size:36px;font-weight:800;letter-spacing:-.03em;line-height:1;color:var(--ink);">$1.1B</div>
         <div style="font-size:12px;font-weight:700;color:var(--ink);margin:6px 0 4px;">Norton FY25 Bookings</div>
         <div style="font-size:12px;color:var(--ink-soft);line-height:1.4;">+4.5% YoY — driven by add-ons, tier mix shift, price increases. Not new customers.</div>
       </div>
-      <div style="background:var(--card);border:1px solid var(--line);border-radius:8px;padding:22px 20px;">
+      <div class="bh-stat-tile">
         <div style="font-size:36px;font-weight:800;letter-spacing:-.03em;line-height:1;color:var(--ink);">19M</div>
         <div style="font-size:12px;font-weight:700;color:var(--ink);margin:6px 0 4px;">Norton Direct Units</div>
         <div style="font-size:12px;color:var(--ink-soft);line-height:1.4;">Across N360, VPN, VSB, and Mobile entry doors.</div>
       </div>
-      <div style="background:var(--card);border:1px solid var(--line);border-radius:8px;padding:22px 20px;">
+      <div class="bh-stat-tile">
         <div style="font-size:36px;font-weight:800;letter-spacing:-.03em;line-height:1;color:var(--ink);">87.3M</div>
         <div style="font-size:12px;font-weight:700;color:var(--ink);margin:6px 0 4px;">Norton Partner Units</div>
         <div style="font-size:12px;color:var(--ink-soft);line-height:1.4;">Massive volume — but at much lower per-unit economics than direct.</div>
       </div>
-      <div style="background:var(--card);border:1px solid var(--line);border-radius:8px;padding:22px 20px;">
+      <div class="bh-stat-tile">
         <div style="font-size:36px;font-weight:800;letter-spacing:-.03em;line-height:1;color:var(--ink);">3rd</div>
         <div style="font-size:12px;font-weight:700;color:var(--ink);margin:6px 0 4px;">NPS Rank Globally</div>
         <div style="font-size:12px;color:var(--ink-soft);line-height:1.4;">Top-rated on only 3 of 14 product experience attributes consumers care about.</div>
@@ -500,7 +526,7 @@
     <div style="background:var(--card);border:1px solid var(--line);border-radius:8px;padding:28px 32px;margin-bottom:18px;">
       <div style="font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:6px;">FY25 Bookings by Segment</div>
       <h3 style="font-size:20px;font-weight:700;letter-spacing:-.015em;margin-bottom:20px;">The growth story is shifting.</h3>
-      <table style="width:100%;border-collapse:collapse;font-size:13px;font-family:inherit;">
+      <table class="bh-table">
         <thead>
           <tr style="border-bottom:2px solid var(--line);">
             <th style="text-align:left;padding:8px 12px 10px 0;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);">Tier</th>
@@ -567,34 +593,34 @@
     <div style="background:var(--card);border:1px solid var(--line);border-radius:8px;padding:28px 32px;margin-bottom:18px;">
       <div style="font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:6px;">Revenue Mix</div>
       <h3 style="font-size:20px;font-weight:700;letter-spacing:-.015em;margin-bottom:20px;">Add-ons are quietly carrying the business.</h3>
-      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:18px;">
-        <div style="background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:16px 14px;">
+      <div class="bh-grid-5" style="margin-bottom:18px;">
+        <div class="bh-tile">
           <div style="font-size:22px;font-weight:800;letter-spacing:-.02em;color:var(--ink);">$27M</div>
           <div style="font-size:11px;font-weight:700;color:var(--ink);margin:4px 0 2px;">Utilities Ultimate</div>
           <div style="font-size:11px;color:var(--green);font-weight:700;">+36% YoY</div>
         </div>
-        <div style="background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:16px 14px;">
+        <div class="bh-tile">
           <div style="font-size:22px;font-weight:800;letter-spacing:-.02em;color:var(--ink);">$60M</div>
           <div style="font-size:11px;font-weight:700;color:var(--ink);margin:4px 0 2px;">Driver Updater</div>
           <div style="font-size:11px;color:var(--green);font-weight:700;">+78% YoY</div>
         </div>
-        <div style="background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:16px 14px;">
+        <div class="bh-tile">
           <div style="font-size:22px;font-weight:800;letter-spacing:-.02em;color:var(--ink);">$48M</div>
           <div style="font-size:11px;font-weight:700;color:var(--ink);margin:4px 0 2px;">AntiTrack</div>
           <div style="font-size:11px;color:var(--green);font-weight:700;">+20% YoY</div>
         </div>
-        <div style="background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:16px 14px;">
+        <div class="bh-tile">
           <div style="font-size:22px;font-weight:800;letter-spacing:-.02em;color:var(--ink);">$51M</div>
           <div style="font-size:11px;font-weight:700;color:var(--ink);margin:4px 0 2px;">PMA</div>
           <div style="font-size:11px;color:var(--green);font-weight:700;">+36% YoY</div>
         </div>
-        <div style="background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:16px 14px;">
+        <div class="bh-tile">
           <div style="font-size:22px;font-weight:800;letter-spacing:-.02em;color:var(--ink);">$89M</div>
           <div style="font-size:11px;font-weight:700;color:var(--ink);margin:4px 0 2px;">Other (Browser, Rep Def)</div>
           <div style="font-size:11px;color:var(--green);font-weight:700;">+3% YoY</div>
         </div>
       </div>
-      <div style="padding:16px 20px;background:var(--paper);border-left:4px solid var(--yellow);border-radius:0 6px 6px 0;">
+      <div class="bh-callout">
         <p style="font-size:13.5px;color:var(--ink);line-height:1.6;margin:0;"><strong>$375M in Norton add-on bookings, growing 30%+</strong> — these are unloved utilities that nobody markets, yet they're growing faster than the core product. Imagine what a Norton-branded financial protection or scam-defense add-on could do.</p>
       </div>
     </div>
@@ -603,7 +629,7 @@
     <div style="background:var(--card);border:1px solid var(--line);border-radius:8px;padding:28px 32px;margin-bottom:18px;">
       <div style="font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:6px;">Pricing & CLR</div>
       <h3 style="font-size:20px;font-weight:700;letter-spacing:-.015em;margin-bottom:20px;">The current Norton SKU lineup.</h3>
-      <table style="width:100%;border-collapse:collapse;font-size:13px;font-family:inherit;margin-bottom:20px;">
+      <table class="bh-table" style="margin-bottom:20px;">
         <thead>
           <tr style="border-bottom:2px solid var(--line);">
             <th style="text-align:left;padding:8px 12px 10px 0;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);">Tier</th>
@@ -665,24 +691,24 @@
           </tr>
         </tbody>
       </table>
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px;">
-        <div style="background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:16px 14px;">
+      <div class="bh-grid-3" style="margin-bottom:18px;">
+        <div class="bh-tile">
           <div style="font-size:28px;font-weight:800;letter-spacing:-.02em;color:var(--ink);">2.7%</div>
           <div style="font-size:11px;font-weight:700;color:var(--ink);margin:4px 0 2px;">Site Conversion Rate</div>
           <div style="font-size:11px;color:var(--ink-soft);">24.4M annual sessions</div>
         </div>
-        <div style="background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:16px 14px;">
+        <div class="bh-tile">
           <div style="font-size:28px;font-weight:800;letter-spacing:-.02em;color:var(--ink);">$54</div>
           <div style="font-size:11px;font-weight:700;color:var(--ink);margin:4px 0 2px;">Blended ASP</div>
           <div style="font-size:11px;color:var(--ink-soft);">Across 730K direct units</div>
         </div>
-        <div style="background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:16px 14px;">
+        <div class="bh-tile">
           <div style="font-size:28px;font-weight:800;letter-spacing:-.02em;color:var(--ink);">8×</div>
           <div style="font-size:11px;font-weight:700;color:var(--ink);margin:4px 0 2px;">CLR Spread (NAVP → Ultimate+)</div>
           <div style="font-size:11px;color:var(--ink-soft);">$45 versus $1,187</div>
         </div>
       </div>
-      <div style="padding:16px 20px;background:var(--paper);border-left:4px solid var(--yellow);border-radius:0 6px 6px 0;">
+      <div class="bh-callout">
         <p style="font-size:13.5px;color:var(--ink);line-height:1.6;margin:0;"><strong>The opportunity:</strong> 77% of Norton customers buy NAVP, Standard, or Deluxe — the lowest three tiers. Only 11% reach the LifeLock bundles where the real CLR lives. Moving Laura just one tier up ($45 → $62 CLR) is worth more than acquiring a brand-new NAVP customer.</p>
       </div>
     </div>
@@ -691,7 +717,7 @@
     <div style="background:var(--card);border:1px solid var(--line);border-radius:8px;padding:28px 32px;margin-bottom:18px;">
       <div style="font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--red);margin-bottom:6px;">Warning Signal</div>
       <h3 style="font-size:20px;font-weight:700;letter-spacing:-.015em;margin-bottom:20px;">Brand health is the warning light.</h3>
-      <div style="display:grid;grid-template-columns:1fr 1.6fr;gap:24px;align-items:start;">
+      <div class="bh-grid-2">
         <div>
           <div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:10px;">BHI Ranking — FY26 Q3</div>
           <div style="display:flex;flex-direction:column;gap:6px;">
@@ -726,10 +752,10 @@
           </div>
         </div>
         <div style="display:flex;flex-direction:column;gap:14px;">
-          <div style="padding:18px 20px;background:var(--paper);border-left:4px solid var(--red);border-radius:0 6px 6px 0;">
+          <div class="bh-callout-red">
             <p style="font-size:13.5px;color:var(--ink);line-height:1.6;margin:0;"><strong>Norton is losing ground to Big Tech.</strong> Microsoft, Google, and Apple are all gaining brand health. Microsoft is one point away from passing Norton. The category isn't being eaten by a competitor — it's being eaten by the operating system.</p>
           </div>
-          <div style="padding:18px 20px;background:var(--paper);border-left:4px solid var(--amber);border-radius:0 6px 6px 0;">
+          <div class="bh-callout-amber">
             <p style="font-size:13.5px;color:var(--ink);line-height:1.6;margin:0;"><strong>Where it gets uncomfortable:</strong> NordVPN ranks 1st in NPS and top-rated on 13 of 14 product attributes. Norton ranks 3rd in NPS and top-rated on only 3 of 14. Norton outspends NordVPN on media ($39M vs £25M comparable), holds more market share — and is still losing on the things customers actually rate.</p>
           </div>
         </div>
@@ -740,8 +766,8 @@
     <div style="background:var(--card);border:1px solid var(--line);border-radius:8px;padding:28px 32px;margin-bottom:18px;">
       <div style="font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:6px;">Competitive Landscape</div>
       <h3 style="font-size:20px;font-weight:700;letter-spacing:-.015em;margin-bottom:20px;">Four fronts converging on Norton.</h3>
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px;">
-        <div style="background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:18px 16px;">
+      <div class="bh-grid-4" style="margin-bottom:18px;">
+        <div class="bh-tile">
           <div style="font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:8px;">Traditional Specialists</div>
           <div style="font-size:13px;color:var(--ink);line-height:1.6;margin-bottom:10px;">McAfee · Bitdefender · Trend Micro · Malwarebytes · TotalAV · Kaspersky</div>
           <div style="font-size:12px;color:var(--ink-soft);line-height:1.4;">All premium-tier, all pressured by OS vendors. Where Norton has historically been winning.</div>
@@ -751,18 +777,18 @@
           <div style="font-size:13px;color:var(--ink);line-height:1.6;margin-bottom:10px;">Microsoft · Google · Apple</div>
           <div style="font-size:12px;color:var(--ink-soft);line-height:1.4;">Closing platforms, AI scam detection in calls/SMS/email/browsers. The structural threat.</div>
         </div>
-        <div style="background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:18px 16px;">
+        <div class="bh-tile">
           <div style="font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--amber);margin-bottom:8px;">Indirect</div>
           <div style="font-size:13px;color:var(--ink);line-height:1.6;margin-bottom:10px;">NordVPN · ExpressVPN · Aura</div>
           <div style="font-size:12px;color:var(--ink-soft);line-height:1.4;">VPN and Identity players expanding into Scam Protection, Family, full cybersafety suites. The ones gaining brand health.</div>
         </div>
-        <div style="background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:18px 16px;">
+        <div class="bh-tile">
           <div style="font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:8px;">B2B2C / OEMs</div>
           <div style="font-size:13px;color:var(--ink);line-height:1.6;margin-bottom:10px;">McAfee→HP/Dell · Bitdefender→Netgear/Asus · F-Secure→AT&amp;T/Verizon · Array→BoA/Capital One</div>
           <div style="font-size:12px;color:var(--ink-soft);line-height:1.4;">Cybersafety embedded into devices, telcos, and banks. The channel that doesn't need brand.</div>
         </div>
       </div>
-      <div style="padding:16px 20px;background:var(--paper);border-left:4px solid var(--yellow);border-radius:0 6px 6px 0;">
+      <div class="bh-callout">
         <p style="font-size:13.5px;color:var(--ink);line-height:1.6;margin:0;"><strong>The strategic question:</strong> Norton has historically competed in one of these lanes. The reimagination needs to credibly answer all four — at the same time.</p>
       </div>
     </div>
@@ -771,33 +797,33 @@
     <div style="background:var(--card);border:1px solid var(--line);border-radius:8px;padding:28px 32px;margin-bottom:18px;">
       <div style="font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:6px;">Revenue by Job to Be Done</div>
       <h3 style="font-size:20px;font-weight:700;letter-spacing:-.015em;margin-bottom:20px;">Where Norton's revenue actually maps to user problems.</h3>
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px;">
-        <div style="background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:18px 16px;">
+      <div class="bh-grid-4" style="margin-bottom:18px;">
+        <div class="bh-tile">
           <div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:8px;">Protect my digital life</div>
           <div style="font-size:28px;font-weight:800;letter-spacing:-.02em;color:var(--ink);line-height:1;margin-bottom:6px;">$1.7B</div>
           <div style="display:inline-block;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;background:#e8f5e8;color:var(--green);border-radius:999px;margin-bottom:8px;">LEADING</div>
           <div style="font-size:11px;color:var(--ink-soft);line-height:1.4;">Norton 360</div>
         </div>
-        <div style="background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:18px 16px;">
+        <div class="bh-tile">
           <div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:8px;">Verify people &amp; info</div>
           <div style="font-size:18px;font-weight:800;letter-spacing:-.02em;color:var(--ink-soft);line-height:1;margin-bottom:6px;">Nascent</div>
           <div style="display:inline-block;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;background:#ffefd8;color:var(--amber);border-radius:999px;margin-bottom:8px;">NASCENT</div>
           <div style="font-size:11px;color:var(--ink-soft);line-height:1.4;">Norton Genie Scam Protection</div>
         </div>
-        <div style="background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:18px 16px;">
+        <div class="bh-tile">
           <div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:8px;">Control my personal data</div>
           <div style="font-size:28px;font-weight:800;letter-spacing:-.02em;color:var(--ink);line-height:1;margin-bottom:6px;">$105M</div>
           <div style="display:inline-block;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;background:#e8edf5;color:#3a5fa0;border-radius:999px;margin-bottom:8px;">PARITY</div>
           <div style="font-size:11px;color:var(--ink-soft);line-height:1.4;">Norton VPN, PMA, AntiTrack</div>
         </div>
-        <div style="background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:18px 16px;">
+        <div class="bh-tile">
           <div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:8px;">Keep finances safe</div>
           <div style="font-size:28px;font-weight:800;letter-spacing:-.02em;color:var(--ink);line-height:1;margin-bottom:6px;">$293M</div>
           <div style="display:inline-block;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;background:#e8f5e8;color:var(--green);border-radius:999px;margin-bottom:8px;">NORTON LEADING</div>
           <div style="font-size:11px;color:var(--ink-soft);line-height:1.4;">N360 with LifeLock, Secure Identity</div>
         </div>
       </div>
-      <div style="padding:16px 20px;background:var(--paper);border-left:4px solid var(--yellow);border-radius:0 6px 6px 0;">
+      <div class="bh-callout">
         <p style="font-size:13.5px;color:var(--ink);line-height:1.6;margin:0;"><strong>The reframe:</strong> 80% of Norton's revenue ($1.7B) sits in the legacy "protect from threats" job — the most commoditized JTBD on the page. The two jobs with the most upside (verify people, keep finances safe) together generate less than $400M. The reimagination has to shift the revenue mix as much as the product mix.</p>
       </div>
     </div>
