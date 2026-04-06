@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Concept Builder — Norton Reimagined Sprint</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<style>
+/* ── Gate ───────────────────────────────────────────────────────────────── */
+#gate {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+}
+.gate-card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 48px 44px;
+  width: 100%;
+  max-width: 420px;
+  text-align: center;
+}
+.gate-card .eyebrow { margin-bottom: 18px; }
+.gate-card h2 {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -.025em;
+  margin-bottom: 8px;
+}
+.gate-card p {
+  font-size: 14px;
+  color: var(--ink-soft);
+  margin-bottom: 28px;
+  line-height: 1.5;
+}
+.gate-input-wrap { position: relative; margin-bottom: 10px; }
+#gateInput {
+  width: 100%;
+  padding: 13px 16px;
+  border: 1.5px solid var(--line);
+  border-radius: 8px;
+  font-size: 15px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color .15s;
+  box-sizing: border-box;
+  text-align: center;
+  letter-spacing: .1em;
+}
+#gateInput:focus { border-color: var(--ink); }
+#gateInput.error { border-color: #ff4444; }
+#gateErr {
+  font-size: 12px;
+  color: #ff4444;
+  min-height: 16px;
+  margin-bottom: 14px;
+}
+@keyframes shake {
+  0%,100% { transform: translateX(0); }
+  20%,60%  { transform: translateX(-6px); }
+  40%,80%  { transform: translateX(6px); }
+}
+.shake { animation: shake .35s ease; }
+#gateBtn { width: 100%; }
+
+/* ── Tool (hidden until authed) ─────────────────────────────────────────── */
+#tool {
+  display: none;
+  opacity: 0;
+  transition: opacity .4s ease;
+}
+#tool.visible { display: block; opacity: 1; }
+
+/* ── Laura Quick Reference ──────────────────────────────────────────────── */
+.laura-ref {
+  background: var(--ink);
+  color: #fff;
+  border-radius: 10px;
+  margin-bottom: 32px;
+  overflow: hidden;
+}
+.laura-ref-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  cursor: pointer;
+  user-select: none;
+}
+.laura-ref-header h4 {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--yellow);
+  margin: 0;
+}
+.laura-ref-header .chevron {
+  font-size: 12px;
+  color: #aaa;
+  transition: transform .2s;
+}
+.laura-ref-header.open .chevron { transform: rotate(180deg); }
+.laura-ref-body {
+  display: none;
+  padding: 0 24px 20px;
+  border-top: 1px solid rgba(255,255,255,.08);
+}
+.laura-ref-body.open { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding-top: 20px; }
+.lrf-col h5 {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--yellow);
+  margin: 0 0 8px;
+}
+.lrf-col ul {
+  list-style: none;
+  padding: 0; margin: 0;
+}
+.lrf-col ul li {
+  font-size: 13px;
+  color: #d0d0d0;
+  padding: 4px 0;
+  border: none;
+  line-height: 1.4;
+}
+.lrf-col ul li::before { display: none; }
+
+/* ── Build type toggle ───────────────────────────────────────────────────── */
+.build-toggle {
+  display: inline-flex;
+  background: var(--paper);
+  border: 1.5px solid var(--line);
+  border-radius: 999px;
+  padding: 4px;
+  gap: 0;
+}
+.build-toggle button {
+  background: none;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 999px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--ink-soft);
+  transition: all .15s;
+}
+.build-toggle button.active {
+  background: var(--ink);
+  color: #fff;
+}
+
+/* ── Section cards ───────────────────────────────────────────────────────── */
+.cb-section {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 28px 30px;
+  margin-bottom: 18px;
+}
+.cb-section .sec-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.cb-section .sec-num {
+  width: 24px; height: 24px;
+  background: var(--yellow);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 800;
+  flex-shrink: 0;
+}
+.cb-section h3 {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -.01em;
+  margin: 0;
+}
+.cb-section .sec-hint {
+  font-size: 13px;
+  color: var(--ink-soft);
+  margin-bottom: 14px;
+  line-height: 1.5;
+}
+
+/* ── Inputs ──────────────────────────────────────────────────────────────── */
+.cb-textarea,
+.cb-input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1.5px solid var(--line);
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--ink);
+  background: var(--paper);
+  outline: none;
+  transition: border-color .15s;
+  box-sizing: border-box;
+  line-height: 1.5;
+}
+.cb-textarea { resize: vertical; min-height: 100px; }
+.cb-textarea:focus, .cb-input:focus { border-color: var(--ink); background: #fff; }
+.cb-textarea.req-err, .cb-input.req-err { border-color: #ff4444; }
+
+/* ── Capability checkboxes ───────────────────────────────────────────────── */
+.cap-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 8px;
+}
+.cap-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border: 1.5px solid var(--line);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all .15s;
+  user-select: none;
+}
+.cap-item:hover { border-color: var(--ink); }
+.cap-item.checked { background: var(--ink); border-color: var(--ink); color: #fff; }
+.cap-item input { display: none; }
+.cap-check {
+  width: 16px; height: 16px;
+  border: 2px solid var(--line);
+  border-radius: 3px;
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px;
+  transition: all .15s;
+}
+.cap-item.checked .cap-check { background: var(--yellow); border-color: var(--yellow); color: var(--ink); }
+.cap-label { font-size: 13px; font-weight: 500; }
+
+/* ── JTBD rows ───────────────────────────────────────────────────────────── */
+.jtbd-rows { display: flex; flex-direction: column; gap: 12px; }
+.jtbd-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr auto;
+  gap: 8px;
+  align-items: start;
+}
+.jtbd-field { display: flex; flex-direction: column; gap: 4px; }
+.jtbd-field label { font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-softer); }
+.jtbd-remove {
+  background: none; border: none; cursor: pointer;
+  color: var(--ink-softer); font-size: 16px; padding: 0;
+  margin-top: 22px;
+  transition: color .15s;
+}
+.jtbd-remove:hover { color: #ff4444; }
+.jtbd-remove:disabled { opacity: .2; cursor: not-allowed; }
+.btn-add-row {
+  background: none;
+  border: 1.5px dashed var(--line);
+  border-radius: 6px;
+  width: 100%;
+  padding: 10px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-soft);
+  cursor: pointer;
+  margin-top: 8px;
+  transition: all .15s;
+}
+.btn-add-row:hover { border-color: var(--ink); color: var(--ink); }
+
+/* ── Competitor rows ─────────────────────────────────────────────────────── */
+.comp-rows { display: flex; flex-direction: column; gap: 12px; }
+.comp-row {
+  display: grid;
+  grid-template-columns: 1fr 2fr auto;
+  gap: 8px;
+  align-items: start;
+}
+.comp-remove { margin-top: 0; }
+
+/* ── Screen toggle ───────────────────────────────────────────────────────── */
+.screen-toggle {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.screen-toggle button {
+  background: var(--paper);
+  border: 1.5px solid var(--line);
+  border-radius: 999px;
+  padding: 8px 18px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--ink-soft);
+  transition: all .15s;
+}
+.screen-toggle button.active {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: #fff;
+}
+
+/* ── Generate button ─────────────────────────────────────────────────────── */
+.generate-wrap {
+  text-align: center;
+  margin: 32px 0 24px;
+}
+.btn-generate {
+  background: var(--yellow);
+  color: var(--ink);
+  border: none;
+  border-radius: 999px;
+  padding: 18px 48px;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: -.01em;
+  cursor: pointer;
+  transition: transform .15s, box-shadow .15s;
+}
+.btn-generate:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(255,232,0,.4); }
+.btn-generate:disabled { opacity: .5; cursor: not-allowed; transform: none; box-shadow: none; }
+.gen-err {
+  font-size: 13px;
+  color: #ff4444;
+  margin-top: 10px;
+  min-height: 18px;
+}
+
+/* ── Output card ─────────────────────────────────────────────────────────── */
+.output-card {
+  background: var(--ink);
+  color: #fff;
+  border-radius: 12px;
+  padding: 32px;
+  margin-bottom: 40px;
+  display: none;
+}
+.output-card.visible { display: block; }
+.output-card .oc-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.output-card h3 {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--yellow);
+  margin: 0;
+}
+.btn-copy {
+  background: var(--yellow);
+  color: var(--ink);
+  border: none;
+  border-radius: 999px;
+  padding: 8px 20px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background .15s;
+}
+.btn-copy:hover { background: #e6d000; }
+.btn-copy.copied { background: #0a7a3d; color: #fff; }
+#outputText {
+  width: 100%;
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 6px;
+  color: #e8e8e6;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 12px;
+  line-height: 1.6;
+  padding: 16px;
+  resize: vertical;
+  min-height: 320px;
+  outline: none;
+  box-sizing: border-box;
+}
+
+/* ── Responsive ──────────────────────────────────────────────────────────── */
+@media (max-width: 860px) {
+  .gate-card { padding: 36px 24px; }
+  .cb-section { padding: 22px 18px; }
+  .jtbd-row { grid-template-columns: 1fr; }
+  .jtbd-remove { margin-top: 0; }
+  .comp-row { grid-template-columns: 1fr auto; }
+  .comp-row .comp-borrow { grid-column: 1; }
+  .laura-ref-body.open { grid-template-columns: 1fr; }
+  .cap-grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 480px) {
+  .cap-grid { grid-template-columns: 1fr; }
+  .build-toggle button { padding: 9px 16px; font-size: 13px; }
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-brand">
+      <span class="dot"></span>
+      Norton Reimagined <span class="sub">· Design Sprint</span>
+    </a>
+    <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-links" id="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="laura.html">Laura</a></li>
+      <li><a href="where-is-norton.html">Where is Norton</a></li>
+      <li><a href="prototypes.html">Prototypes</a></li>
+      <li><a href="resources.html">Resources</a></li>
+      <li><a href="concept-builder.html" class="active">Concept Builder</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- ═══════════════════ GATE ═══════════════════ -->
+<div id="gate">
+  <div class="gate-card">
+    <span class="eyebrow">Beta Access</span>
+    <h2>Concept Builder</h2>
+    <p>This tool is for Norton Reimagined sprint participants only. Enter the sprint password to continue.</p>
+    <div class="gate-input-wrap">
+      <input type="password" id="gateInput" placeholder="Sprint password" autocomplete="off"
+        onkeydown="if(event.key==='Enter')checkPassword()">
+    </div>
+    <div id="gateErr"></div>
+    <button class="btn btn-dark btn-generate" id="gateBtn" style="font-size:15px;padding:13px 32px;" onclick="checkPassword()">
+      Enter →
+    </button>
+  </div>
+</div>
+
+<!-- ═══════════════════ TOOL ═══════════════════ -->
+<div id="tool">
+<div class="page">
+
+  <span class="eyebrow">Beta · Sprint Tool</span>
+  <h1 class="page-title">Concept <span class="mark">Builder</span>.</h1>
+  <p class="lede">Fill in the sections below and generate a production-ready Claude prompt for your prototype or landing page.</p>
+
+  <!-- Laura Quick Reference -->
+  <div class="laura-ref">
+    <div class="laura-ref-header" onclick="toggleLauraRef(this)">
+      <h4>⚡ Laura Quick Reference — tap to expand</h4>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="laura-ref-body" id="lauraRefBody">
+      <div class="lrf-col">
+        <h5>Who she is</h5>
+        <ul>
+          <li>35–55, working parent, full household</li>
+          <li>5–10 devices across family</li>
+          <li>Mass-market premium income</li>
+          <li>Tech-comfortable, not curious</li>
+          <li>"Unknowledgeable" majority mindset</li>
+          <li>Sees cyber safety as basic life admin</li>
+          <li>Burnt out being the household IT person</li>
+        </ul>
+      </div>
+      <div class="lrf-col">
+        <h5>What she wants</h5>
+        <ul>
+          <li>Protect household with minimum admin</li>
+          <li>Block threats before anyone clicks</li>
+          <li>Simple, trustworthy parental controls</li>
+          <li>Plain-language guidance when something's wrong</li>
+          <li>A product that replaces her as family IT</li>
+        </ul>
+        <h5 style="margin-top:14px;">What fails with her</h5>
+        <ul>
+          <li>Dashboards full of toggles</li>
+          <li>Jargon (IOCs, endpoints, DNS)</li>
+          <li>Gamification / streaks</li>
+          <li>Dark-pattern upsells</li>
+          <li>Asking her to understand the threat</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- 1. Build Type -->
+  <div class="cb-section">
+    <div class="sec-label">
+      <span class="sec-num">1</span>
+      <h3>What are you building?</h3>
+    </div>
+    <div class="build-toggle">
+      <button id="btnLP" class="active" onclick="setBuildType('landing')">Landing Page</button>
+      <button id="btnIOS" onclick="setBuildType('ios')">iOS Prototype</button>
+    </div>
+  </div>
+
+  <!-- 2. Concept -->
+  <div class="cb-section">
+    <div class="sec-label">
+      <span class="sec-num">2</span>
+      <h3>Describe your concept</h3>
+    </div>
+    <p class="sec-hint">What does this do and what problem does it solve for Laura?</p>
+    <textarea class="cb-textarea" id="concept" rows="5" placeholder="e.g. A daily household security summary delivered each morning — no scanning required. Norton silently checks all 8 family devices overnight and shows Laura one calm status card when she opens the app."></textarea>
+  </div>
+
+  <!-- 3. Capabilities -->
+  <div class="cb-section">
+    <div class="sec-label">
+      <span class="sec-num">3</span>
+      <h3>Which Norton capabilities does it use?</h3>
+    </div>
+    <div class="cap-grid" id="capGrid"></div>
+  </div>
+
+  <!-- 4. AI hook -->
+  <div class="cb-section">
+    <div class="sec-label">
+      <span class="sec-num">4</span>
+      <h3>How does AI show up?</h3>
+    </div>
+    <p class="sec-hint">What does the AI do that couldn't be done without it?</p>
+    <textarea class="cb-textarea" id="aiHook" rows="4" placeholder="e.g. AI correlates signals across all 8 devices and the family's known digital footprint to predict and block threats before anyone in the household encounters them — no manual scans, no alerts unless action is needed."></textarea>
+  </div>
+
+  <!-- 5. User journey -->
+  <div class="cb-section">
+    <div class="sec-label">
+      <span class="sec-num">5</span>
+      <h3>Walk through the user journey</h3>
+    </div>
+    <p class="sec-hint">How does Laura discover this, use it for the first time, and keep coming back? Step by step.</p>
+    <textarea class="cb-textarea" id="journey" rows="6" placeholder="e.g. Discovery: Laura sees a Norton email — 'Your family had a quiet week online.' She opens it, curious. First use: She taps through to a clean status card showing all 8 devices green. Sets up morning brief in 90 seconds. Retention: Every morning she gets one notification — 'All clear' or 'One thing to review.' She checks it like the weather."></textarea>
+  </div>
+
+  <!-- 6. Differentiators -->
+  <div class="cb-section">
+    <div class="sec-label">
+      <span class="sec-num">6</span>
+      <h3>What are the unique advantages?</h3>
+    </div>
+    <p class="sec-hint">What does Norton uniquely bring that competitors can't copy?</p>
+    <textarea class="cb-textarea" id="differentiators" rows="4" placeholder="e.g. 30 years of threat data, LifeLock identity layer, cross-device coverage no single-product competitor can match, and a trusted brand Laura already associates with protection."></textarea>
+  </div>
+
+  <!-- 7. Engagement -->
+  <div class="cb-section">
+    <div class="sec-label">
+      <span class="sec-num">7</span>
+      <h3>Why would Laura engage with this regularly?</h3>
+    </div>
+    <p class="sec-hint">What makes this essential — daily or weekly habit, not just useful once?</p>
+    <textarea class="cb-textarea" id="engagement" rows="4" placeholder="e.g. The morning brief creates a daily 'all clear' ritual — like checking the weather. Laura doesn't need to interact, but she notices when it's missing. The moment it catches something real, she becomes an evangelist."></textarea>
+  </div>
+
+  <!-- 8. JTBDs -->
+  <div class="cb-section">
+    <div class="sec-label">
+      <span class="sec-num">8</span>
+      <h3>Jobs To Be Done — in priority order</h3>
+    </div>
+    <p class="sec-hint">Minimum 3 required. Format: When I _ · I want to _ · So I can _</p>
+    <div class="jtbd-rows" id="jtbdRows"></div>
+    <button class="btn-add-row" onclick="addJtbd()">+ Add another JTBD</button>
+  </div>
+
+  <!-- 9. Competitors -->
+  <div class="cb-section">
+    <div class="sec-label">
+      <span class="sec-num">9</span>
+      <h3>Competitors &amp; inspiration to reference</h3>
+    </div>
+    <p class="sec-hint">Name the product/company and what specifically to borrow from it.</p>
+    <div class="comp-rows" id="compRows"></div>
+    <button class="btn-add-row" onclick="addComp()">+ Add another reference</button>
+  </div>
+
+  <!-- 10. Screen (iOS only) -->
+  <div class="cb-section" id="screenSection" style="display:none;">
+    <div class="sec-label">
+      <span class="sec-num">10</span>
+      <h3>Which screen or flow?</h3>
+    </div>
+    <div class="screen-toggle" id="screenToggle">
+      <button class="active" onclick="setScreen(this,'Dashboard / Home')">Dashboard / Home</button>
+      <button onclick="setScreen(this,'Onboarding')">Onboarding</button>
+      <button onclick="setScreen(this,'Alert / Event')">Alert / Event</button>
+      <button onclick="setScreen(this,'Detail View')">Detail View</button>
+      <button onclick="setScreen(this,'Full App Flow')">Full App Flow</button>
+    </div>
+  </div>
+
+  <!-- Generate -->
+  <div class="generate-wrap">
+    <button class="btn-generate" onclick="generate()">✦ Generate My Claude Prompt</button>
+    <div class="gen-err" id="genErr"></div>
+  </div>
+
+  <!-- Output -->
+  <div class="output-card" id="outputCard">
+    <div class="oc-header">
+      <h3>✦ Your Claude Prompt</h3>
+      <button class="btn-copy" id="copyBtn" onclick="copyPrompt()">Copy</button>
+    </div>
+    <textarea id="outputText" readonly></textarea>
+  </div>
+
+</div><!-- /page -->
+</div><!-- /tool -->
+
+<div class="footer">
+  <span class="brand">Norton Reimagined</span>
+  <span>Concept Builder · Beta · Sprint Tool</span>
+</div>
+
+<script>
+// ── Password gate ─────────────────────────────────────────────────────────────
+const GATE_PW = 'laura2026';
+
+function checkPassword() {
+  const input = document.getElementById('gateInput');
+  const err   = document.getElementById('gateErr');
+  if (input.value === GATE_PW) {
+    document.getElementById('gate').style.display = 'none';
+    const tool = document.getElementById('tool');
+    tool.style.display = 'block';
+    requestAnimationFrame(() => { requestAnimationFrame(() => { tool.classList.add('visible'); }); });
+    err.textContent = '';
+  } else {
+    input.classList.add('error', 'shake');
+    err.textContent = 'Incorrect password. Try again.';
+    setTimeout(() => input.classList.remove('shake'), 400);
+    input.select();
+  }
+}
+
+// ── Laura ref toggle ──────────────────────────────────────────────────────────
+function toggleLauraRef(header) {
+  header.classList.toggle('open');
+  document.getElementById('lauraRefBody').classList.toggle('open');
+}
+
+// ── Build type ────────────────────────────────────────────────────────────────
+let buildType = 'landing';
+function setBuildType(type) {
+  buildType = type;
+  document.getElementById('btnLP').classList.toggle('active', type === 'landing');
+  document.getElementById('btnIOS').classList.toggle('active', type === 'ios');
+  document.getElementById('screenSection').style.display = type === 'ios' ? 'block' : 'none';
+}
+
+// ── Screen toggle ─────────────────────────────────────────────────────────────
+let selectedScreen = 'Dashboard / Home';
+function setScreen(btn, val) {
+  document.querySelectorAll('#screenToggle button').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  selectedScreen = val;
+}
+
+// ── Norton capabilities ───────────────────────────────────────────────────────
+const CAPABILITIES = [
+  'Antivirus & Malware Protection', 'Secure VPN', 'Dark Web Monitoring',
+  'LifeLock Identity Protection', 'Safe Web & Safe Search', 'Genie Scam Protection',
+  'Password Manager', 'Smart Scan', 'Privacy Monitor', 'Family & Parental Controls',
+  'Cloud Backup', 'Norton 360 Dashboard', 'Norton Money (Financial Wellness)',
+  'Threat Intelligence Engine', 'Device Management', 'Credit & Financial Monitoring'
+];
+
+(function buildCapGrid() {
+  const grid = document.getElementById('capGrid');
+  CAPABILITIES.forEach(cap => {
+    const item = document.createElement('label');
+    item.className = 'cap-item';
+    item.innerHTML = `<input type="checkbox" value="${cap}"><span class="cap-check">✓</span><span class="cap-label">${cap}</span>`;
+    item.addEventListener('click', () => {
+      const cb = item.querySelector('input');
+      setTimeout(() => {
+        cb.checked ? item.classList.add('checked') : item.classList.remove('checked');
+      }, 0);
+    });
+    grid.appendChild(item);
+  });
+})();
+
+function getSelectedCaps() {
+  return [...document.querySelectorAll('#capGrid input:checked')].map(i => i.value);
+}
+
+// ── JTBDs ─────────────────────────────────────────────────────────────────────
+let jtbdCount = 0;
+function addJtbd(when='', want='', soican='') {
+  jtbdCount++;
+  const id = jtbdCount;
+  const rows = document.getElementById('jtbdRows');
+  const row = document.createElement('div');
+  row.className = 'jtbd-row';
+  row.id = `jtbd-${id}`;
+  row.innerHTML = `
+    <div class="jtbd-field">
+      <label>When I…</label>
+      <input class="cb-input" placeholder="…check my email late at night" value="${escHtml(when)}">
+    </div>
+    <div class="jtbd-field">
+      <label>I want to…</label>
+      <input class="cb-input" placeholder="…know if anything looks suspicious" value="${escHtml(want)}">
+    </div>
+    <div class="jtbd-field">
+      <label>So I can…</label>
+      <input class="cb-input" placeholder="…act immediately without panicking" value="${escHtml(soican)}">
+    </div>
+    <button class="jtbd-remove" onclick="removeRow('jtbd-${id}')" title="Remove">✕</button>
+  `;
+  rows.appendChild(row);
+  updateRemoveBtns('jtbdRows', 'jtbd-remove', 3);
+}
+
+// ── Competitors ───────────────────────────────────────────────────────────────
+let compCount = 0;
+function addComp(name='', borrow='') {
+  compCount++;
+  const id = compCount;
+  const rows = document.getElementById('compRows');
+  const row = document.createElement('div');
+  row.className = 'comp-row';
+  row.id = `comp-${id}`;
+  row.innerHTML = `
+    <input class="cb-input" placeholder="e.g. Apple Screen Time" value="${escHtml(name)}">
+    <textarea class="cb-textarea comp-borrow" rows="2" placeholder="What to borrow from this…">${escHtml(borrow)}</textarea>
+    <button class="jtbd-remove comp-remove" onclick="removeRow('comp-${id}')" title="Remove">✕</button>
+  `;
+  rows.appendChild(row);
+  updateRemoveBtns('compRows', 'jtbd-remove', 1);
+}
+
+function removeRow(id) {
+  document.getElementById(id)?.remove();
+  updateRemoveBtns('jtbdRows', 'jtbd-remove', 3);
+  updateRemoveBtns('compRows', 'jtbd-remove', 1);
+}
+
+function updateRemoveBtns(containerId, btnClass, minRows) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  const rows = container.querySelectorAll(':scope > div');
+  rows.forEach((row, i) => {
+    const btn = row.querySelector('.' + btnClass);
+    if (btn) btn.disabled = rows.length <= minRows;
+  });
+}
+
+// Seed initial rows
+addJtbd(); addJtbd(); addJtbd();
+addComp();
+
+// ── Generate ──────────────────────────────────────────────────────────────────
+function getJtbds() {
+  return [...document.querySelectorAll('#jtbdRows .jtbd-row')].map(row => {
+    const inputs = row.querySelectorAll('input');
+    return { when: inputs[0]?.value.trim(), want: inputs[1]?.value.trim(), soican: inputs[2]?.value.trim() };
+  });
+}
+
+function getComps() {
+  return [...document.querySelectorAll('#compRows .comp-row')].map(row => {
+    const name   = row.querySelector('input')?.value.trim();
+    const borrow = row.querySelector('textarea')?.value.trim();
+    return { name, borrow };
+  }).filter(c => c.name || c.borrow);
+}
+
+function validate() {
+  const concept  = document.getElementById('concept').value.trim();
+  const aiHook   = document.getElementById('aiHook').value.trim();
+  const journey  = document.getElementById('journey').value.trim();
+  const jtbds    = getJtbds();
+  const complete = jtbds.filter(j => j.when && j.want && j.soican);
+  const errors = [];
+  if (!concept)         errors.push('Concept description is required.');
+  if (!aiHook)          errors.push('AI integration description is required.');
+  if (!journey)         errors.push('User journey is required.');
+  if (complete.length < 3) errors.push('At least 3 complete JTBDs are required.');
+  return errors;
+}
+
+function generate() {
+  const errEl = document.getElementById('genErr');
+  const errors = validate();
+  if (errors.length) { errEl.textContent = errors[0]; return; }
+  errEl.textContent = '';
+
+  const concept       = document.getElementById('concept').value.trim();
+  const aiHook        = document.getElementById('aiHook').value.trim();
+  const journey       = document.getElementById('journey').value.trim();
+  const differentiators = document.getElementById('differentiators').value.trim();
+  const engagement    = document.getElementById('engagement').value.trim();
+  const caps          = getSelectedCaps();
+  const jtbds         = getJtbds().filter(j => j.when && j.want && j.soican);
+  const comps         = getComps();
+  const isIOS         = buildType === 'ios';
+
+  const role = isIOS
+    ? 'You are a Senior iOS Product Designer and React developer specialising in consumer security and privacy products.'
+    : 'You are a Senior Product Designer and Frontend Developer specialising in consumer security and privacy products.';
+
+  const capsSection = caps.length
+    ? `NORTON CAPABILITIES USED:\n${caps.map(c => `- ${c}`).join('\n')}`
+    : 'NORTON CAPABILITIES USED:\n(no specific capabilities selected)';
+
+  const jtbdSection = `JOBS TO BE DONE (priority order):\n${jtbds.map((j,i) => `${i+1}. When I ${j.when} · I want to ${j.want} · So I can ${j.soican}`).join('\n')}`;
+
+  const compSection = comps.length
+    ? `COMPETITORS & INSPIRATION:\n${comps.map(c => `- ${c.name}: ${c.borrow}`).join('\n')}`
+    : '';
+
+  const designSystem = `NORTON REIMAGINED DESIGN SYSTEM:
+- Typography: Inter Tight (weights 400/500/600/700/800)
+- Colors: #242424 ink · #FFE800 yellow accent · #F8F8F7 paper background · #FFFFFF card
+- Border radius: 8px cards · 999px pills/tags · 36px device frame (iOS)
+- Nav style: pill navigation, sticky/fixed top
+- Tone: calm, assured, protective — Norton as her fiduciary
+- Never use jargon (IOCs, endpoints, heuristics, DNS)
+- Always show outcomes, not mechanics`;
+
+  let platformSection;
+  if (isIOS) {
+    platformSection = `TARGET PLATFORM: iOS Prototype (390×844pt, @3x)
+SCREEN TO BUILD: ${selectedScreen}
+THREE-TAB NAV: Home · ✦ NeoClaw · Coach
+DESIGN PRINCIPLES:
+- Default to the product deciding and acting; show outcome after
+- "You're protected" status — bury the mechanics
+- Household framing ("your family", "everyone's devices")
+- Single clear CTA when interruption is necessary
+- Calm, assured, protective tone throughout
+TECHNICAL REQUIREMENTS:
+- Single React component with default export
+- No external dependencies beyond React
+- Fully interactive with useState/useEffect
+- Realistic placeholder data (not "Lorem ipsum")
+- Pixel-perfect iOS feel: safe areas, native font stack fallback, touch targets ≥44pt
+- Include the three-tab nav if building a full-screen view`;
+  } else {
+    platformSection = `TARGET PLATFORM: Landing Page (web, responsive)
+PAGE SECTION STRUCTURE (in order):
+1. Hero — outcome-first headline, one CTA, no product jargon
+2. Problem — Laura's pain in her own words
+3. Solution — what Norton does, not what it is
+4. AI Showcase — what the AI does silently on her behalf
+5. Features as Outcomes — each feature described as a result Laura feels
+6. Differentiators — what only Norton can deliver
+7. Competitive Context — why existing alternatives leave gaps
+8. Social Proof — real-feeling testimonials from Laura-alike users
+9. Pricing / CTA — outcome-framed, single clear action
+10. Footer — minimal, trustworthy
+COPY PRINCIPLES:
+- Outcome-first: lead with the result, not the feature
+- Laura's voice: plain language, no tech jargon
+- Household framing throughout
+- Calm and assured — never scary or alarmist
+TECHNICAL REQUIREMENTS:
+- Single self-contained HTML file
+- Responsive (mobile-first, breakpoints at 640px and 1024px)
+- No external JavaScript dependencies
+- Inline CSS and JS only
+- Use Inter Tight via Google Fonts link
+- Fully accessible (semantic HTML, alt text, focus states)`;
+  }
+
+  const prompt = `${role}
+
+Build the following Norton Reimagined concept for Laura, the Outsourcer — the target persona for this product.
+
+═══════════════════════════════════════════
+LAURA IN ONE LINE
+═══════════════════════════════════════════
+She is the guardian of her household's digital life — but she doesn't want the job. She wants a trusted expert to quietly handle it in the background, the way insurance or utilities do.
+
+═══════════════════════════════════════════
+CONCEPT
+═══════════════════════════════════════════
+${concept}
+
+═══════════════════════════════════════════
+${capsSection}
+
+═══════════════════════════════════════════
+AI INTEGRATION
+═══════════════════════════════════════════
+${aiHook}
+
+═══════════════════════════════════════════
+USER JOURNEY
+═══════════════════════════════════════════
+${journey}
+${differentiators ? `\n═══════════════════════════════════════════\nDIFFERENTIATORS\n═══════════════════════════════════════════\n${differentiators}` : ''}
+${engagement ? `\n═══════════════════════════════════════════\nENGAGEMENT & RETENTION\n═══════════════════════════════════════════\n${engagement}` : ''}
+
+═══════════════════════════════════════════
+${jtbdSection}
+${compSection ? `\n═══════════════════════════════════════════\n${compSection}` : ''}
+
+═══════════════════════════════════════════
+${designSystem}
+
+═══════════════════════════════════════════
+${platformSection}
+
+═══════════════════════════════════════════
+WHAT LAURA REJECTS — do not include any of these
+═══════════════════════════════════════════
+- Dashboards full of toggles, sliders, or config screens
+- Asking her to understand the threat before making a decision
+- Technical jargon of any kind
+- Hidden costs or dark-pattern upsells
+- Gamification (streaks, badges, points)
+- Anything that adds to her mental load rather than removing it
+
+Build it now. Output only the ${isIOS ? 'React component' : 'HTML file'} — no explanations, no preamble.`;
+
+  document.getElementById('outputText').value = prompt;
+  const card = document.getElementById('outputCard');
+  card.classList.add('visible');
+  card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  document.getElementById('copyBtn').textContent = 'Copy';
+  document.getElementById('copyBtn').className = 'btn-copy';
+}
+
+function copyPrompt() {
+  const text = document.getElementById('outputText').value;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = '✓ Copied';
+    btn.className = 'btn-copy copied';
+    setTimeout(() => { btn.textContent = 'Copy'; btn.className = 'btn-copy'; }, 2500);
+  });
+}
+
+function escHtml(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+</script>
+
+<script src="nav.js"></script>
+</body>
+</html>
