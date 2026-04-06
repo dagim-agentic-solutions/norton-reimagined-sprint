@@ -284,75 +284,107 @@
   }
   .proto-delete:hover { color: #ff4444; }
 
-  /* Password modal */
-  .modal-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,.6);
-    z-index: 1000;
-    align-items: center;
-    justify-content: center;
+  /* ── Comments ─────────────────────────────────────────────────────────── */
+  .comments-section {
+    margin-top: 16px;
+    border-top: 1px solid var(--line);
+    padding-top: 14px;
   }
-  .modal-overlay.open { display: flex; }
-  .modal {
-    background: #fff;
-    border-radius: 6px;
-    padding: 40px;
-    width: 100%;
-    max-width: 380px;
-    box-shadow: 0 24px 64px rgba(0,0,0,.2);
-    font-family: "Inter Tight", sans-serif;
-  }
-  .modal h3 {
-    font-size: 20px;
-    font-weight: 700;
-    margin-bottom: 8px;
-    color: #242424;
-  }
-  .modal p {
-    font-size: 13px;
-    color: #6b6b6b;
-    margin-bottom: 20px;
-  }
-  .modal input[type="password"] {
-    width: 100%;
-    padding: 10px 14px;
-    border: 1.5px solid #e0e0de;
-    border-radius: 4px;
-    font-size: 15px;
+  .comments-toggle {
+    background: none;
+    border: none;
     font-family: inherit;
-    margin-bottom: 8px;
-    outline: none;
-    box-sizing: border-box;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: color .15s;
   }
-  .modal input[type="password"]:focus { border-color: #242424; }
-  .modal-actions {
+  .comments-toggle:hover { color: var(--ink); }
+  .comments-toggle .ct-count {
+    background: var(--yellow);
+    color: var(--ink);
+    border-radius: 999px;
+    padding: 1px 7px;
+    font-size: 11px;
+    font-weight: 700;
+  }
+  .comments-body { display: none; margin-top: 12px; }
+  .comments-body.open { display: block; }
+
+  .comment-list { list-style: none; padding: 0; margin: 0 0 12px; }
+  .comment-item {
     display: flex;
     gap: 10px;
-    margin-top: 16px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--line);
   }
-  .modal-actions button {
-    flex: 1;
-    padding: 10px;
-    border: none;
-    border-radius: 4px;
-    font-family: inherit;
-    font-weight: 700;
-    font-size: 13px;
-    cursor: pointer;
+  .comment-item:last-child { border-bottom: none; }
+  .comment-avatar {
+    width: 28px; height: 28px;
+    background: var(--ink);
+    color: var(--yellow);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 800;
+    flex-shrink: 0;
     text-transform: uppercase;
-    letter-spacing: .06em;
   }
-  .modal-confirm { background: #242424; color: #fff; }
-  .modal-confirm:hover { background: #ff4444; }
-  .modal-cancel  { background: #f0f0ee; color: #242424; }
-  .modal-msg {
-    font-size: 12px;
-    min-height: 16px;
-    color: #ff4444;
-    margin-top: 4px;
+  .comment-content { flex: 1; min-width: 0; }
+  .comment-meta {
+    display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap;
+    margin-bottom: 3px;
   }
+  .comment-author { font-size: 12px; font-weight: 700; }
+  .comment-time { font-size: 11px; color: var(--ink-softer); }
+  .comment-text { font-size: 13px; line-height: 1.5; word-break: break-word; }
+  .comment-delete {
+    background: none; border: none; cursor: pointer;
+    color: var(--ink-softer); font-size: 10px;
+    padding: 0; opacity: 0; transition: opacity .15s, color .15s;
+    flex-shrink: 0; align-self: flex-start; margin-top: 2px;
+  }
+  .comment-item:hover .comment-delete { opacity: 1; }
+  .comment-delete:hover { color: #ff4444; }
+
+  .comment-form { display: flex; flex-direction: column; gap: 8px; }
+  .comment-form input,
+  .comment-form textarea {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1.5px solid var(--line);
+    border-radius: 4px;
+    font-size: 13px;
+    font-family: inherit;
+    background: var(--paper);
+    color: var(--ink);
+    outline: none;
+    transition: border-color .15s;
+    box-sizing: border-box;
+  }
+  .comment-form input:focus,
+  .comment-form textarea:focus { border-color: var(--ink); }
+  .comment-form textarea { resize: vertical; min-height: 64px; }
+  .comment-form-row { display: flex; gap: 8px; align-items: flex-start; }
+  .comment-form-row input { flex: 1; }
+  .comment-submit {
+    background: var(--ink); color: #fff;
+    border: none; border-radius: 4px;
+    padding: 9px 16px;
+    font-family: inherit; font-size: 12px; font-weight: 700;
+    letter-spacing: .04em; text-transform: uppercase;
+    cursor: pointer; white-space: nowrap;
+    transition: background .15s;
+  }
+  .comment-submit:hover { background: #1a1a1a; }
+  .comment-submit:disabled { opacity: .5; cursor: not-allowed; }
+  .comment-err { font-size: 11px; color: #ff4444; min-height: 14px; }
 
   /* Laura score badge on prototype cards */
   .laura-score {
@@ -511,7 +543,9 @@ async function loadPrototypes() {
     // Newest first
     list.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
 
+    const protoIds = list.map(p => p.id);
     container.innerHTML = '<div class="proto-grid">' + list.map(p => {
+
       const date = p.createdAt
         ? new Date(p.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })
         : '';
@@ -536,9 +570,29 @@ async function loadPrototypes() {
               <div class="score-reco">${escapeHtml(p.lauraRecommendation || '')}</div>
             </div>
           </div>` : ''}
-          <button class="proto-delete" onclick="openDeleteModal('${escapeAttr(p.id)}')">✕ Delete</button>
+          <button class="proto-delete" onclick="deletePrototype('${escapeAttr(p.id)}', this)">✕ Delete</button>
+
+          <div class="comments-section">
+            <button class="comments-toggle" onclick="toggleComments('${escapeAttr(p.id)}', this)">
+              💬 Notes <span class="ct-count" id="cc-${escapeAttr(p.id)}">...</span>
+            </button>
+            <div class="comments-body" id="cb-${escapeAttr(p.id)}">
+              <ul class="comment-list" id="cl-${escapeAttr(p.id)}"></ul>
+              <div class="comment-form">
+                <input type="text" placeholder="Your name" id="cn-${escapeAttr(p.id)}" maxlength="80">
+                <div class="comment-form-row">
+                  <textarea placeholder="Add a note…" id="ct-${escapeAttr(p.id)}" maxlength="1000" rows="2"></textarea>
+                  <button class="comment-submit" onclick="postComment('${escapeAttr(p.id)}')">Post</button>
+                </div>
+                <div class="comment-err" id="ce-${escapeAttr(p.id)}"></div>
+              </div>
+            </div>
+          </div>
         </div>`;
     }).join('') + '</div>';
+
+    // Load comment counts for all cards
+    loadAllCommentCounts(protoIds);
   } catch (err) {
     console.error('Failed to load prototypes:', err);
     container.innerHTML = `
@@ -726,61 +780,135 @@ function escapeAttr(s) {
 // Load on page open
 loadPrototypes();
 
-// ── Delete modal ─────────────────────────────────────────────────────────────
-let _pendingDeleteId = null;
-
-function openDeleteModal(id) {
-  _pendingDeleteId = id;
-  document.getElementById('deletePassword').value = '';
-  document.getElementById('deleteModalMsg').textContent = '';
-  document.getElementById('deleteModal').classList.add('open');
-  setTimeout(() => document.getElementById('deletePassword').focus(), 50);
-}
-
-function closeDeleteModal() {
-  _pendingDeleteId = null;
-  document.getElementById('deleteModal').classList.remove('open');
-}
-
-async function confirmDelete() {
-  const password = document.getElementById('deletePassword').value;
-  const msgEl    = document.getElementById('deleteModalMsg');
-  const btn      = document.getElementById('deleteConfirmBtn');
-
-  if (!password) {
-    msgEl.textContent = 'Please enter the password.';
-    return;
-  }
-
+// ── Delete prototype (no password) ───────────────────────────────────────────
+async function deletePrototype(id, btn) {
+  if (!confirm('Delete this prototype? This cannot be undone.')) return;
   btn.disabled = true;
   btn.textContent = 'Deleting…';
-  msgEl.textContent = '';
-
   try {
-    const res = await fetch(`${API_URL}/${_pendingDeleteId}`, {
-      method:  'DELETE',
-      headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ password }),
-    });
-    const data = await res.json();
-    if (!res.ok) {
-      msgEl.textContent = data.error || 'Failed to delete.';
-      return;
-    }
-    closeDeleteModal();
+    const res = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+    if (!res.ok) throw new Error(`Server error ${res.status}`);
     await loadPrototypes();
-  } catch (err) {
-    msgEl.textContent = `Error: ${err.message}`;
-  } finally {
+  } catch (e) {
+    alert(`Failed to delete: ${e.message}`);
     btn.disabled = false;
-    btn.textContent = 'Delete';
+    btn.textContent = '✕ Delete';
   }
 }
 
-// Close modal on overlay click
-document.getElementById('deleteModal').addEventListener('click', function(e) {
-  if (e.target === this) closeDeleteModal();
-});
+// ── Comments ─────────────────────────────────────────────────────────────────
+const COMMENTS_API = '/api/comments';
+const _loadedComments = {}; // cache per protoId
+
+async function toggleComments(protoId, btn) {
+  const body = document.getElementById(`cb-${protoId}`);
+  const isOpen = body.classList.toggle('open');
+  if (isOpen && !_loadedComments[protoId]) {
+    await loadComments(protoId);
+  }
+}
+
+async function loadComments(protoId) {
+  const list  = document.getElementById(`cl-${protoId}`);
+  const count = document.getElementById(`cc-${protoId}`);
+  try {
+    const res  = await fetch(`${COMMENTS_API}?protoId=${encodeURIComponent(protoId)}`);
+    const data = await res.json();
+    const comments = data.comments || [];
+    _loadedComments[protoId] = comments;
+    count.textContent = comments.length;
+    renderComments(protoId, comments);
+  } catch(e) {
+    if (list) list.innerHTML = `<li style="font-size:12px;color:#ff4444;padding:8px 0;">Failed to load notes.</li>`;
+  }
+}
+
+function renderComments(protoId, comments) {
+  const list = document.getElementById(`cl-${protoId}`);
+  if (!list) return;
+  if (comments.length === 0) {
+    list.innerHTML = `<li style="font-size:12px;color:var(--ink-softer);padding:8px 0;">No notes yet — be the first.</li>`;
+    return;
+  }
+  const sorted = [...comments].sort((a,b) => (a.createdAt||0) - (b.createdAt||0));
+  list.innerHTML = sorted.map(c => {
+    const initials = c.author.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
+    const time = c.createdAt
+      ? new Date(c.createdAt).toLocaleDateString('en-US', { month:'short', day:'numeric', hour:'numeric', minute:'2-digit' })
+      : '';
+    return `<li class="comment-item">
+      <div class="comment-avatar">${escapeHtml(initials)}</div>
+      <div class="comment-content">
+        <div class="comment-meta">
+          <span class="comment-author">${escapeHtml(c.author)}</span>
+          <span class="comment-time">${escapeHtml(time)}</span>
+        </div>
+        <div class="comment-text">${escapeHtml(c.text)}</div>
+      </div>
+      <button class="comment-delete" onclick="deleteComment('${escapeAttr(c.id)}','${escapeAttr(protoId)}')" title="Delete note">✕</button>
+    </li>`;
+  }).join('');
+}
+
+async function postComment(protoId) {
+  const nameEl = document.getElementById(`cn-${protoId}`);
+  const textEl = document.getElementById(`ct-${protoId}`);
+  const errEl  = document.getElementById(`ce-${protoId}`);
+  const btn    = textEl.parentElement.querySelector('.comment-submit');
+  errEl.textContent = '';
+
+  const author = nameEl.value.trim();
+  const text   = textEl.value.trim();
+  if (!author) { errEl.textContent = 'Please enter your name.'; nameEl.focus(); return; }
+  if (!text)   { errEl.textContent = 'Please enter a note.'; textEl.focus(); return; }
+
+  btn.disabled = true; btn.textContent = 'Posting…';
+  try {
+    const res  = await fetch(COMMENTS_API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ protoId, author, text }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || `Error ${res.status}`);
+    textEl.value = '';
+    _loadedComments[protoId] = null; // invalidate cache
+    await loadComments(protoId);
+  } catch(e) {
+    errEl.textContent = e.message;
+  } finally {
+    btn.disabled = false; btn.textContent = 'Post';
+  }
+}
+
+async function deleteComment(commentId, protoId) {
+  if (!confirm('Delete this note?')) return;
+  try {
+    const res = await fetch(`${COMMENTS_API}/${commentId}`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ protoId }),
+    });
+    if (!res.ok) throw new Error(`Error ${res.status}`);
+    _loadedComments[protoId] = null;
+    await loadComments(protoId);
+  } catch(e) {
+    alert(`Failed to delete note: ${e.message}`);
+  }
+}
+
+// Load comment counts after prototypes render
+async function loadAllCommentCounts(protoIds) {
+  await Promise.all(protoIds.map(async id => {
+    const count = document.getElementById(`cc-${id}`);
+    if (!count) return;
+    try {
+      const res  = await fetch(`${COMMENTS_API}?protoId=${encodeURIComponent(id)}`);
+      const data = await res.json();
+      count.textContent = (data.comments || []).length;
+    } catch { count.textContent = '0'; }
+  }));
+}
 
 
 function lauraClass(verdict) {
@@ -796,20 +924,6 @@ function lauraClass(verdict) {
 
 </script>
 
-
-<!-- Delete password modal -->
-<div class="modal-overlay" id="deleteModal">
-  <div class="modal">
-    <h3>Delete prototype</h3>
-    <p>Enter the sprint password to confirm deletion. This cannot be undone.</p>
-    <input type="password" id="deletePassword" placeholder="Password" onkeydown="if(event.key==='Enter')confirmDelete()">
-    <div class="modal-msg" id="deleteModalMsg"></div>
-    <div class="modal-actions">
-      <button class="modal-cancel" onclick="closeDeleteModal()">Cancel</button>
-      <button class="modal-confirm" id="deleteConfirmBtn" onclick="confirmDelete()">Delete</button>
-    </div>
-  </div>
-</div>
 
 <script src="nav.js"></script>
 </body>
