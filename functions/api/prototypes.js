@@ -185,7 +185,7 @@ export async function onRequestPost({ request, env }) {
   // ── Auto-score against Laura (non-fatal) ───────────────────────────────────
   // Pass fileContent for file uploads so we can extract text directly.
   // For URL submissions we'll fetch the page. Failures are silently ignored.
-  const lauraResult = await scoreLaura(prototype, env);
+  const lauraResult = await scoreLaura(prototype, hasFile && !hasUrl ? fileContent : null, env);
   if (lauraResult) {
     prototype = { ...prototype, ...lauraResult };
   }
@@ -277,47 +277,67 @@ async function screenshotUrl(url) {
   }
 }
 
-async function scoreLaura(prototype, env) {
+async function scoreLaura(prototype, fileContent, env) {
+  // Scores a prototype against Laura using text extraction.
+  // Screenshots were too slow (Vercel cold start + Microlink + Claude vision
+  // exceeded the Worker CPU budget). Text-based scoring is fast and reliable.
   if (!env.ANTHROPIC_API_KEY) return null;
 
-  // Determine which URL to screenshot.
-  // For Vercel-deployed file uploads the resolved URL IS the live app — use it directly.
-  // For user-submitted URLs, attempt to screenshot.
-  const urlToShot = prototype.url && !prototype.url.startsWith('/api/')
-    ? prototype.url
-    : null;
+  let extractedText = '';
 
-  if (!urlToShot) return null;
+  // 1. For file uploads, extract text directly from the HTML/JS content
+  if (fileContent && typeof fileContent === 'string' && fileContent.trim().length > 0) {
+    extractedText = fileContent
+      .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+      .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+      .replace(/<!--[\s\S]*?-->/g, ' ')
+      .replace(/<[^>]+>/g, ' ')
+      .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&nbsp;/g, ' ')
+      .replace(/\s+/g, ' ').trim().slice(0, 2000);
+  }
 
-  // Take screenshot — skip scoring if we can't get one
-  const screenshotB64 = await screenshotUrl(urlToShot);
-  if (!screenshotB64) return null;
+  // 2. For URL submissions, try to fetch the page
+  if (!extractedText && prototype.url && !prototype.url.startsWith('/api/')) {
+    try {
+      const res = await fetch(prototype.url, {
+        headers: { 'User-Agent': 'NortonSprint-LauraBot/1.0' },
+        signal: AbortSignal.timeout(8000),
+      });
+      if (res.ok) {
+        const html = await res.text();
+        extractedText = html
+          .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+          .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+          .replace(/<!--[\s\S]*?-->/g, ' ')
+          .replace(/<[^>]+>/g, ' ')
+          .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&nbsp;/g, ' ')
+          .replace(/\s+/g, ' ').trim().slice(0, 2000);
+      }
+    } catch { /* unreachable URL — skip */ }
+  }
 
-  // Build vision prompt — show Claude what Laura would see
-  const systemContext = `${LAURA_CONTEXT_SCORE}
+  // Build concept from what we have — even just title+summary is enough
+  const concept = [
+    `Title: "${prototype.title}"`,
+    `Submitted by: ${prototype.name}`,
+    `Summary: ${prototype.summary}`,
+    extractedText ? `\nPrototype content (extracted):\n${extractedText}` : '',
+  ].join('\n');
 
-You are evaluating a prototype screenshot. Judge the actual UX and UI as Laura would experience it:
-- Is the value proposition immediately clear without reading carefully?
-- Does the visual hierarchy feel calm and trustworthy, or busy and demanding?
-- Is there obvious jargon, overwhelming options, or configuration complexity?
-- Does it feel like something that "just works" in the background, or something she'd have to manage?
-- What does the layout, copy tone, and visual design communicate about the product's intent?`;
+  const prompt = `${LAURA_CONTEXT_SCORE}
 
-  const userPrompt = `Prototype title: "${prototype.title}"
-Submitted by: ${prototype.name}
-Summary: ${prototype.summary}
+---
+PROTOTYPE TO EVALUATE:
+${concept}
 
-The screenshot above shows the actual prototype UI. Evaluate the full visual and UX experience — layout, copy, hierarchy, tone, and interaction patterns — through Laura's eyes.
-
+---
 Respond with ONLY a valid JSON object — no prose, no markdown fences:
 {
   "score": <integer 0-100>,
   "verdict": "<LOVES IT | LIKES IT | MEH | SKEPTICAL | REJECTS IT>",
-  "recommendation": "<1-2 sentences — the single most important UX or copy change to make this land better for Laura, or why it already works for her>"
+  "recommendation": "<1-2 sentences — the single most important change to make this land better for Laura, or why it already works>"
 }
-
-The verdict MUST match the score band:
-90-100 → LOVES IT | 75-89 → LIKES IT | 55-74 → MEH | 35-54 → SKEPTICAL | 0-34 → REJECTS IT`;
+The verdict MUST match the score band: 90-100 → LOVES IT | 75-89 → LIKES IT | 55-74 → MEH | 35-54 → SKEPTICAL | 0-34 → REJECTS IT`;
 
   try {
     const res = await fetch('https://api.anthropic.com/v1/messages', {
@@ -329,25 +349,8 @@ The verdict MUST match the score band:
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-5',
-        max_tokens: 350,
-        messages: [{
-          role: 'user',
-          content: [
-            {
-              type: 'image',
-              source: {
-                type:       'base64',
-                media_type: 'image/png',
-                data:       screenshotB64,
-              },
-            },
-            {
-              type: 'text',
-              text: userPrompt,
-            },
-          ],
-        }],
-        system: systemContext,
+        max_tokens: 300,
+        messages: [{ role: 'user', content: prompt }],
       }),
     });
     if (!res.ok) return null;
@@ -360,7 +363,7 @@ The verdict MUST match the score band:
       lauraRecommendation: result.recommendation  ?? null,
     };
   } catch {
-    return null; // Scoring failure is always non-fatal
+    return null;
   }
 }
 
