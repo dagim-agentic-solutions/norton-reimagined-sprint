@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Norton Reimagined — Design Sprint</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
@@ -495,10 +496,14 @@
 
   @media (max-width: 860px) {
     .hero { padding: 48px 24px 72px; }
-    .hero h1 { font-size: 48px; }
+    .hero h1 { font-size: 44px; }
     .section { padding: 48px 24px 0; }
     .obj-grid, .shot-gallery, .agenda-grid, .nav-cards { grid-template-columns: 1fr; }
-    .hero-meta { gap: 20px; }
+    .hero-meta { gap: 14px; flex-wrap: wrap; }
+  }
+  @media (max-width: 480px) {
+    .hero h1 { font-size: 34px; }
+    .hero .lede { font-size: 15px; }
   }
 </style>
 </head>
@@ -511,7 +516,10 @@
       <span class="dot"></span>
       Norton Reimagined <span class="sub">· Design Sprint</span>
     </a>
-    <ul class="nav-links">
+    <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-links" id="nav-links">
       <li><a href="index.html" class="active">Home</a></li>
       <li><a href="laura.html">Laura</a></li>
       <li><a href="where-is-norton.html">Where is Norton</a></li>
@@ -1047,5 +1055,6 @@
   <span>3-day Design Sprint · Tiger Team</span>
 </div>
 
+<script src="nav.js"></script>
 </body>
 </html>

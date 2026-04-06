@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Prototypes — Norton Reimagined Sprint</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
@@ -399,7 +400,10 @@
       <span class="dot"></span>
       Norton Reimagined <span class="sub">· Design Sprint</span>
     </a>
-    <ul class="nav-links">
+    <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-links" id="nav-links">
       <li><a href="index.html">Home</a></li>
       <li><a href="laura.html">Laura</a></li>
       <li><a href="where-is-norton.html">Where is Norton</a></li>
@@ -807,5 +811,6 @@ function lauraClass(verdict) {
   </div>
 </div>
 
+<script src="nav.js"></script>
 </body>
 </html>
