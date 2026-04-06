@@ -344,16 +344,37 @@ async function deployToVercel(files, projectName, token) {
   const deployData = await deployRes.json();
   if (!deployData.url) throw new Error("Vercel did not return a deployment URL.");
 
-  // 2. Disable deployment protection (Pro feature) so anyone with the link can view
-  await fetch(`https://api.vercel.com/v9/projects/${encodeURIComponent(projectName)}`, {
-    method: "PATCH",
-    headers: authHeader,
-    body: JSON.stringify({
-      ssoProtection:        null,
-      passwordProtection:   null,
-      deploymentProtection: "none",
-    }),
-  }).catch(() => {}); // non-fatal — deployment still works if this fails
+  // 2. Disable deployment protection so anyone with the link can view.
+  // First get the project id (needed by some protection endpoints).
+  const projectRes = await fetch(
+    `https://api.vercel.com/v9/projects/${encodeURIComponent(projectName)}`,
+    { headers: authHeader }
+  );
+  const projectData = projectRes.ok ? await projectRes.json() : {};
+  const projectId   = projectData.id || projectName;
+
+  // Patch protection off — try both field names for compatibility.
+  const patchRes = await fetch(
+    `https://api.vercel.com/v9/projects/${encodeURIComponent(projectId)}`,
+    {
+      method:  "PATCH",
+      headers: authHeader,
+      body: JSON.stringify({
+        ssoProtection:        null,
+        passwordProtection:   null,
+        deploymentProtection: "none",
+        protection:           "none",
+      }),
+    }
+  );
+
+  if (!patchRes.ok) {
+    const patchErr = await patchRes.json().catch(() => ({}));
+    // Surface the error so we can debug — still return the URL
+    console.error("Vercel protection patch failed:", JSON.stringify(patchErr));
+    // Attach error info to the response URL so caller can see it
+    return `https://${deployData.url}?__protection_patch_error=${encodeURIComponent(patchErr?.error?.message || patchRes.status)}`;
+  }
 
   return `https://${deployData.url}`;
 }
