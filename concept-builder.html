@@ -368,6 +368,44 @@
 .ia-char-count { font-size: 10px; color: var(--ink-softer); text-align: right; margin-top: 2px; }
 .ia-tab-row.is-home .ia-char-count { color: rgba(255,255,255,.4); }
 
+/* ── Tone grid ───────────────────────────────────────────────────────────── */
+.tone-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 10px;
+}
+.tone-item {
+  border: 1.5px solid var(--line);
+  border-radius: 8px;
+  padding: 14px 16px;
+  cursor: pointer;
+  transition: all .15s;
+  user-select: none;
+}
+.tone-item:hover { border-color: var(--ink); }
+.tone-item.selected { background: var(--ink); border-color: var(--ink); color: #fff; }
+.tone-item .tone-name {
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 4px;
+  transition: color .15s;
+}
+.tone-item .tone-desc {
+  font-size: 12px;
+  color: var(--ink-soft);
+  line-height: 1.45;
+  transition: color .15s;
+}
+.tone-item.selected .tone-desc { color: rgba(255,255,255,.65); }
+.tone-item .tone-check {
+  display: none;
+  float: right;
+  margin-top: -2px;
+  font-size: 14px;
+  color: var(--yellow);
+}
+.tone-item.selected .tone-check { display: inline; }
+
 /* ── Generate button ─────────────────────────────────────────────────────── */
 .generate-wrap {
   text-align: center;
@@ -753,8 +791,8 @@
       <span class="sec-num" id="toneSecNum">—</span>
       <h3>Voice &amp; tone</h3>
     </div>
-    <p class="sec-hint">How should this concept speak to Laura? Describe the emotional register, personality, and communication style you want — calm and reassuring, confident and decisive, warm and approachable, etc. Be specific. This will directly shape the copy and UI language in the generated output.</p>
-    <textarea class="cb-textarea" id="voiceTone" rows="4" placeholder="e.g. Calm, decisive, and warm — like a trusted friend who happens to be a security expert. Never scary or technical. Speaks in outcomes ('your family is protected') not mechanics ('scan completed'). Uses 'we' when Norton acts, 'you' when addressing Laura. Short sentences. No exclamation marks."></textarea>
+    <p class="sec-hint">Choose the voice that best fits your concept. This will shape all copy and UI language in the generated output.</p>
+    <div class="tone-grid" id="toneGrid"></div>
   </div>
 
   <!-- Generate -->
@@ -1075,6 +1113,67 @@ function updateRemoveBtns(containerId, btnClass, minRows) {
 addJtbd(); addJtbd(); addJtbd();
 addComp();
 
+// ── Voice & Tone ──────────────────────────────────────────────────────────────
+const TONE_OPTIONS = [
+  {
+    name: 'The Quiet Guardian',
+    desc: 'Calm, invisible, protective. Acts without asking. Speaks only when you need to know something. Like a seatbelt — you don\'t notice it until it matters.',
+    prompt: 'Calm, minimal, and protective. The product acts silently and speaks only when something requires Laura\'s attention. Copy is short, assured, and outcome-focused. No exclamation marks. No urgency unless warranted.'
+  },
+  {
+    name: 'The Trusted Advisor',
+    desc: 'Warm, expert, plain-spoken. Explains what happened without making you feel dumb. Like a doctor you actually trust — clear, honest, never condescending.',
+    prompt: 'Warm and authoritative, like a trusted expert who respects Laura\'s time. Explains clearly without jargon. Uses "we" when Norton acts on her behalf. Never talks down. Conversational but precise.'
+  },
+  {
+    name: 'The Confident Protector',
+    desc: 'Decisive, strong, reassuring. Makes Laura feel like she has the best team in her corner. Confident without being aggressive — a sense of quiet power.',
+    prompt: 'Confident and decisive. Copy projects strength and reliability without aggression. Makes Laura feel covered, not scared. Uses active voice. Short, punchy sentences. Conveys that Norton handles it so she doesn\'t have to.'
+  },
+  {
+    name: 'The Helpful Companion',
+    desc: 'Friendly, approachable, encouraging. Feels like a knowledgeable friend who happens to work in security. Lightens the weight of digital responsibility.',
+    prompt: 'Friendly and approachable, like a knowledgeable friend rather than a corporation. Light and encouraging in tone. Acknowledges the burden of digital responsibility and takes it off Laura\'s shoulders with warmth, not alarm.'
+  },
+  {
+    name: 'The Plain Communicator',
+    desc: 'Direct, no-nonsense, efficient. Respects Laura\'s time. Says exactly what she needs to know and nothing more. Clarity over personality.',
+    prompt: 'Direct and efficient. Every word earns its place. No preamble, no filler, no jargon. Tells Laura exactly what happened, what it means, and what (if anything) she needs to do. Respects her intelligence and her time.'
+  },
+  {
+    name: 'The Modern Brand',
+    desc: 'Sharp, contemporary, slightly editorial. Feels like a premium consumer brand that happens to do security — not a legacy software company.',
+    prompt: 'Sharp and contemporary, with a premium consumer brand sensibility. Confident without being corporate. Short headlines, strong verbs, deliberate use of white space. Feels modern and considered — design-forward rather than utility-first.'
+  },
+];
+
+let _selectedTone = null;
+
+(function buildToneGrid() {
+  const grid = document.getElementById('toneGrid');
+  if (!grid) return;
+  TONE_OPTIONS.forEach((t, i) => {
+    const item = document.createElement('div');
+    item.className = 'tone-item';
+    item.id = `tone-${i}`;
+    item.innerHTML = `
+      <span class="tone-check">✓</span>
+      <div class="tone-name">${t.name}</div>
+      <div class="tone-desc">${t.desc}</div>`;
+    item.addEventListener('click', () => {
+      document.querySelectorAll('.tone-item').forEach(el => el.classList.remove('selected'));
+      item.classList.add('selected');
+      _selectedTone = i;
+    });
+    grid.appendChild(item);
+  });
+})();
+
+function getSelectedTone() {
+  if (_selectedTone === null) return '';
+  return TONE_OPTIONS[_selectedTone].prompt;
+}
+
 // ── Information Architecture / Nav tabs ───────────────────────────────────────
 let iaTabCount = 0;
 let iaHomeId = null;
@@ -1224,7 +1323,7 @@ function generate() {
   const caps          = getSelectedCaps();
   const jtbds         = getJtbds().filter(j => j.when && j.want && j.soican);
   const comps         = getComps();
-  const voiceTone     = document.getElementById('voiceTone').value.trim();
+  const voiceTone     = getSelectedTone();
   const isIOS         = buildType === 'ios';
   const iaTabs        = isIOS ? getIaTabs() : [];
   const onboardingStory = isIOS ? document.getElementById('onboardingStory').value.trim() : '';
