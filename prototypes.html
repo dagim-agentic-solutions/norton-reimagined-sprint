@@ -386,6 +386,163 @@
   .comment-submit:disabled { opacity: .5; cursor: not-allowed; }
   .comment-err { font-size: 11px; color: #ff4444; min-height: 14px; }
 
+  /* ── Voting ─────────────────────────────────────────────────────────────── */
+  .vote-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid var(--line);
+  }
+  .vote-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--paper);
+    border: 1.5px solid var(--line);
+    border-radius: 999px;
+    padding: 7px 16px 7px 12px;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all .15s;
+    color: var(--ink);
+  }
+  .vote-btn:hover:not(:disabled) { border-color: var(--ink); background: var(--ink); color: #fff; }
+  .vote-btn.voted {
+    background: var(--yellow);
+    border-color: var(--yellow);
+    color: var(--ink);
+  }
+  .vote-btn.voted:hover:not(:disabled) { background: #e6d000; border-color: #e6d000; }
+  .vote-btn:disabled { opacity: .45; cursor: not-allowed; }
+  .vote-btn .v-icon { font-size: 15px; line-height: 1; }
+  .vote-count { font-size: 13px; font-weight: 700; color: var(--ink-soft); min-width: 16px; }
+  .vote-quota { font-size: 11px; color: var(--ink-softer); margin-left: auto; }
+
+  /* ── Results modal ───────────────────────────────────────────────────────── */
+  .results-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.55);
+    z-index: 2000;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .results-overlay.open { display: flex; }
+  .results-modal {
+    background: #fff;
+    border-radius: 10px;
+    padding: 36px 40px 32px;
+    width: 100%;
+    max-width: 480px;
+    box-shadow: 0 24px 64px rgba(0,0,0,.2);
+    font-family: 'Inter Tight', sans-serif;
+  }
+  .results-modal h3 {
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -.02em;
+    margin-bottom: 4px;
+    color: var(--ink);
+  }
+  .results-modal .rm-sub {
+    font-size: 13px;
+    color: var(--ink-soft);
+    margin-bottom: 24px;
+  }
+  .results-list { list-style: none; padding: 0; margin: 0 0 24px; }
+  .results-list li {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .results-list li:last-child { border-bottom: none; }
+  .rank-num {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--ink);
+    min-width: 28px;
+    text-align: center;
+  }
+  .rank-num.gold   { color: #c8960c; }
+  .rank-num.silver { color: #7a7a7a; }
+  .rank-num.bronze { color: #9a5c2a; }
+  .rank-info { flex: 1; min-width: 0; }
+  .rank-info a {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--ink);
+    text-decoration: none;
+    border-bottom: 1.5px solid var(--yellow);
+  }
+  .rank-info a:hover { color: #444; }
+  .rank-votes { font-size: 12px; color: var(--ink-softer); margin-top: 2px; }
+  .results-empty {
+    text-align: center;
+    color: var(--ink-soft);
+    font-size: 14px;
+    padding: 20px 0 28px;
+  }
+  .results-close {
+    width: 100%;
+    padding: 12px;
+    background: var(--ink);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: .02em;
+  }
+  .results-close:hover { background: #1a1a1a; }
+
+  /* ── List head actions ───────────────────────────────────────────────────── */
+  .list-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .btn-results {
+    background: var(--yellow);
+    color: var(--ink);
+    border: none;
+    border-radius: 999px;
+    padding: 9px 18px;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background .15s;
+  }
+  .btn-results:hover { background: #e6d000; }
+  .btn-reset {
+    background: none;
+    border: 1.5px solid var(--line);
+    border-radius: 999px;
+    padding: 8px 16px;
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--ink-softer);
+    cursor: pointer;
+    transition: all .15s;
+  }
+  .btn-reset:hover { border-color: #ff4444; color: #ff4444; }
+
   /* Laura score badge on prototype cards */
   .laura-score {
     display: flex;
@@ -496,7 +653,11 @@
   <!-- LIST -->
   <div class="list-head">
     <h2>Submitted <em>prototypes</em></h2>
-    <span class="count" id="count">Loading...</span>
+    <div class="list-actions">
+      <span class="count" id="count">Loading...</span>
+      <button class="btn-results" onclick="openResults()">🏆 View Results</button>
+      <button class="btn-reset" onclick="resetAllVotes()">↺ Reset All Votes</button>
+    </div>
   </div>
 
   <div id="listContainer">
@@ -570,6 +731,14 @@ async function loadPrototypes() {
               <div class="score-reco">${escapeHtml(p.lauraRecommendation || '')}</div>
             </div>
           </div>` : ''}
+          <div class="vote-row" id="vr-${escapeAttr(p.id)}">
+            <button class="vote-btn" id="vb-${escapeAttr(p.id)}" onclick="castVote('${escapeAttr(p.id)}')">
+              <span class="v-icon">👍</span> Vote
+            </button>
+            <span class="vote-count" id="vc-${escapeAttr(p.id)}">—</span>
+            <span class="vote-quota" id="vq-${escapeAttr(p.id)}"></span>
+          </div>
+
           <button class="proto-delete" onclick="deletePrototype('${escapeAttr(p.id)}', this)">✕ Delete</button>
 
           <div class="comments-section">
@@ -591,8 +760,9 @@ async function loadPrototypes() {
         </div>`;
     }).join('') + '</div>';
 
-    // Load comment counts for all cards
+    // Load comment counts and vote data for all cards
     loadAllCommentCounts(protoIds);
+    loadVotes(protoIds);
   } catch (err) {
     console.error('Failed to load prototypes:', err);
     container.innerHTML = `
@@ -928,6 +1098,157 @@ async function loadAllCommentCounts(protoIds) {
 }
 
 
+// ── Voting ────────────────────────────────────────────────────────────────────
+const VOTES_API    = '/api/votes';
+const MAX_VOTES    = 3;
+const SESSION_KEY  = 'norton_sprint_votes'; // sessionStorage key
+
+function getSessionVotes() {
+  try { return JSON.parse(sessionStorage.getItem(SESSION_KEY) || '[]'); } catch { return []; }
+}
+function saveSessionVotes(arr) {
+  sessionStorage.setItem(SESSION_KEY, JSON.stringify(arr));
+}
+
+let _globalVotes = {}; // { protoId: count }
+
+async function loadVotes(protoIds) {
+  try {
+    const res  = await fetch(VOTES_API);
+    const data = await res.json();
+    _globalVotes = data.votes || {};
+  } catch { _globalVotes = {}; }
+  const sessionVoted = getSessionVotes();
+  protoIds.forEach(id => renderVoteBtn(id, sessionVoted));
+}
+
+function renderVoteBtn(protoId, sessionVoted) {
+  const btn   = document.getElementById(`vb-${protoId}`);
+  const count = document.getElementById(`vc-${protoId}`);
+  const quota = document.getElementById(`vq-${protoId}`);
+  if (!btn || !count) return;
+
+  const hasVoted  = sessionVoted.includes(protoId);
+  const votesLeft = MAX_VOTES - sessionVoted.length;
+  const total     = _globalVotes[protoId] || 0;
+
+  count.textContent = total === 1 ? '1 vote' : `${total} votes`;
+
+  btn.classList.toggle('voted', hasVoted);
+  btn.innerHTML = hasVoted
+    ? `<span class="v-icon">✓</span> Voted`
+    : `<span class="v-icon">👍</span> Vote`;
+
+  // Disable if: already voted this one, OR out of quota
+  btn.disabled = hasVoted || votesLeft === 0;
+
+  if (quota) {
+    if (sessionVoted.length === 0) {
+      quota.textContent = `${MAX_VOTES} votes remaining`;
+    } else if (votesLeft > 0) {
+      quota.textContent = `${votesLeft} vote${votesLeft===1?'':'s'} left`;
+    } else {
+      quota.textContent = 'All votes used';
+    }
+  }
+}
+
+async function castVote(protoId) {
+  const sessionVoted = getSessionVotes();
+  if (sessionVoted.includes(protoId)) return;
+  if (sessionVoted.length >= MAX_VOTES) return;
+
+  const btn = document.getElementById(`vb-${protoId}`);
+  if (btn) { btn.disabled = true; btn.innerHTML = `<span class="v-icon">⏳</span>`; }
+
+  try {
+    const res  = await fetch(VOTES_API, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ protoId }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Vote failed');
+    _globalVotes = data.votes || _globalVotes;
+    const newVoted = [...sessionVoted, protoId];
+    saveSessionVotes(newVoted);
+    // Re-render all vote buttons so quota updates everywhere
+    const allIds = Object.keys(document.querySelectorAll
+      ? [...document.querySelectorAll('[id^="vb-"]')].map(el => el.id.replace('vb-','')) : []);
+    document.querySelectorAll('[id^="vb-"]').forEach(el => {
+      renderVoteBtn(el.id.replace('vb-', ''), newVoted);
+    });
+  } catch(e) {
+    if (btn) { btn.disabled = false; btn.innerHTML = `<span class="v-icon">👍</span> Vote`; }
+    alert(`Vote failed: ${e.message}`);
+  }
+}
+
+async function resetAllVotes() {
+  if (!confirm('Reset ALL votes across ALL prototypes? This cannot be undone.')) return;
+  try {
+    const res = await fetch(VOTES_API, { method: 'DELETE' });
+    if (!res.ok) throw new Error(`Server error ${res.status}`);
+    _globalVotes = {};
+    saveSessionVotes([]); // also clear this user's session votes
+    document.querySelectorAll('[id^="vb-"]').forEach(el => {
+      renderVoteBtn(el.id.replace('vb-', ''), []);
+    });
+  } catch(e) { alert(`Reset failed: ${e.message}`); }
+}
+
+// ── Results modal ─────────────────────────────────────────────────────────────
+async function openResults() {
+  // Fetch fresh vote data
+  try {
+    const res  = await fetch(VOTES_API);
+    const data = await res.json();
+    _globalVotes = data.votes || {};
+  } catch {}
+
+  // Get prototype list for titles/urls
+  let protoList = [];
+  try {
+    const res  = await fetch(API_URL);
+    const data = await res.json();
+    protoList = data.prototypes || [];
+  } catch {}
+
+  // Build top 5
+  const ranked = Object.entries(_globalVotes)
+    .filter(([,v]) => v > 0)
+    .sort((a,b) => b[1] - a[1])
+    .slice(0, 5);
+
+  const rankClasses = ['gold','silver','bronze','',''];
+  const rankLabels  = ['🥇','🥈','🥉','4','5'];
+
+  let listHtml;
+  if (ranked.length === 0) {
+    listHtml = `<div class="results-empty">No votes cast yet.</div>`;
+  } else {
+    listHtml = '<ul class="results-list">' + ranked.map(([id, votes], i) => {
+      const proto = protoList.find(p => p.id === id);
+      const title = proto ? proto.title : id;
+      const url   = proto ? proto.url : '#';
+      return `<li>
+        <div class="rank-num ${rankClasses[i]}">${rankLabels[i]}</div>
+        <div class="rank-info">
+          <a href="${escapeAttr(url)}" target="_blank" rel="noopener">${escapeHtml(title)}</a>
+          <div class="rank-votes">${votes} vote${votes===1?'':'s'}</div>
+        </div>
+      </li>`;
+    }).join('') + '</ul>';
+  }
+
+  document.getElementById('results-list-container').innerHTML = listHtml;
+  document.getElementById('resultsModal').classList.add('open');
+}
+
+function closeResults() {
+  document.getElementById('resultsModal').classList.remove('open');
+}
+
 function lauraClass(verdict) {
   if (!verdict) return '';
   const v = verdict.toLowerCase();
@@ -941,6 +1262,16 @@ function lauraClass(verdict) {
 
 </script>
 
+
+<!-- Results modal -->
+<div class="results-overlay" id="resultsModal" onclick="if(event.target===this)closeResults()">
+  <div class="results-modal">
+    <h3>🏆 Top Prototypes</h3>
+    <p class="rm-sub">Ranked by team votes this session</p>
+    <div id="results-list-container"></div>
+    <button class="results-close" onclick="closeResults()">Close</button>
+  </div>
+</div>
 
 <script src="nav.js"></script>
 </body>
