@@ -314,6 +314,55 @@
   color: #fff;
 }
 
+/* ── IA / nav tab builder ───────────────────────────────────────────────────── */
+.ia-tabs { display: flex; flex-direction: column; gap: 12px; }
+.ia-tab-row {
+  display: grid;
+  grid-template-columns: auto 1fr 2fr auto;
+  gap: 10px;
+  align-items: start;
+  background: var(--paper);
+  border: 1.5px solid var(--line);
+  border-radius: 8px;
+  padding: 14px 16px;
+  transition: border-color .15s;
+}
+.ia-tab-row.is-home { border-color: var(--ink); background: var(--ink); color: #fff; }
+.ia-tab-row.is-home .cb-input,
+.ia-tab-row.is-home .cb-textarea { background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.2); color: #fff; }
+.ia-tab-row.is-home .cb-input::placeholder,
+.ia-tab-row.is-home .cb-textarea::placeholder { color: rgba(255,255,255,.4); }
+.ia-tab-row.is-home .ia-home-badge { background: var(--yellow); color: var(--ink); }
+.ia-home-toggle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding-top: 2px;
+  cursor: pointer;
+}
+.ia-home-badge {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: var(--line);
+  color: var(--ink-soft);
+  white-space: nowrap;
+  transition: all .15s;
+}
+.ia-home-icon {
+  font-size: 18px;
+  line-height: 1;
+}
+.ia-field { display: flex; flex-direction: column; gap: 4px; }
+.ia-field label { font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-softer); }
+.ia-tab-row.is-home .ia-field label { color: rgba(255,255,255,.5); }
+.ia-char-count { font-size: 10px; color: var(--ink-softer); text-align: right; margin-top: 2px; }
+.ia-tab-row.is-home .ia-char-count { color: rgba(255,255,255,.4); }
+
 /* ── Generate button ─────────────────────────────────────────────────────── */
 .generate-wrap {
   text-align: center;
@@ -595,7 +644,7 @@
   </div>
 
   <!-- 10. Screen (iOS only) -->
-  <div class="cb-section" id="screenSection" style="display:none;">
+  <div class="cb-section ios-only" id="screenSection" style="display:none;">
     <div class="sec-label">
       <span class="sec-num">10</span>
       <h3>Which screen or flow?</h3>
@@ -607,6 +656,41 @@
       <button onclick="setScreen(this,'Detail View')">Detail View</button>
       <button onclick="setScreen(this,'Full App Flow')">Full App Flow</button>
     </div>
+  </div>
+
+  <!-- 11. Information Architecture (iOS only) -->
+  <div class="cb-section ios-only" id="iaSection" style="display:none;">
+    <div class="sec-label">
+      <span class="sec-num">11</span>
+      <h3>App navigation — information architecture</h3>
+    </div>
+    <p class="sec-hint">Design your app's tab bar. 3–5 tabs. Tap the house icon to mark a tab as the home screen (shown first after onboarding). Tab names must be 2 words or fewer. Each tab needs a short description (max 300 chars) of what it conveys or does.</p>
+    <div class="ia-tabs" id="iaTabs"></div>
+    <button class="btn-add-row" id="iaAddBtn" onclick="addIaTab()" style="margin-top:10px;">+ Add tab (max 5)</button>
+  </div>
+
+  <!-- 12. Onboarding carousel story (iOS only) -->
+  <div class="cb-section ios-only" id="onboardingSection" style="display:none;">
+    <div class="sec-label">
+      <span class="sec-num">12</span>
+      <h3>Onboarding welcome carousel</h3>
+    </div>
+    <p class="sec-hint">What story needs to be told to welcome a new user? Why would someone download and use this app? Describe the narrative arc — what problem you open with, what promise you make, and how you end on a clear action. This will be used to generate the onboarding carousel screens.</p>
+    <textarea class="cb-textarea" id="onboardingStory" rows="5" placeholder="e.g. Open: 'Your family's digital life is more exposed than you think — and you're the one expected to handle it.' Promise: 'Norton now handles it for you — silently, completely, without asking you to become an IT expert.' Close: 'Set up in 60 seconds. We'll take it from here.' Each slide should feel calm and confident, not scary."></textarea>
+  </div>
+
+  <!-- 13. First value moment (iOS only) -->
+  <div class="cb-section ios-only" id="fvmSection" style="display:none;">
+    <div class="sec-label">
+      <span class="sec-num">13</span>
+      <h3>First value moment</h3>
+    </div>
+    <p class="sec-hint">
+      The <strong>first value moment</strong> is the earliest point in a mobile app where a new user experiences a clear, concrete benefit that makes them think "this was worth downloading." It's not the onboarding — it's the first time the app <em>does something real for them</em>.<br><br>
+      <strong>Example:</strong> For a weather app, the first value moment is seeing tomorrow's forecast for your exact location within 10 seconds of opening — before you've created an account or adjusted any settings.<br><br>
+      For your prototype: what is the single moment — ideally within the first 60 seconds of use — when Laura thinks "this is already helping me"?
+    </p>
+    <textarea class="cb-textarea" id="firstValueMoment" rows="4" placeholder="e.g. Laura opens the app after a 60-second setup and immediately sees 'All 8 of your family's devices are clean and protected.' No scanning needed — it already checked. That's the moment she knows Norton is quietly working for her."></textarea>
   </div>
 
   <!-- Generate -->
@@ -665,7 +749,8 @@ function setBuildType(type) {
   buildType = type;
   document.getElementById('btnLP').classList.toggle('active', type === 'landing');
   document.getElementById('btnIOS').classList.toggle('active', type === 'ios');
-  document.getElementById('screenSection').style.display = type === 'ios' ? 'block' : 'none';
+  const show = type === 'ios' ? 'block' : 'none';
+  document.querySelectorAll('.ios-only').forEach(el => el.style.display = show);
 }
 
 // ── Screen toggle ─────────────────────────────────────────────────────────────
@@ -877,6 +962,111 @@ function updateRemoveBtns(containerId, btnClass, minRows) {
 addJtbd(); addJtbd(); addJtbd();
 addComp();
 
+// ── Information Architecture / Nav tabs ───────────────────────────────────────
+let iaTabCount = 0;
+let iaHomeId = null;
+
+function addIaTab(name='', desc='') {
+  const rows = document.getElementById('iaTabs');
+  if (rows.querySelectorAll('.ia-tab-row').length >= 5) return;
+  iaTabCount++;
+  const id = iaTabCount;
+  const isFirst = rows.querySelectorAll('.ia-tab-row').length === 0;
+  if (isFirst) iaHomeId = id;
+
+  const row = document.createElement('div');
+  row.className = 'ia-tab-row' + (isFirst ? ' is-home' : '');
+  row.id = `ia-${id}`;
+  row.innerHTML = `
+    <div class="ia-home-toggle" onclick="setIaHome(${id})" title="Set as home tab">
+      <span class="ia-home-icon">${isFirst ? '🏠' : '○'}</span>
+      <span class="ia-home-badge">${isFirst ? 'Home' : 'Set home'}</span>
+    </div>
+    <div class="ia-field">
+      <label>Tab name <span style="font-weight:400;opacity:.6;">(2 words max)</span></label>
+      <input class="cb-input" id="ia-name-${id}" maxlength="24" placeholder="e.g. My Shield"
+        oninput="enforceTabWords(this)">
+    </div>
+    <div class="ia-field">
+      <label>What this tab does</label>
+      <textarea class="cb-textarea" id="ia-desc-${id}" maxlength="300" rows="2"
+        placeholder="Describe what this tab conveys or does for Laura…"
+        oninput="updateIaCharCount(${id})">${escHtml(desc)}</textarea>
+      <div class="ia-char-count" id="ia-cc-${id}">0 / 300</div>
+    </div>
+    <button class="jtbd-remove" onclick="removeIaTab(${id})" title="Remove tab"
+      ${rows.querySelectorAll('.ia-tab-row').length < 2 ? 'disabled' : ''}>✕</button>`;
+
+  if (name) { row.querySelector(`#ia-name-${id}`).value = name; }
+  if (desc)  { updateIaCharCount(id); }
+  rows.appendChild(row);
+  updateIaAddBtn();
+}
+
+function removeIaTab(id) {
+  const row = document.getElementById(`ia-${id}`);
+  const wasHome = iaHomeId === id;
+  row?.remove();
+  if (wasHome) {
+    const first = document.querySelector('#iaTabs .ia-tab-row');
+    if (first) setIaHome(parseInt(first.id.replace('ia-','')));
+  }
+  updateIaAddBtn();
+  updateIaRemoveBtns();
+}
+
+function setIaHome(id) {
+  document.querySelectorAll('#iaTabs .ia-tab-row').forEach(row => {
+    const rowId = parseInt(row.id.replace('ia-',''));
+    const isThis = rowId === id;
+    row.classList.toggle('is-home', isThis);
+    const icon  = row.querySelector('.ia-home-icon');
+    const badge = row.querySelector('.ia-home-badge');
+    if (icon)  icon.textContent  = isThis ? '🏠' : '○';
+    if (badge) badge.textContent = isThis ? 'Home' : 'Set home';
+  });
+  iaHomeId = id;
+}
+
+function enforceTabWords(input) {
+  const words = input.value.trim().split(/\s+/).filter(Boolean);
+  if (words.length > 2) input.value = words.slice(0,2).join(' ');
+}
+
+function updateIaCharCount(id) {
+  const ta = document.getElementById(`ia-desc-${id}`);
+  const cc = document.getElementById(`ia-cc-${id}`);
+  if (ta && cc) cc.textContent = `${ta.value.length} / 300`;
+}
+
+function updateIaAddBtn() {
+  const count = document.querySelectorAll('#iaTabs .ia-tab-row').length;
+  const btn   = document.getElementById('iaAddBtn');
+  if (btn) btn.disabled = count >= 5;
+}
+
+function updateIaRemoveBtns() {
+  const count = document.querySelectorAll('#iaTabs .ia-tab-row').length;
+  document.querySelectorAll('#iaTabs .jtbd-remove').forEach(btn => {
+    btn.disabled = count <= 3;
+  });
+}
+
+function getIaTabs() {
+  return [...document.querySelectorAll('#iaTabs .ia-tab-row')].map(row => {
+    const id   = parseInt(row.id.replace('ia-',''));
+    const name = document.getElementById(`ia-name-${id}`)?.value.trim();
+    const desc = document.getElementById(`ia-desc-${id}`)?.value.trim();
+    const home = iaHomeId === id;
+    return { name, desc, home };
+  });
+}
+
+// Seed 3 default tabs
+addIaTab('My Shield', '');
+addIaTab('NeoClaw', '');
+addIaTab('Coach', '');
+
 // ── Generate ──────────────────────────────────────────────────────────────────
 function getJtbds() {
   return [...document.querySelectorAll('#jtbdRows .jtbd-row')].map(row => {
@@ -922,6 +1112,9 @@ function generate() {
   const jtbds         = getJtbds().filter(j => j.when && j.want && j.soican);
   const comps         = getComps();
   const isIOS         = buildType === 'ios';
+  const iaTabs        = isIOS ? getIaTabs() : [];
+  const onboardingStory = isIOS ? document.getElementById('onboardingStory').value.trim() : '';
+  const firstValueMoment = isIOS ? document.getElementById('firstValueMoment').value.trim() : '';
 
   const role = isIOS
     ? 'You are a Senior iOS Product Designer and React developer specialising in consumer security and privacy products.'
@@ -946,12 +1139,32 @@ function generate() {
 - Never use jargon (IOCs, endpoints, heuristics, DNS)
 - Always show outcomes, not mechanics`;
 
+  // IA / nav section for prompt
+  const iaSection = iaTabs.length
+    ? `APP NAVIGATION — INFORMATION ARCHITECTURE:\n${iaTabs.map((t,i) => {
+        const home = t.home ? ' ← HOME (first screen after onboarding)' : '';
+        return `  Tab ${i+1}: ${t.name || '(unnamed)'}${home}\n  Purpose: ${t.desc || '(no description)'}`;
+      }).join('\n')}`
+    : '';
+
+  const onboardingSection = onboardingStory
+    ? `ONBOARDING WELCOME CAROUSEL — STORY TO TELL:\n${onboardingStory}`
+    : '';
+
+  const fvmSection = firstValueMoment
+    ? `FIRST VALUE MOMENT:\nThe first value moment is the earliest point where a new user experiences a clear, concrete benefit that makes them think "this was worth downloading." For this prototype:\n${firstValueMoment}`
+    : '';
+
+  const tabNavLine = iaTabs.length
+    ? iaTabs.map(t => t.home ? `${t.name || 'Home'} (home)` : (t.name || 'Tab')).join(' · ')
+    : 'Home · ✦ NeoClaw · Coach';
+
   let platformSection;
   if (isIOS) {
     platformSection = `TARGET PLATFORM: iOS Prototype (390×844pt, @3x)
 SCREEN TO BUILD: ${selectedScreen}
-THREE-TAB NAV: Home · ✦ NeoClaw · Coach
-DESIGN PRINCIPLES:
+TAB NAVIGATION: ${tabNavLine}
+${iaSection ? '\n' + iaSection + '\n' : ''}${onboardingSection ? '\n' + onboardingSection + '\n' : ''}${fvmSection ? '\n' + fvmSection + '\n' : ''}DESIGN PRINCIPLES:
 - Default to the product deciding and acting; show outcome after
 - "You're protected" status — bury the mechanics
 - Household framing ("your family", "everyone's devices")
