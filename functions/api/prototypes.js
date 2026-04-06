@@ -6,7 +6,7 @@
  * POST → submits a new prototype:
  *        - url (string): used directly, no Vercel involved
  *        - fileContent + fileName + encoding: file deployed to Vercel automatically
- *          Supported: .html, .js (encoding: "utf8"), .zip (encoding: "base64")
+ *          Supported: .html, .js (encoding: "utf-8"), .zip (encoding: "base64")
  *          Each file submission gets its own unique Vercel project + permanent URL.
  *
  * KV binding: PROTOTYPES_KV
@@ -154,7 +154,7 @@ export async function onRequestPost({ request, env }) {
         vercelFiles = [{
           file: fileName.trim(),
           data: fileContent,
-          encoding: encoding === "base64" ? "base64" : "utf8",
+          encoding: encoding === "base64" ? "base64" : "utf-8",
         }];
       }
     } catch (err) {
@@ -306,7 +306,7 @@ function filesToVercelPayload(rawFiles) {
   return rawFiles.map(({ path, data }) => {
     const ext = path.split(".").pop().toLowerCase();
     if (TEXT_EXTS.has(ext)) {
-      return { file: path, data: decoder.decode(data), encoding: "utf8" };
+      return { file: path, data: decoder.decode(data), encoding: "utf-8" };
     } else {
       // Binary — base64 encode
       let binary = "";
