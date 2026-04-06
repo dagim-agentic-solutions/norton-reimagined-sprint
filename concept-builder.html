@@ -485,33 +485,16 @@
       <li><a href="where-is-norton.html">Where is Norton</a></li>
       <li><a href="prototypes.html">Prototypes</a></li>
       <li><a href="resources.html">Resources</a></li>
-      <li><a href="concept-builder.html" class="active">Concept Builder</a></li>
+      <li><a href="concept-builder.html" class="active">Concept Builder <span style="background:var(--yellow);color:var(--ink);font-size:9px;font-weight:800;padding:1px 6px;border-radius:999px;vertical-align:middle;letter-spacing:.04em;">β</span></a></li>
     </ul>
   </div>
 </nav>
 
-<!-- ═══════════════════ GATE ═══════════════════ -->
-<div id="gate">
-  <div class="gate-card">
-    <span class="eyebrow">Beta Access</span>
-    <h2>Concept Builder</h2>
-    <p>This tool is for Norton Reimagined sprint participants only. Enter the sprint password to continue.</p>
-    <div class="gate-input-wrap">
-      <input type="password" id="gateInput" placeholder="Sprint password" autocomplete="off"
-        onkeydown="if(event.key==='Enter')checkPassword()">
-    </div>
-    <div id="gateErr"></div>
-    <button class="btn btn-dark btn-generate" id="gateBtn" style="font-size:15px;padding:13px 32px;" onclick="checkPassword()">
-      Enter →
-    </button>
-  </div>
-</div>
-
 <!-- ═══════════════════ TOOL ═══════════════════ -->
-<div id="tool">
+<div id="tool" class="visible">
 <div class="page">
 
-  <span class="eyebrow">Beta · Sprint Tool</span>
+  <span class="eyebrow">Sprint Tool <span style="background:var(--yellow);color:var(--ink);padding:2px 8px;border-radius:999px;font-size:10px;margin-left:6px;vertical-align:middle;">BETA</span></span>
   <h1 class="page-title">Concept <span class="mark">Builder</span>.</h1>
   <p class="lede">Fill in the sections below and generate a production-ready Claude prompt for your prototype or landing page.</p>
 
@@ -550,6 +533,81 @@
           <li>Gamification / streaks</li>
           <li>Dark-pattern upsells</li>
           <li>Asking her to understand the threat</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Design Language Quick Reference -->
+  <div class="laura-ref" style="margin-top:16px;">
+    <div class="laura-ref-header" onclick="toggleLauraRef(this)">
+      <h4>🎨 Norton Reimagined Design Language — tap to expand</h4>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="laura-ref-body" id="designRefBody">
+      <div class="lrf-col">
+        <h5>Typography</h5>
+        <ul>
+          <li><strong>Inter Tight</strong> — only typeface</li>
+          <li>Weights: 400 · 500 · 600 · 700 · 800</li>
+          <li>Hero headlines: 800 weight, tight tracking (−0.035em)</li>
+          <li>Body: 400–500, 1.45–1.5 line height</li>
+          <li>Labels: 700, 0.10–0.14em letter-spacing, UPPERCASE</li>
+          <li>-webkit-font-smoothing: antialiased always</li>
+        </ul>
+        <h5 style="margin-top:14px;">Color Palette</h5>
+        <ul>
+          <li><strong>#242424</strong> — ink (primary text, dark surfaces)</li>
+          <li><strong>#FFE800</strong> — yellow (accent, CTA, highlights)</li>
+          <li><strong>#F8F8F7</strong> — paper (page background)</li>
+          <li><strong>#FFFFFF</strong> — card (elevated surfaces)</li>
+          <li><strong>#E6E6E4</strong> — line (borders, dividers)</li>
+          <li><strong>#5a5a5a</strong> — ink-soft (secondary text)</li>
+          <li><strong>#8a8a8a</strong> — ink-softer (tertiary, labels)</li>
+        </ul>
+        <h5 style="margin-top:14px;">Spacing & Layout</h5>
+        <ul>
+          <li>Page max-width: 1180px, centered</li>
+          <li>Page padding: 56px (desktop) · 24px (mobile)</li>
+          <li>Section gap: 18–28px between cards</li>
+          <li>Card padding: 26–28px</li>
+          <li>Grid: 12-column, 18px gap</li>
+        </ul>
+      </div>
+      <div class="lrf-col">
+        <h5>Border Radius</h5>
+        <ul>
+          <li><strong>999px</strong> — pill buttons, tags, badges, nav items</li>
+          <li><strong>8px</strong> — cards, inputs, standard containers</li>
+          <li><strong>36px</strong> — iOS device frame</li>
+          <li><strong>6px</strong> — small UI elements, code blocks</li>
+        </ul>
+        <h5 style="margin-top:14px;">Component Patterns</h5>
+        <ul>
+          <li>Nav: dark (#242424) background, yellow bottom border, sticky/fixed</li>
+          <li>Active nav item: yellow pill background, ink text</li>
+          <li>Primary CTA: yellow pill, ink text, 700–800 weight</li>
+          <li>Eyebrow labels: ink bg, yellow text, pill, 11px 600 uppercase</li>
+          <li>Yellow highlight: <code style="font-size:11px;background:rgba(255,255,255,.1);padding:1px 4px;border-radius:3px;">background: #FFE800; padding: 0 10px; border-radius: 6px;</code></li>
+          <li>Cards: white bg, 1px #E6E6E4 border, 8px radius</li>
+          <li>Section breaks: 40px h2, 800 weight, −0.025em tracking</li>
+        </ul>
+        <h5 style="margin-top:14px;">iOS Prototype Specifics</h5>
+        <ul>
+          <li>Canvas: 390×844pt @3x (iPhone 14/15 Pro)</li>
+          <li>Tab bar: pill-style, ink background, yellow active indicator</li>
+          <li>Safe area: 44pt top, 34pt bottom</li>
+          <li>Touch targets: minimum 44×44pt</li>
+          <li>Tone: calm, protective — never alarmist</li>
+          <li>Status first: "You're protected" before any action</li>
+        </ul>
+        <h5 style="margin-top:14px;">Voice & Tone</h5>
+        <ul>
+          <li>Outcome-first: lead with result, not feature</li>
+          <li>Household framing: "your family", "everyone's devices"</li>
+          <li>No jargon: IOCs, endpoints, heuristics, DNS → banned</li>
+          <li>Norton as fiduciary: trusted, calm, decisive</li>
+          <li>Show what happened, not what you did to make it happen</li>
         </ul>
       </div>
     </div>
@@ -722,27 +780,7 @@
 </div>
 
 <script>
-// ── Password gate ─────────────────────────────────────────────────────────────
-const GATE_PW = 'laura2026';
-
-function checkPassword() {
-  const input = document.getElementById('gateInput');
-  const err   = document.getElementById('gateErr');
-  if (input.value === GATE_PW) {
-    document.getElementById('gate').style.display = 'none';
-    const tool = document.getElementById('tool');
-    tool.style.display = 'block';
-    requestAnimationFrame(() => { requestAnimationFrame(() => { tool.classList.add('visible'); }); });
-    err.textContent = '';
-  } else {
-    input.classList.add('error', 'shake');
-    err.textContent = 'Incorrect password. Try again.';
-    setTimeout(() => input.classList.remove('shake'), 400);
-    input.select();
-  }
-}
-
-// ── Laura ref toggle ──────────────────────────────────────────────────────────
+// ── Ref panel toggle ──────────────────────────────────────────────────────────
 function toggleLauraRef(header) {
   header.classList.toggle('open');
   document.getElementById('lauraRefBody').classList.toggle('open');
