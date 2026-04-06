@@ -38,7 +38,8 @@ a { color: inherit; text-decoration: none; }
   border-bottom: 3px solid var(--yellow);
   position: sticky;
   top: 0;
-  z-index: 100;
+  z-index: 1000;
+  width: 100%;
 }
 .nav-inner {
   max-width: 1180px;
