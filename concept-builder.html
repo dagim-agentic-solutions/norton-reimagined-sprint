@@ -822,20 +822,80 @@ const ROLE_OPTIONS = [
     grid.appendChild(wrapper);
   });
 
-  // Regular caps
+  // Regular caps — with inline role picker on check
   CAPABILITIES.forEach(cap => {
-    const item = document.createElement('label');
-    item.className = 'cap-item';
-    item.innerHTML = `<input type="checkbox" value="${cap}"><span class="cap-check">✓</span><span class="cap-label">${cap}</span>`;
-    item.addEventListener('click', () => {
-      const cb = item.querySelector('input');
-      setTimeout(() => {
-        cb.checked ? item.classList.add('checked') : item.classList.remove('checked');
-      }, 0);
-    });
-    grid.appendChild(item);
+    const key = cap.replace(/[^a-zA-Z0-9]/g,'_');
+    const wrapper = document.createElement('div');
+    wrapper.style.cssText = 'display:flex;flex-direction:column;gap:0;';
+
+    const item = document.createElement('div');
+    item.className = 'cap-item regular-cap';
+    item.dataset.cap = cap;
+    item.style.cssText = 'flex-direction:column;align-items:flex-start;gap:8px;cursor:pointer;';
+
+    item.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;width:100%;" onclick="toggleRegularCap('${cap}')">
+        <span class="cap-check" id="rcc-${key}">✓</span>
+        <span class="cap-label">${cap}</span>
+      </div>
+      <div class="reg-role-picker" id="rrp-${key}" style="display:none;width:100%;padding-top:8px;border-top:1px solid rgba(255,255,255,.15);">
+        <div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--yellow);margin-bottom:6px;">How does it show up?</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          ${ROLE_OPTIONS.map(r => `
+            <label style="display:flex;align-items:center;gap:5px;cursor:pointer;padding:5px 11px;border:1.5px solid rgba(255,255,255,.2);border-radius:999px;font-size:11px;font-weight:600;color:#fff;transition:all .15s;"
+              id="rrl-${key}-${r.value}">
+              <input type="radio" name="rrole_${key}" value="${r.value}" style="display:none;" onchange="updateRegRoleStyles('${cap}')">
+              ${r.label}
+            </label>`).join('')}
+        </div>
+      </div>`;
+
+    wrapper.appendChild(item);
+    grid.appendChild(wrapper);
   });
 })();
+
+// Track regular cap state
+const _regularState = {}; // { 'Secure VPN': { checked: bool, role: 'primary'|'part'|'cross' } }
+
+function toggleRegularCap(cap) {
+  const key = cap.replace(/[^a-zA-Z0-9]/g,'_');
+  if (!_regularState[cap]) _regularState[cap] = { checked: false, role: 'primary' };
+  _regularState[cap].checked = !_regularState[cap].checked;
+
+  const check  = document.getElementById(`rcc-${key}`);
+  const picker = document.getElementById(`rrp-${key}`);
+  const item   = check?.closest('.regular-cap');
+
+  if (_regularState[cap].checked) {
+    item?.style.setProperty('background','var(--ink)');
+    item?.style.setProperty('border-color','var(--ink)');
+    if (check) check.style.cssText = 'background:var(--yellow);border-color:var(--yellow);color:var(--ink);';
+    if (picker) picker.style.display = 'block';
+    const defaultRadio = document.querySelector(`input[name="rrole_${key}"][value="primary"]`);
+    if (defaultRadio) { defaultRadio.checked = true; updateRegRoleStyles(cap); }
+  } else {
+    item?.style.removeProperty('background');
+    item?.style.setProperty('border-color','var(--line)');
+    if (check) check.style.cssText = '';
+    if (picker) picker.style.display = 'none';
+    _regularState[cap].role = 'primary';
+  }
+}
+
+function updateRegRoleStyles(cap) {
+  const key = cap.replace(/[^a-zA-Z0-9]/g,'_');
+  const checked = document.querySelector(`input[name="rrole_${key}"]:checked`);
+  if (checked && _regularState[cap]) _regularState[cap].role = checked.value;
+  ROLE_OPTIONS.forEach(r => {
+    const lbl = document.getElementById(`rrl-${key}-${r.value}`);
+    if (!lbl) return;
+    const isSelected = checked?.value === r.value;
+    lbl.style.background   = isSelected ? 'var(--yellow)' : 'transparent';
+    lbl.style.borderColor  = isSelected ? 'var(--yellow)' : 'rgba(255,255,255,.2)';
+    lbl.style.color        = isSelected ? 'var(--ink)' : '#fff';
+  });
+}
 
 // Track featured cap state
 const _featuredState = {}; // { 'NeoClaw': { checked: bool, role: 'primary'|'part'|'cross' } }
@@ -886,8 +946,13 @@ function updateRoleStyle(lbl, cap, val) {
 }
 
 function getSelectedCaps() {
-  const regular = [...document.querySelectorAll('#capGrid input[type="checkbox"]:checked')].map(i => i.value);
   const featured = Object.entries(_featuredState)
+    .filter(([,s]) => s.checked)
+    .map(([cap, s]) => {
+      const roleLabel = ROLE_OPTIONS.find(r => r.value === s.role)?.label || s.role;
+      return `${cap} [${roleLabel}]`;
+    });
+  const regular = Object.entries(_regularState)
     .filter(([,s]) => s.checked)
     .map(([cap, s]) => {
       const roleLabel = ROLE_OPTIONS.find(r => r.value === s.role)?.label || s.role;
