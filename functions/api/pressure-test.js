@@ -119,7 +119,9 @@ The verdict MUST match the score band:
 `;
 
 // ─── CORS ─────────────────────────────────────────────────────────────────────
-const ALLOWED_ORIGIN = "https://norton-reimagined-sprint.pages.dev";
+// TODO: Lock this down to the final microsite origin once the URL is known.
+// e.g. "https://your-microsite.pages.dev"
+const ALLOWED_ORIGIN = "*";
 
 function corsHeaders() {
   return {
