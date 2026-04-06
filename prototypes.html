@@ -311,8 +311,14 @@
         <input type="text" id="title" placeholder="e.g. Norton Horizon — Forecast dashboard" maxlength="120">
       </div>
       <div class="field full">
-        <label for="url">Prototype URL</label>
-        <input type="url" id="url" placeholder="https://..." maxlength="500">
+        <label for="url">Prototype URL <span style="font-weight:400;color:#6b6b6b;">(optional if uploading a file)</span></label>
+        <input type="url" id="url" placeholder="https://..." maxlength="500" oninput="onUrlInput()">
+      </div>
+      <div class="field full" style="text-align:center;color:#6b6b6b;font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:4px 0;">— or —</div>
+      <div class="field full">
+        <label for="fileUpload">Upload a file <span style="font-weight:400;color:#6b6b6b;">(.html or .js, max 500 KB)</span></label>
+        <input type="file" id="fileUpload" accept=".html,.js" onchange="onFileInput()" style="padding:10px 12px;cursor:pointer;">
+        <span id="fileMsg" style="font-size:12px;color:#6b6b6b;margin-top:4px;display:block;"></span>
       </div>
       <div class="field full">
         <label for="summary">Summary</label>
@@ -391,7 +397,7 @@ async function loadPrototypes() {
           <p class="desc">${escapeHtml(p.summary || '')}</p>
           <div class="link-row">
             <a href="${escapeAttr(p.url)}" target="_blank" rel="noopener">
-              Open prototype <span class="arrow">→</span>
+              ${p.sourceType === 'file' ? `View file (${escapeHtml(p.fileName || 'uploaded')})` : 'Open prototype'} <span class="arrow">→</span>
             </a>
           </div>
         </div>`;
@@ -408,29 +414,101 @@ async function loadPrototypes() {
   }
 }
 
-async function submitPrototype() {
-  const author = document.getElementById('author').value.trim();
-  const title = document.getElementById('title').value.trim();
+// ── URL / file mutual exclusion ──────────────────────────────────────────────
+function onUrlInput() {
   const url = document.getElementById('url').value.trim();
-  const summary = document.getElementById('summary').value.trim();
-  const msgEl = document.getElementById('formMsg');
-  const btn = document.getElementById('submitBtn');
+  const fileInput = document.getElementById('fileUpload');
+  const fileMsg   = document.getElementById('fileMsg');
+  if (url) {
+    fileInput.disabled = true;
+    fileInput.value    = '';
+    fileMsg.textContent = 'File upload disabled — URL takes priority.';
+  } else {
+    fileInput.disabled  = false;
+    fileMsg.textContent = '';
+  }
+}
 
-  msgEl.className = 'form-msg';
+function onFileInput() {
+  const fileInput = document.getElementById('fileUpload');
+  const urlInput  = document.getElementById('url');
+  const fileMsg   = document.getElementById('fileMsg');
+  if (fileInput.files.length > 0) {
+    urlInput.disabled   = true;
+    urlInput.value      = '';
+    fileMsg.textContent = `Selected: ${fileInput.files[0].name} (${(fileInput.files[0].size / 1024).toFixed(1)} KB)`;
+  } else {
+    urlInput.disabled   = false;
+    fileMsg.textContent = '';
+  }
+}
+
+// ── Submit ───────────────────────────────────────────────────────────────────
+async function submitPrototype() {
+  const name    = document.getElementById('author').value.trim();
+  const title   = document.getElementById('title').value.trim();
+  const url     = document.getElementById('url').value.trim();
+  const summary = document.getElementById('summary').value.trim();
+  const fileInput = document.getElementById('fileUpload');
+  const msgEl   = document.getElementById('formMsg');
+  const btn     = document.getElementById('submitBtn');
+
+  msgEl.className  = 'form-msg';
   msgEl.textContent = '';
 
-  // Validation
-  if (!author || !title || !url || !summary) {
-    msgEl.className = 'form-msg error';
-    msgEl.textContent = 'All fields are required.';
+  // Basic required fields
+  if (!name || !title || !summary) {
+    msgEl.className  = 'form-msg error';
+    msgEl.textContent = 'Name, title, and summary are required.';
     return;
   }
-  try {
-    new URL(url);
-  } catch {
-    msgEl.className = 'form-msg error';
-    msgEl.textContent = 'Please enter a valid URL (including https://).';
+
+  // Must have URL or file
+  const hasUrl  = !!url;
+  const hasFile = fileInput.files.length > 0;
+  if (!hasUrl && !hasFile) {
+    msgEl.className  = 'form-msg error';
+    msgEl.textContent = 'Please provide a prototype URL or upload a file.';
     return;
+  }
+
+  // URL format check
+  if (hasUrl) {
+    try { new URL(url); } catch {
+      msgEl.className  = 'form-msg error';
+      msgEl.textContent = 'Please enter a valid URL (including https://).';
+      return;
+    }
+  }
+
+  // Build payload
+  const payload = { name, title, summary };
+
+  if (hasUrl) {
+    // URL wins
+    payload.url = url;
+  } else {
+    // Read file as text
+    try {
+      const file = fileInput.files[0];
+      if (file.size > 500 * 1024) {
+        msgEl.className  = 'form-msg error';
+        msgEl.textContent = `File is too large (${(file.size/1024).toFixed(0)} KB). Max 500 KB.`;
+        return;
+      }
+      const ext = file.name.split('.').pop().toLowerCase();
+      if (!['html','js'].includes(ext)) {
+        msgEl.className  = 'form-msg error';
+        msgEl.textContent = 'Only .html and .js files are accepted.';
+        return;
+      }
+      payload.fileContent = await file.text();
+      payload.fileName    = file.name;
+    } catch (err) {
+      msgEl.className  = 'form-msg error';
+      msgEl.textContent = `Could not read file: ${err.message}`;
+      return;
+    }
   }
 
   btn.disabled = true;
@@ -439,34 +517,39 @@ async function submitPrototype() {
 
   try {
     const res = await fetch(API_URL, {
-      method: 'POST',
+      method:  'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ author, title, url, summary })
+      body:    JSON.stringify(payload),
     });
     if (!res.ok) {
-      const errText = await res.text();
-      throw new Error(`${res.status}: ${errText.slice(0, 140)}`);
+      const errData = await res.json().catch(() => ({}));
+      throw new Error(errData.error || `Server error ${res.status}`);
     }
-    msgEl.className = 'form-msg success';
+    msgEl.className  = 'form-msg success';
     msgEl.textContent = '✓ Submitted. Thanks!';
     clearForm(true);
     await loadPrototypes();
     setTimeout(() => { msgEl.textContent = ''; msgEl.className = 'form-msg'; }, 4000);
   } catch (err) {
     console.error(err);
-    msgEl.className = 'form-msg error';
+    msgEl.className  = 'form-msg error';
     msgEl.textContent = `Failed to submit: ${err.message}`;
   } finally {
-    btn.disabled = false;
+    btn.disabled    = false;
     btn.textContent = origLabel;
   }
 }
 
-function clearForm(keepAuthor) {
-  if (!keepAuthor) document.getElementById('author').value = '';
-  document.getElementById('title').value = '';
-  document.getElementById('url').value = '';
+function clearForm(keepName) {
+  if (!keepName) document.getElementById('author').value = '';
+  document.getElementById('title').value   = '';
+  document.getElementById('url').value     = '';
   document.getElementById('summary').value = '';
+  const fileInput = document.getElementById('fileUpload');
+  fileInput.value    = '';
+  fileInput.disabled = false;
+  document.getElementById('url').disabled  = false;
+  document.getElementById('fileMsg').textContent = '';
 }
 
 function escapeHtml(s) {
