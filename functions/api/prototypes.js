@@ -334,6 +334,7 @@ async function deployToVercel(files, projectName, token) {
         installCommand:   null,
       },
       target: "production",
+      public: true, // disable deployment protection — anyone with the link can view
     }),
   });
 
