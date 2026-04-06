@@ -119,10 +119,7 @@ The verdict MUST match the score band:
 `;
 
 // ─── CORS ─────────────────────────────────────────────────────────────────────
-// TODO: Replace "*" with the exact origin of the deployed Norton cheat sheet
-// once the Cloudflare Pages URL is confirmed.
-// e.g. "https://norton-reimagined-sprint.pages.dev"
-const ALLOWED_ORIGIN = "*";
+const ALLOWED_ORIGIN = "https://norton-reimagined-sprint.pages.dev";
 
 function corsHeaders() {
   return {
