@@ -156,39 +156,156 @@
     line-height: 1.5;
   }
 
-  /* Screenshot gallery */
-  .shot-gallery {
+  /* What we want to do — content blocks */
+  .content-blocks {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 18px;
   }
-  .shot {
+  .content-block {
     background: var(--card);
     border: 1px solid var(--line);
     border-radius: 8px;
     overflow: hidden;
   }
-  .shot img {
-    display: block;
-    width: 100%;
-    height: auto;
-    border-bottom: 1px solid var(--line);
+  .content-block .block-header {
+    background: var(--ink);
+    color: #fff;
+    padding: 18px 24px;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
   }
-  .shot .caption {
-    padding: 16px 20px;
-  }
-  .shot .caption .tag {
+  .block-header .block-tag {
     font-size: 10px;
     font-weight: 700;
-    letter-spacing: 0.14em;
+    letter-spacing: .12em;
     text-transform: uppercase;
-    color: var(--ink-soft);
+    color: var(--yellow);
+    margin-bottom: 3px;
   }
-  .shot .caption h4 {
-    font-size: 16px;
+  .block-header h4 {
+    font-size: 17px;
     font-weight: 700;
-    margin-top: 3px;
-    letter-spacing: -0.01em;
+    letter-spacing: -.015em;
+    line-height: 1.25;
+  }
+  .block-body {
+    padding: 20px 24px;
+  }
+  /* Goals list */
+  .goal-list {
+    list-style: none;
+    margin: 0; padding: 0;
+  }
+  .goal-list li {
+    display: flex;
+    gap: 10px;
+    font-size: 13px;
+    color: var(--ink);
+    line-height: 1.5;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .goal-list li:last-child { border-bottom: none; }
+  .goal-list li::before {
+    content: "→";
+    color: var(--yellow-dark, #b8a800);
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  /* Biz objectives */
+  .biz-obj { margin-bottom: 16px; }
+  .biz-obj:last-child { margin-bottom: 0; }
+  .biz-obj-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .biz-obj-title::before {
+    content: "";
+    display: inline-block;
+    width: 8px; height: 8px;
+    background: var(--yellow);
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+  .biz-obj-desc {
+    font-size: 12px;
+    color: #6b6b6b;
+    line-height: 1.5;
+  }
+  /* Team table */
+  .team-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .team-table th {
+    text-align: left;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: #999;
+    padding: 0 8px 8px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .team-table td {
+    padding: 8px 8px 8px 0;
+    vertical-align: top;
+    border-bottom: 1px solid var(--line);
+    line-height: 1.4;
+    color: var(--ink);
+  }
+  .team-table tr:last-child td { border-bottom: none; }
+  .team-table td:first-child { font-weight: 700; color: #242424; white-space: nowrap; }
+  .team-table td .names { color: #6b6b6b; font-size: 11px; margin-top: 1px; }
+  /* Prototyping phases */
+  .proto-phases {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+  .proto-phase {
+    display: flex;
+    gap: 14px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--line);
+    align-items: flex-start;
+  }
+  .proto-phase:last-child { border-bottom: none; }
+  .phase-day {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--yellow-dark, #b8a800);
+    white-space: nowrap;
+    padding-top: 2px;
+    min-width: 48px;
+  }
+  .phase-body .phase-name {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 2px;
+  }
+  .phase-body .phase-desc {
+    font-size: 12px;
+    color: #6b6b6b;
+    line-height: 1.4;
+  }
+  .proto-note {
+    margin-top: 16px;
+    padding: 12px 14px;
+    background: #fffbe0;
+    border: 1px solid #ffe800;
+    border-radius: 5px;
+    font-size: 12px;
+    color: #5a4e00;
+    line-height: 1.5;
   }
 
   /* Agenda */
@@ -506,35 +623,118 @@
     <h2>What we want to do.</h2>
     <p class="sub">The seven locked outcomes by end of day three.</p>
   </div>
-  <div class="shot-gallery">
-    <div class="shot">
-      <img src="sprint/objectives.png" alt="What do we want to do">
-      <div class="caption">
-        <div class="tag">Sprint Goals</div>
-        <h4>Seven outcomes to lock by end of day three</h4>
+  <div class="content-blocks">
+
+    <!-- Sprint Goals -->
+    <div class="content-block">
+      <div class="block-header">
+        <div>
+          <div class="block-tag">Sprint Goals</div>
+          <h4>Seven outcomes to lock by end of day three</h4>
+        </div>
+      </div>
+      <div class="block-body">
+        <ul class="goal-list">
+          <li>Lock conviction on who we're building for (Laura) and her priority JTBDs</li>
+          <li>Align on product vision and information architecture before prototyping</li>
+          <li>Produce a Vision Statement as a locked output</li>
+          <li>Take learnings from original Norton Reimagined designs</li>
+          <li>Identify the new Norton concept that resonates most with Laura, the outsourcer</li>
+          <li>Prototype IA-driven: dashboard first, then page-by-page through the architecture</li>
+          <li>Test with real customers daily — cumulative feedback across the full prototype</li>
+        </ul>
       </div>
     </div>
-    <div class="shot">
-      <img src="sprint/business-objectives.png" alt="Norton Reimagined Business Objectives">
-      <div class="caption">
-        <div class="tag">Business Objectives</div>
-        <h4>Three strategic outcomes this sprint serves</h4>
+
+    <!-- Business Objectives -->
+    <div class="content-block">
+      <div class="block-header">
+        <div>
+          <div class="block-tag">Business Objectives</div>
+          <h4>Three strategic outcomes this sprint serves</h4>
+        </div>
+      </div>
+      <div class="block-body">
+        <div class="biz-obj">
+          <div class="biz-obj-title">Increase Engagement</div>
+          <div class="biz-obj-desc">Drive deeper, more frequent product usage. Laura should open Norton as part of her daily routine — not just when something goes wrong.</div>
+        </div>
+        <div class="biz-obj">
+          <div class="biz-obj-title">Accelerate Growth Rate</div>
+          <div class="biz-obj-desc">Expand the subscriber base and increase ARPU through a compelling 3-tier model. Give Laura clear reasons to upgrade and stay.</div>
+        </div>
+        <div class="biz-obj">
+          <div class="biz-obj-title">Unlock Agentic AI</div>
+          <div class="biz-obj-desc">Move beyond AI-as-feature to AI-as-experience. Norton should leverage agentic tools that act on Laura's behalf — protecting, advising, and simplifying.</div>
+        </div>
       </div>
     </div>
-    <div class="shot">
-      <img src="sprint/team-roles.png" alt="Team and Roles">
-      <div class="caption">
-        <div class="tag">Team &amp; Roles</div>
-        <h4>Tiger team with clear ownership</h4>
+
+    <!-- Team & Roles -->
+    <div class="content-block">
+      <div class="block-header">
+        <div>
+          <div class="block-tag">Team &amp; Roles</div>
+          <h4>Tiger team with clear ownership</h4>
+        </div>
+      </div>
+      <div class="block-body">
+        <table class="team-table">
+          <thead>
+            <tr><th>Role</th><th>People</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Decider</td><td><div>Travis</div><div class="names">Final call on contested decisions</div></td></tr>
+            <tr><td>Sprint Lead + PM</td><td><div>Dagim</div><div class="names">Facilitates, keeps time, drives product thinking</div></td></tr>
+            <tr><td>Product</td><td><div>Deval, Shubh</div><div class="names">Drives product thinking</div></td></tr>
+            <tr><td>AI Innovation</td><td><div>Iskander, Michalis</div><div class="names">Encourages and challenges AI-powered solutions</div></td></tr>
+            <tr><td>Design</td><td><div>Tiffany, Andrew</div><div class="names">Prototyping quality, FigJam, design coherence</div></td></tr>
+            <tr><td>Engineering</td><td><div>Tomas</div><div class="names">Real-time feasibility and technical constraints</div></td></tr>
+            <tr><td>Brand / Marketing</td><td><div>Lynne, Bill</div><div class="names">Brand framework and narrative</div></td></tr>
+            <tr><td>Research</td><td><div>Leah + Team</div><div class="names">User research, usability sessions, feedback synthesis</div></td></tr>
+          </tbody>
+        </table>
       </div>
     </div>
-    <div class="shot">
-      <img src="sprint/prototyping-approach.png" alt="Prototyping approach">
-      <div class="caption">
-        <div class="tag">Prototyping Approach</div>
-        <h4>IA-driven, page-by-page, with cumulative testing</h4>
+
+    <!-- Prototyping Approach -->
+    <div class="content-block">
+      <div class="block-header">
+        <div>
+          <div class="block-tag">Prototyping Approach</div>
+          <h4>IA-driven, page-by-page, with cumulative testing</h4>
+        </div>
+      </div>
+      <div class="block-body">
+        <div class="proto-phases">
+          <div class="proto-phase">
+            <div class="phase-day">Day 1 PM</div>
+            <div class="phase-body">
+              <div class="phase-name">Concept — Landing Page</div>
+              <div class="phase-desc">Everyone builds. Validate the concept before committing to full prototypes.</div>
+            </div>
+          </div>
+          <div class="proto-phase">
+            <div class="phase-day">Day 2</div>
+            <div class="phase-body">
+              <div class="phase-name">Full Prototype</div>
+              <div class="phase-desc">Align on top concepts. Split into groups — one full iOS experience per concept.</div>
+            </div>
+          </div>
+          <div class="proto-phase">
+            <div class="phase-day">Day 3</div>
+            <div class="phase-body">
+              <div class="phase-name">Iterate All</div>
+              <div class="phase-desc">Regroup on a single concept. Apply final feedback. Ship the story.</div>
+            </div>
+          </div>
+        </div>
+        <div class="proto-note">
+          <strong>Cumulative testing:</strong> Each session tests the full prototype built so far. Feedback accumulates — we get richer insights on earlier sections as the prototype grows.
+        </div>
       </div>
     </div>
+
   </div>
 </section>
 
