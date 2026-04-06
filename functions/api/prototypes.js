@@ -185,7 +185,7 @@ export async function onRequestPost({ request, env }) {
   // ── Auto-score against Laura (non-fatal) ───────────────────────────────────
   // Pass fileContent for file uploads so we can extract text directly.
   // For URL submissions we'll fetch the page. Failures are silently ignored.
-  const lauraResult = await scoreLaura(prototype, hasFile && !hasUrl ? fileContent : null, env);
+  const lauraResult = await scoreLaura(prototype, env);
   if (lauraResult) {
     prototype = { ...prototype, ...lauraResult };
   }
@@ -253,58 +253,67 @@ SCORING GUIDE (Laura Score 0–100):
 - 0–34 REJECTS IT: Fundamentally misreads Laura, adds to mental load.
 `;
 
-function extractTextFromHtml(html) {
-  return html
-    .replace(/<script[\s\S]*?<\/script>/gi, ' ')
-    .replace(/<style[\s\S]*?<\/style>/gi, ' ')
-    .replace(/<!--[\s\S]*?-->/g, ' ')
-    .replace(/<[^>]+>/g, ' ')
-    .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&nbsp;/g, ' ').replace(/&#?[a-z0-9]+;/gi, ' ')
-    .replace(/\s+/g, ' ')
-    .trim();
+async function screenshotUrl(url) {
+  // Uses microlink.io (free, no key needed) to screenshot any live URL.
+  // Returns base64-encoded PNG, or null on failure.
+  try {
+    const apiUrl = `https://api.microlink.io?url=${encodeURIComponent(url)}&screenshot=true&meta=false&embed=screenshot.url`;
+    const metaRes = await fetch(apiUrl, { signal: AbortSignal.timeout(15000) });
+    if (!metaRes.ok) return null;
+    const meta = await metaRes.json();
+    const screenshotUrl = meta?.data?.screenshot?.url;
+    if (!screenshotUrl) return null;
+
+    // Fetch the actual image
+    const imgRes = await fetch(screenshotUrl, { signal: AbortSignal.timeout(10000) });
+    if (!imgRes.ok) return null;
+    const imgBuf = await imgRes.arrayBuffer();
+    const bytes = new Uint8Array(imgBuf);
+    let binary = '';
+    for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
+    return btoa(binary);
+  } catch {
+    return null;
+  }
 }
 
-async function scoreLaura(prototype, fileContent, env) {
+async function scoreLaura(prototype, env) {
   if (!env.ANTHROPIC_API_KEY) return null;
 
-  let extractedText = '';
+  // Determine which URL to screenshot.
+  // For Vercel-deployed file uploads the resolved URL IS the live app — use it directly.
+  // For user-submitted URLs, attempt to screenshot.
+  const urlToShot = prototype.url && !prototype.url.startsWith('/api/')
+    ? prototype.url
+    : null;
 
-  // 1. Get content to analyse
-  if (fileContent && typeof fileContent === 'string') {
-    extractedText = extractTextFromHtml(fileContent);
-  } else if (prototype.url && prototype.sourceType === 'url') {
-    try {
-      const res = await fetch(prototype.url, {
-        headers: { 'User-Agent': 'NortonSprint-LauraBot/1.0' },
-        signal: AbortSignal.timeout(6000),
-      });
-      if (res.ok) {
-        const html = await res.text();
-        extractedText = extractTextFromHtml(html);
-      }
-    } catch {
-      return null; // URL unreachable — skip scoring silently
-    }
-  }
+  if (!urlToShot) return null;
 
-  if (!extractedText || extractedText.trim().length < 30) return null;
+  // Take screenshot — skip scoring if we can't get one
+  const screenshotB64 = await screenshotUrl(urlToShot);
+  if (!screenshotB64) return null;
 
-  // 2. Build concept string — title + extracted text, capped at 1800 chars
-  const concept = `Prototype title: "${prototype.title}"\nSubmitted by: ${prototype.name}\nSummary: ${prototype.summary}\n\nPrototype content (extracted text):\n${extractedText.slice(0, 1500)}`;
+  // Build vision prompt — show Claude what Laura would see
+  const systemContext = `${LAURA_CONTEXT_SCORE}
 
-  // 3. Call Anthropic
-  const prompt = `${LAURA_CONTEXT_SCORE}
+You are evaluating a prototype screenshot. Judge the actual UX and UI as Laura would experience it:
+- Is the value proposition immediately clear without reading carefully?
+- Does the visual hierarchy feel calm and trustworthy, or busy and demanding?
+- Is there obvious jargon, overwhelming options, or configuration complexity?
+- Does it feel like something that "just works" in the background, or something she'd have to manage?
+- What does the layout, copy tone, and visual design communicate about the product's intent?`;
 
----
-PROTOTYPE TO EVALUATE:
-${concept}
+  const userPrompt = `Prototype title: "${prototype.title}"
+Submitted by: ${prototype.name}
+Summary: ${prototype.summary}
 
----
+The screenshot above shows the actual prototype UI. Evaluate the full visual and UX experience — layout, copy, hierarchy, tone, and interaction patterns — through Laura's eyes.
+
 Respond with ONLY a valid JSON object — no prose, no markdown fences:
 {
   "score": <integer 0-100>,
   "verdict": "<LOVES IT | LIKES IT | MEH | SKEPTICAL | REJECTS IT>",
-  "recommendation": "<1-2 sentences — the single most important change to make this land better for Laura, or why it already works>"
+  "recommendation": "<1-2 sentences — the single most important UX or copy change to make this land better for Laura, or why it already works for her>"
 }
 
 The verdict MUST match the score band:
@@ -320,8 +329,25 @@ The verdict MUST match the score band:
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-5',
-        max_tokens: 300,
-        messages: [{ role: 'user', content: prompt }],
+        max_tokens: 350,
+        messages: [{
+          role: 'user',
+          content: [
+            {
+              type: 'image',
+              source: {
+                type:       'base64',
+                media_type: 'image/png',
+                data:       screenshotB64,
+              },
+            },
+            {
+              type: 'text',
+              text: userPrompt,
+            },
+          ],
+        }],
+        system: systemContext,
       }),
     });
     if (!res.ok) return null;
