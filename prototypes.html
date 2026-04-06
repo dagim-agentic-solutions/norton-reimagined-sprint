@@ -265,6 +265,93 @@
     .form-grid .full { grid-column: span 1; }
     .proto-grid { grid-template-columns: 1fr; }
   }
+
+  /* Delete button */
+  .proto-delete {
+    background: none;
+    border: none;
+    color: #6b6b6b;
+    font-size: 11px;
+    font-family: inherit;
+    cursor: pointer;
+    padding: 2px 0;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    font-weight: 600;
+    transition: color .15s;
+    margin-top: 8px;
+  }
+  .proto-delete:hover { color: #ff4444; }
+
+  /* Password modal */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.6);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: #fff;
+    border-radius: 6px;
+    padding: 40px;
+    width: 100%;
+    max-width: 380px;
+    box-shadow: 0 24px 64px rgba(0,0,0,.2);
+    font-family: "Inter Tight", sans-serif;
+  }
+  .modal h3 {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: #242424;
+  }
+  .modal p {
+    font-size: 13px;
+    color: #6b6b6b;
+    margin-bottom: 20px;
+  }
+  .modal input[type="password"] {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1.5px solid #e0e0de;
+    border-radius: 4px;
+    font-size: 15px;
+    font-family: inherit;
+    margin-bottom: 8px;
+    outline: none;
+    box-sizing: border-box;
+  }
+  .modal input[type="password"]:focus { border-color: #242424; }
+  .modal-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 16px;
+  }
+  .modal-actions button {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    font-family: inherit;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+  }
+  .modal-confirm { background: #242424; color: #fff; }
+  .modal-confirm:hover { background: #ff4444; }
+  .modal-cancel  { background: #f0f0ee; color: #242424; }
+  .modal-msg {
+    font-size: 12px;
+    min-height: 16px;
+    color: #ff4444;
+    margin-top: 4px;
+  }
 </style>
 </head>
 <body>
@@ -400,6 +487,7 @@ async function loadPrototypes() {
               ${p.sourceType === 'file' ? `View file (${escapeHtml(p.fileName || 'uploaded')})` : 'Open prototype'} <span class="arrow">→</span>
             </a>
           </div>
+          <button class="proto-delete" onclick="openDeleteModal('${escapeAttr(p.id)}')">✕ Delete</button>
         </div>`;
     }).join('') + '</div>';
   } catch (err) {
@@ -588,7 +676,79 @@ function escapeAttr(s) {
 
 // Load on page open
 loadPrototypes();
+
+// ── Delete modal ─────────────────────────────────────────────────────────────
+let _pendingDeleteId = null;
+
+function openDeleteModal(id) {
+  _pendingDeleteId = id;
+  document.getElementById('deletePassword').value = '';
+  document.getElementById('deleteModalMsg').textContent = '';
+  document.getElementById('deleteModal').classList.add('open');
+  setTimeout(() => document.getElementById('deletePassword').focus(), 50);
+}
+
+function closeDeleteModal() {
+  _pendingDeleteId = null;
+  document.getElementById('deleteModal').classList.remove('open');
+}
+
+async function confirmDelete() {
+  const password = document.getElementById('deletePassword').value;
+  const msgEl    = document.getElementById('deleteModalMsg');
+  const btn      = document.getElementById('deleteConfirmBtn');
+
+  if (!password) {
+    msgEl.textContent = 'Please enter the password.';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Deleting…';
+  msgEl.textContent = '';
+
+  try {
+    const res = await fetch(`${API_URL}/${_pendingDeleteId}`, {
+      method:  'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ password }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      msgEl.textContent = data.error || 'Failed to delete.';
+      return;
+    }
+    closeDeleteModal();
+    await loadPrototypes();
+  } catch (err) {
+    msgEl.textContent = `Error: ${err.message}`;
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Delete';
+  }
+}
+
+// Close modal on overlay click
+document.getElementById('deleteModal').addEventListener('click', function(e) {
+  if (e.target === this) closeDeleteModal();
+});
+
 </script>
+
+
+<!-- Delete password modal -->
+<div class="modal-overlay" id="deleteModal">
+  <div class="modal">
+    <h3>Delete prototype</h3>
+    <p>Enter the sprint password to confirm deletion. This cannot be undone.</p>
+    <input type="password" id="deletePassword" placeholder="Password" onkeydown="if(event.key==='Enter')confirmDelete()">
+    <div class="modal-msg" id="deleteModalMsg"></div>
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="closeDeleteModal()">Cancel</button>
+      <button class="modal-confirm" id="deleteConfirmBtn" onclick="confirmDelete()">Delete</button>
+    </div>
+  </div>
+</div>
 
 </body>
 </html>
