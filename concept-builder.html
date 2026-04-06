@@ -783,7 +783,9 @@
 // ── Ref panel toggle ──────────────────────────────────────────────────────────
 function toggleLauraRef(header) {
   header.classList.toggle('open');
-  document.getElementById('lauraRefBody').classList.toggle('open');
+  // Toggle the next sibling element (the body panel), not a hardcoded ID
+  const body = header.nextElementSibling;
+  if (body) body.classList.toggle('open');
 }
 
 // ── Build type ────────────────────────────────────────────────────────────────
