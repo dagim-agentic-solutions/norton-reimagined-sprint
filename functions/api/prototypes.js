@@ -360,10 +360,8 @@ async function deployToVercel(files, projectName, token) {
       method:  "PATCH",
       headers: authHeader,
       body: JSON.stringify({
-        ssoProtection:        null,
-        passwordProtection:   null,
-        deploymentProtection: "none",
-        protection:           "none",
+        ssoProtection:      null,
+        passwordProtection: null,
       }),
     }
   );
