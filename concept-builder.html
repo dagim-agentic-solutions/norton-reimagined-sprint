@@ -1350,6 +1350,26 @@ function generate() {
 - Colors: #242424 ink · #FFE800 yellow accent · #F8F8F7 paper background · #FFFFFF card
 - Border radius: 8px cards · 999px pills/tags · 36px device frame (iOS)
 - Nav style: pill navigation, sticky/fixed top
+
+LAYOUT & SPACING STANDARDS (non-negotiable):
+- All screens and pages must be fully scrollable — no content cut off, no fixed-height viewports that trap content
+- Padding must be generous and consistent: minimum 20px horizontal padding on mobile, 24–32px on cards and containers
+- Text within cards and components must NOT be cramped — ensure breathing room between type and container edges (min 16px internal padding)
+- Text should feel like it belongs inside its container, not squeezed in — if it looks tight, add more space
+- Line height: 1.45–1.6 for body text, 1.0–1.15 for large display headings
+- Vertical rhythm: consistent spacing between sections (24–48px), never let sections bleed into each other
+- Touch targets on iOS: minimum 44×44pt, never smaller
+
+DESIGN QA CHECKLIST — apply before outputting:
+- [ ] Every screen scrolls naturally — no overflow:hidden trapping content
+- [ ] No text is clipped, truncated unexpectedly, or runs to the edge of the screen
+- [ ] All interactive elements have visible tap/hover states
+- [ ] Spacing between components is even and intentional — no orphaned elements
+- [ ] Cards have consistent internal padding — text never touches the border
+- [ ] Color contrast passes WCAG AA (white on #242424 ✓, #242424 on #FFE800 ✓)
+- [ ] On iOS: safe area insets are respected top and bottom
+- [ ] Realistic data — no "Lorem ipsum", no placeholder@example.com, no "User Name"
+- [ ] The design looks like it was built by a senior designer, not assembled from a template
 ${voiceTone ? `\nVOICE & TONE (defined by the concept author):\n${voiceTone}` : '- Tone: calm, assured, protective — Norton as her fiduciary\n- Always show outcomes, not mechanics'}`;
 
   // IA / nav section for prompt
