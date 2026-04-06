@@ -243,6 +243,7 @@
   transition: all .15s;
 }
 .cap-item.checked .cap-check { background: var(--yellow); border-color: var(--yellow); color: var(--ink); }
+.featured-cap .cap-check { border-color: rgba(255,255,255,.3); color: transparent; transition: all .15s; }
 .cap-label { font-size: 13px; font-weight: 500; }
 
 /* ── JTBD rows ───────────────────────────────────────────────────────────── */
@@ -684,8 +685,59 @@ const CAPABILITIES = [
   'Threat Intelligence Engine', 'Device Management', 'Credit & Financial Monitoring'
 ];
 
+// Featured capabilities that require a role selector when checked
+const FEATURED_CAPS = {
+  'NeoClaw': 'Norton\'s security-first cloud AI agent platform — performs tasks autonomously on Laura\'s behalf with full privacy protection',
+  'Norton Genie': 'Norton\'s AI assistant — answers security questions, explains threats, and guides Laura through decisions in plain language'
+};
+
+const ROLE_OPTIONS = [
+  { value: 'primary', label: 'Primary Focus', hint: 'Core to the concept — central to the experience' },
+  { value: 'part',    label: 'Part of App',   hint: 'Integrated feature — supporting role' },
+  { value: 'cross',   label: 'Cross Promotion', hint: 'Referenced/upsell — outside main flow' },
+];
+
 (function buildCapGrid() {
   const grid = document.getElementById('capGrid');
+
+  // Featured caps first — full-width with role selector
+  Object.entries(FEATURED_CAPS).forEach(([cap, desc]) => {
+    const wrapper = document.createElement('div');
+    wrapper.style.gridColumn = '1 / -1';
+    wrapper.style.marginBottom = '4px';
+
+    const item = document.createElement('div');
+    item.className = 'cap-item featured-cap';
+    item.dataset.cap = cap;
+    item.style.cssText = 'flex-direction:column;align-items:flex-start;gap:10px;border:2px solid var(--line);cursor:default;';
+
+    item.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;width:100%;cursor:pointer;" onclick="toggleFeaturedCap('${cap}')">
+        <span class="cap-check" id="fcc-${cap.replace(/\s+/g,'_')}">✓</span>
+        <div style="flex:1">
+          <span class="cap-label" style="font-weight:700;">${cap}</span>
+          <div style="font-size:12px;color:var(--ink-soft);margin-top:2px;line-height:1.4;">${desc}</div>
+        </div>
+        <span style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-softer);border:1px solid var(--line);padding:3px 8px;border-radius:999px;">✦ Featured</span>
+      </div>
+      <div class="featured-role-picker" id="frp-${cap.replace(/\s+/g,'_')}" style="display:none;width:100%;padding-top:10px;border-top:1px solid rgba(255,255,255,.15);">
+        <div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--yellow);margin-bottom:8px;">How does ${cap} show up?</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          ${ROLE_OPTIONS.map(r => `
+            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;padding:7px 14px;border:1.5px solid rgba(255,255,255,.2);border-radius:999px;font-size:12px;font-weight:600;color:#fff;transition:all .15s;"
+              onmouseover="this.style.borderColor='var(--yellow)'" onmouseout="updateRoleStyle(this,'${cap}','${r.value}')"
+              id="frl-${cap.replace(/\s+/g,'_')}-${r.value}">
+              <input type="radio" name="role_${cap.replace(/\s+/g,'_')}" value="${r.value}" style="display:none;" onchange="updateRoleStyles('${cap}')">
+              ${r.label}
+            </label>`).join('')}
+        </div>
+      </div>`;
+
+    wrapper.appendChild(item);
+    grid.appendChild(wrapper);
+  });
+
+  // Regular caps
   CAPABILITIES.forEach(cap => {
     const item = document.createElement('label');
     item.className = 'cap-item';
@@ -700,8 +752,63 @@ const CAPABILITIES = [
   });
 })();
 
+// Track featured cap state
+const _featuredState = {}; // { 'NeoClaw': { checked: bool, role: 'primary'|'part'|'cross' } }
+
+function toggleFeaturedCap(cap) {
+  const key = cap.replace(/\s+/g,'_');
+  if (!_featuredState[cap]) _featuredState[cap] = { checked: false, role: 'primary' };
+  _featuredState[cap].checked = !_featuredState[cap].checked;
+
+  const check  = document.getElementById(`fcc-${key}`);
+  const picker = document.getElementById(`frp-${key}`);
+  const item   = check?.closest('.featured-cap');
+
+  if (_featuredState[cap].checked) {
+    item?.style.setProperty('background','var(--ink)');
+    item?.style.setProperty('border-color','var(--ink)');
+    check.style.cssText = 'background:var(--yellow);border-color:var(--yellow);color:var(--ink);';
+    if (picker) picker.style.display = 'block';
+    // Set default radio
+    const defaultRadio = document.querySelector(`input[name="role_${key}"][value="primary"]`);
+    if (defaultRadio) { defaultRadio.checked = true; updateRoleStyles(cap); }
+  } else {
+    item?.style.removeProperty('background');
+    item?.style.setProperty('border-color','var(--line)');
+    check.style.cssText = '';
+    if (picker) picker.style.display = 'none';
+  }
+}
+
+function updateRoleStyles(cap) {
+  const key = cap.replace(/\s+/g,'_');
+  const checked = document.querySelector(`input[name="role_${key}"]:checked`);
+  if (checked && _featuredState[cap]) _featuredState[cap].role = checked.value;
+  ROLE_OPTIONS.forEach(r => {
+    const lbl = document.getElementById(`frl-${key}-${r.value}`);
+    if (!lbl) return;
+    const isSelected = checked?.value === r.value;
+    lbl.style.background = isSelected ? 'var(--yellow)' : 'transparent';
+    lbl.style.borderColor = isSelected ? 'var(--yellow)' : 'rgba(255,255,255,.2)';
+    lbl.style.color = isSelected ? 'var(--ink)' : '#fff';
+  });
+}
+
+function updateRoleStyle(lbl, cap, val) {
+  const key = cap.replace(/\s+/g,'_');
+  const checked = document.querySelector(`input[name="role_${key}"]:checked`);
+  lbl.style.borderColor = checked?.value === val ? 'var(--yellow)' : 'rgba(255,255,255,.2)';
+}
+
 function getSelectedCaps() {
-  return [...document.querySelectorAll('#capGrid input:checked')].map(i => i.value);
+  const regular = [...document.querySelectorAll('#capGrid input[type="checkbox"]:checked')].map(i => i.value);
+  const featured = Object.entries(_featuredState)
+    .filter(([,s]) => s.checked)
+    .map(([cap, s]) => {
+      const roleLabel = ROLE_OPTIONS.find(r => r.value === s.role)?.label || s.role;
+      return `${cap} [${roleLabel}]`;
+    });
+  return [...featured, ...regular];
 }
 
 // ── JTBDs ─────────────────────────────────────────────────────────────────────
