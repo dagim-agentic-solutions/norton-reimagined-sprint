@@ -150,9 +150,10 @@ export async function onRequestPost({ request, env }) {
         }
         vercelFiles = filesToVercelPayload(rawFiles);
       } else {
-        // Single HTML or JS file
+        // Single HTML or JS file — always serve at root as index.html
+        const ext = fileName.trim().split(".").pop().toLowerCase();
         vercelFiles = [{
-          file: fileName.trim(),
+          file: ext === "js" ? "index.js" : "index.html",
           data: fileContent,
           encoding: encoding === "base64" ? "base64" : "utf-8",
         }];
