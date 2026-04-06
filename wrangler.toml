@@ -1,0 +1,6 @@
+name = "norton-reimagined-sprint"
+pages_build_output_dir = "."
+
+[[kv_namespaces]]
+binding = "PROTOTYPES_KV"
+id = "5a0f3db0979b40a59d39a50f1b12a99b"
