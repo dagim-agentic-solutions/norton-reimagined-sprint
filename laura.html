@@ -23,6 +23,7 @@
     -webkit-font-smoothing: antialiased;
     line-height: 1.45;
   }
+  body { padding-top: 63px; }
   .page {
     max-width: 1180px;
     margin: 0 auto;
@@ -34,8 +35,10 @@
     background: var(--ink);
     color: #fff;
     border-bottom: 3px solid var(--yellow);
-    position: sticky;
+    position: fixed;
     top: 0;
+    left: 0;
+    right: 0;
     z-index: 1000;
     width: 100%;
   }
