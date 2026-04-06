@@ -342,7 +342,14 @@ async function deployToVercel(files, projectName, token) {
   }
 
   const deployData = await deployRes.json();
-  if (!deployData.url) throw new Error("Vercel did not return a deployment URL.");
+  // Debug: log all URL fields Vercel returns
+  console.log("Vercel deploy response fields:", JSON.stringify({
+    url: deployData.url,
+    alias: deployData.alias,
+    aliases: deployData.aliases,
+    readyState: deployData.readyState,
+  }));
+  if (!deployData.url) throw new Error(`Vercel returned no URL. Keys: ${Object.keys(deployData).join(", ")}`);
 
   // 2. Disable deployment protection so anyone with the link can view.
   // First get the project id (needed by some protection endpoints).
