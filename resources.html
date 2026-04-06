@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Resources — Norton Reimagined Sprint</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<style>
+  .res-section {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 28px 32px;
+    margin-bottom: 18px;
+  }
+  .res-section .head {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 18px;
+  }
+  .res-section .icon {
+    width: 44px; height: 44px;
+    background: var(--yellow);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+  .res-section .head-text { flex: 1; }
+  .res-section .tag {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+  .res-section h2 {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.015em;
+    margin-top: 2px;
+  }
+  .res-section .count {
+    font-size: 11px;
+    color: var(--ink-softer);
+    background: var(--paper);
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-weight: 600;
+  }
+
+  .res-list {
+    list-style: none;
+    padding: 0;
+  }
+  .res-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .res-item:last-child { border-bottom: none; }
+  .res-item .num {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--ink-softer);
+    letter-spacing: 0.1em;
+    min-width: 32px;
+    padding-top: 3px;
+  }
+  .res-item .body { flex: 1; }
+  .res-item h4 {
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    margin-bottom: 3px;
+  }
+  .res-item h4 a {
+    color: var(--ink);
+    border-bottom: 2px solid transparent;
+    transition: border-color 0.15s;
+  }
+  .res-item h4 a:hover { border-bottom-color: var(--yellow); }
+  .res-item p {
+    font-size: 13.5px;
+    color: var(--ink-soft);
+    line-height: 1.5;
+  }
+  .res-item.placeholder {
+    opacity: 0.7;
+  }
+  .res-item.placeholder h4 {
+    color: var(--ink-softer);
+    font-style: italic;
+  }
+  .res-item .type-badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 999px;
+    margin-right: 8px;
+    vertical-align: middle;
+  }
+  .badge-deck { background: #e8f0f8; color: #1e5fa0; }
+  .badge-doc { background: #f0e8f8; color: #6a1e9a; }
+  .badge-link { background: #f0f8e8; color: #2e7a1a; }
+  .badge-video { background: #f8e8e8; color: #b01818; }
+  .badge-tool { background: #fff4cc; color: #8a6a00; }
+
+  .placeholder-note {
+    background: #fffef0;
+    border: 1px solid #f5e89a;
+    border-radius: 8px;
+    padding: 20px 24px;
+    margin-bottom: 28px;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+  .placeholder-note .dot {
+    width: 10px; height: 10px;
+    background: var(--yellow);
+    border-radius: 50%;
+    margin-top: 6px;
+    flex-shrink: 0;
+  }
+  .placeholder-note .text {
+    font-size: 14px;
+    color: var(--ink);
+    line-height: 1.5;
+  }
+  .placeholder-note strong { font-weight: 700; }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-brand">
+      <span class="dot"></span>
+      Norton Reimagined <span class="sub">· Design Sprint</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="laura.html">Laura</a></li>
+      <li><a href="where-is-norton.html">Where is Norton</a></li>
+      <li><a href="prototypes.html">Prototypes</a></li>
+      <li><a href="resources.html" class="active">Resources</a></li>
+    </ul>
+  </div>
+</nav>
+
+<div class="page">
+
+  <span class="eyebrow">Reference Material</span>
+  <h1 class="page-title">Helpful <span class="mark">resources</span>.</h1>
+  <p class="lede">
+    Research decks, brand frameworks, relevant reading, and tools the sprint team
+    should know about. Organized by type so you can find what you need fast.
+  </p>
+
+  <div class="placeholder-note" style="margin-top: 28px;">
+    <span class="dot"></span>
+    <div class="text">
+      <strong>This page is a placeholder.</strong> The sections below are scaffolded and ready — once you send through the specific links, they'll be swapped in for the placeholder items. Everything already has the right structure and styling.
+    </div>
+  </div>
+
+  <!-- =================== RESEARCH =================== -->
+  <div class="res-section">
+    <div class="head">
+      <div class="icon">R</div>
+      <div class="head-text">
+        <div class="tag">Category 01</div>
+        <h2>Research &amp; Insights</h2>
+      </div>
+      <span class="count">4 placeholders</span>
+    </div>
+    <ul class="res-list">
+      <li class="res-item placeholder">
+        <div class="num">01</div>
+        <div class="body">
+          <h4><span class="type-badge badge-deck">Deck</span>Project Spotlight — Target Audience &amp; Brand Strategy Overview</h4>
+          <p>The canonical January 2026 deck defining the Outsourcer persona and the Norton brand strategy. Source for Laura's JTBDs, category needs, and experience expectations.</p>
+        </div>
+      </li>
+      <li class="res-item placeholder">
+        <div class="num">02</div>
+        <div class="body">
+          <h4><span class="type-badge badge-deck">Deck</span>Gen Norton Reimagine — Qualitative Research Report</h4>
+          <p>The qual study behind the 4P framework (Proactive, Progressive, Principled, Pervasive). Tests the original Reimagine prototype against Knowledgeable vs Unknowledgeable mindsets.</p>
+        </div>
+      </li>
+      <li class="res-item placeholder">
+        <div class="num">03</div>
+        <div class="body">
+          <h4><span class="type-badge badge-deck">Deck</span>Acquisition Line-ups Phase 1 Report</h4>
+          <p>Competitive positioning of Norton vs LifeLock and adjacent categories. Source for the "holistic protection vs specialized recovery" framing.</p>
+        </div>
+      </li>
+      <li class="res-item placeholder">
+        <div class="num">04</div>
+        <div class="body">
+          <h4><span class="type-badge badge-link">Link</span>Placeholder — additional research to be added</h4>
+          <p>Send through any additional research you want the team to reference — Equifax enrichment data, user interview findings, competitive teardowns.</p>
+        </div>
+      </li>
+    </ul>
+  </div>
+
+  <!-- =================== BRAND =================== -->
+  <div class="res-section">
+    <div class="head">
+      <div class="icon">B</div>
+      <div class="head-text">
+        <div class="tag">Category 02</div>
+        <h2>Brand &amp; Positioning</h2>
+      </div>
+      <span class="count">3 placeholders</span>
+    </div>
+    <ul class="res-list">
+      <li class="res-item placeholder">
+        <div class="num">01</div>
+        <div class="body">
+          <h4><span class="type-badge badge-doc">Doc</span>Norton Brand Strategy Framework</h4>
+          <p>Brand Purpose, Foundations, Experience Principles, and Character. The source of truth for tone, narrative, and visual direction.</p>
+        </div>
+      </li>
+      <li class="res-item placeholder">
+        <div class="num">02</div>
+        <div class="body">
+          <h4><span class="type-badge badge-doc">Doc</span>Digital Fiduciary Advisory Positioning</h4>
+          <p>The strategic framing Dagim is pushing with Vincent, Leena, and Travis — Norton as a digital fiduciary analogous to Goldman Sachs or Equinox.</p>
+        </div>
+      </li>
+      <li class="res-item placeholder">
+        <div class="num">03</div>
+        <div class="body">
+          <h4><span class="type-badge badge-link">Link</span>Placeholder — brand assets / visual language</h4>
+          <p>Norton Reimagined design system components, color palette, typography, Figma libraries.</p>
+        </div>
+      </li>
+    </ul>
+  </div>
+
+  <!-- =================== PRIOR WORK =================== -->
+  <div class="res-section">
+    <div class="head">
+      <div class="icon">P</div>
+      <div class="head-text">
+        <div class="tag">Category 03</div>
+        <h2>Prior Work &amp; Prototypes</h2>
+      </div>
+      <span class="count">3 placeholders</span>
+    </div>
+    <ul class="res-list">
+      <li class="res-item placeholder">
+        <div class="num">01</div>
+        <div class="body">
+          <h4><span class="type-badge badge-link">Link</span>Norton Reimagined v8 iOS prototype</h4>
+          <p>The most recent iteration of the reimagined Norton iOS app — three-tab nav (Overview / NeoClaw / Coach), agentic AI flows branded as Norton Neo.</p>
+        </div>
+      </li>
+      <li class="res-item placeholder">
+        <div class="num">02</div>
+        <div class="body">
+          <h4><span class="type-badge badge-link">Link</span>Original Norton Reimagine prototype</h4>
+          <p>The earlier reimagine prototype tested in Leah's qual study. Useful for "what we learned not to do" reference.</p>
+        </div>
+      </li>
+      <li class="res-item placeholder">
+        <div class="num">03</div>
+        <div class="body">
+          <h4><span class="type-badge badge-link">Link</span>FigJam boards from prior sessions</h4>
+          <p>Sprint boards, affinity maps, concept explorations from the earlier workshops.</p>
+        </div>
+      </li>
+    </ul>
+  </div>
+
+  <!-- =================== TOOLS =================== -->
+  <div class="res-section">
+    <div class="head">
+      <div class="icon">T</div>
+      <div class="head-text">
+        <div class="tag">Category 04</div>
+        <h2>Tools for the Sprint</h2>
+      </div>
+      <span class="count">4 placeholders</span>
+    </div>
+    <ul class="res-list">
+      <li class="res-item">
+        <div class="num">01</div>
+        <div class="body">
+          <h4><span class="type-badge badge-tool">Tool</span><a href="laura.html">Laura Pressure-Tester</a></h4>
+          <p>Live tool on this microsite. Paste any concept and get a Laura Score with bulleted reasoning. Use it throughout the sprint to pressure-test concepts against the persona.</p>
+        </div>
+      </li>
+      <li class="res-item">
+        <div class="num">02</div>
+        <div class="body">
+          <h4><span class="type-badge badge-tool">Tool</span><a href="prototypes.html">Prototype Submission Log</a></h4>
+          <p>Shared datastore for sprint prototypes. Everyone can submit and browse. Use this as the running build log across the three days.</p>
+        </div>
+      </li>
+      <li class="res-item placeholder">
+        <div class="num">03</div>
+        <div class="body">
+          <h4><span class="type-badge badge-tool">Tool</span>FigJam workspace</h4>
+          <p>Link to the shared FigJam board for the sprint. All decisions, options, open questions, and assumptions live here per the ground rules.</p>
+        </div>
+      </li>
+      <li class="res-item placeholder">
+        <div class="num">04</div>
+        <div class="body">
+          <h4><span class="type-badge badge-tool">Tool</span>Figma — Norton Reimagined library</h4>
+          <p>Shared Figma file with the Norton Reimagined components, patterns, and iOS templates used for prototyping.</p>
+        </div>
+      </li>
+    </ul>
+  </div>
+
+  <!-- =================== RELEVANT READING =================== -->
+  <div class="res-section">
+    <div class="head">
+      <div class="icon">A</div>
+      <div class="head-text">
+        <div class="tag">Category 05</div>
+        <h2>Relevant Articles &amp; Reading</h2>
+      </div>
+      <span class="count">4 placeholders</span>
+    </div>
+    <ul class="res-list">
+      <li class="res-item placeholder">
+        <div class="num">01</div>
+        <div class="body">
+          <h4><span class="type-badge badge-link">Link</span>Placeholder — industry article or trend piece</h4>
+          <p>Relevant reading on cybersecurity category evolution, AI scams, or agentic product patterns.</p>
+        </div>
+      </li>
+      <li class="res-item placeholder">
+        <div class="num">02</div>
+        <div class="body">
+          <h4><span class="type-badge badge-link">Link</span>Placeholder — competitive analysis or teardown</h4>
+          <p>Aura, Bitdefender, Malwarebytes, 1Password — any competitor teardown worth referencing.</p>
+        </div>
+      </li>
+      <li class="res-item placeholder">
+        <div class="num">03</div>
+        <div class="body">
+          <h4><span class="type-badge badge-video">Video</span>Placeholder — video or talk</h4>
+          <p>Any video content worth reviewing before or during the sprint.</p>
+        </div>
+      </li>
+      <li class="res-item placeholder">
+        <div class="num">04</div>
+        <div class="body">
+          <h4><span class="type-badge badge-link">Link</span>Placeholder — additional reading</h4>
+          <p>Anything else the sprint team should review.</p>
+        </div>
+      </li>
+    </ul>
+  </div>
+
+</div>
+
+<div class="footer">
+  <span class="brand">Norton Reimagined · Digital Fiduciary Advisory</span>
+  <span>Reference Material · Working List</span>
+</div>
+
+</body>
+</html>

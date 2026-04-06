@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Prototypes — Norton Reimagined Sprint</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<style>
+  /* Submit form */
+  .submit-card {
+    background: var(--ink);
+    color: #fff;
+    border-radius: 12px;
+    padding: 40px 44px;
+    position: relative;
+    overflow: hidden;
+    margin-top: 28px;
+  }
+  .submit-card::before {
+    content: "";
+    position: absolute;
+    top: -80px; right: -80px;
+    width: 280px; height: 280px;
+    background: var(--yellow);
+    border-radius: 50%;
+    opacity: 0.1;
+  }
+  .submit-card .eyebrow {
+    background: var(--yellow);
+    color: var(--ink);
+  }
+  .submit-card h2 {
+    font-size: 36px;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.05;
+    margin-top: 14px;
+    position: relative;
+  }
+  .submit-card h2 em {
+    font-style: normal;
+    background: var(--yellow);
+    color: var(--ink);
+    padding: 0 10px;
+    border-radius: 6px;
+  }
+  .submit-card .sub {
+    margin-top: 12px;
+    color: #c9c9c9;
+    font-size: 15px;
+    max-width: 560px;
+    position: relative;
+  }
+
+  .form-grid {
+    position: relative;
+    z-index: 2;
+    margin-top: 28px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .form-grid .full { grid-column: span 2; }
+  .field label {
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--yellow);
+    margin-bottom: 8px;
+  }
+  .field input,
+  .field textarea {
+    width: 100%;
+    background: #1a1a1a;
+    border: 1px solid #3a3a3a;
+    border-radius: 8px;
+    padding: 14px 16px;
+    font-family: 'Inter Tight', sans-serif;
+    font-size: 15px;
+    color: #fff;
+    transition: border-color 0.2s;
+  }
+  .field textarea {
+    min-height: 100px;
+    resize: vertical;
+    line-height: 1.5;
+  }
+  .field input:focus, .field textarea:focus {
+    outline: none;
+    border-color: var(--yellow);
+  }
+  .field input::placeholder,
+  .field textarea::placeholder { color: #7a7a7a; }
+
+  .form-actions {
+    margin-top: 20px;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+    position: relative;
+  }
+  .form-msg {
+    font-size: 13px;
+    color: #c9c9c9;
+  }
+  .form-msg.success { color: var(--yellow); font-weight: 600; }
+  .form-msg.error { color: #ff6b6b; }
+
+  /* List of prototypes */
+  .list-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin: 48px 0 20px;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  .list-head h2 {
+    font-size: 32px;
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    line-height: 1.1;
+  }
+  .list-head h2 em {
+    font-style: normal;
+    background: var(--yellow);
+    padding: 0 8px;
+    border-radius: 4px;
+  }
+  .list-head .count {
+    font-size: 13px;
+    color: var(--ink-soft);
+    font-weight: 600;
+  }
+
+  .proto-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+  .proto {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 24px 26px;
+    transition: all 0.15s;
+    position: relative;
+  }
+  .proto:hover {
+    border-color: var(--ink);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px rgba(36,36,36,0.08);
+  }
+  .proto-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    gap: 12px;
+  }
+  .proto-author {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .proto-author::before {
+    content: "";
+    width: 8px; height: 8px;
+    background: var(--yellow);
+    border-radius: 50%;
+  }
+  .proto-date {
+    font-size: 11px;
+    color: var(--ink-softer);
+  }
+  .proto h3 {
+    font-size: 19px;
+    font-weight: 700;
+    letter-spacing: -0.015em;
+    line-height: 1.25;
+    margin-bottom: 8px;
+  }
+  .proto p.desc {
+    font-size: 14px;
+    color: var(--ink-soft);
+    line-height: 1.5;
+    margin-bottom: 16px;
+  }
+  .proto .link-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 14px;
+    border-top: 1px solid var(--line);
+  }
+  .proto .link-row a {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .proto .link-row a:hover { text-decoration: underline; }
+  .proto .link-row .arrow {
+    font-size: 14px;
+    transition: transform 0.15s;
+  }
+  .proto:hover .link-row .arrow { transform: translateX(3px); }
+
+  .empty-state {
+    background: var(--card);
+    border: 2px dashed var(--line);
+    border-radius: 8px;
+    padding: 60px 32px;
+    text-align: center;
+  }
+  .empty-state .icon {
+    font-size: 40px;
+    margin-bottom: 12px;
+  }
+  .empty-state h3 {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.015em;
+    margin-bottom: 6px;
+  }
+  .empty-state p {
+    font-size: 14px;
+    color: var(--ink-soft);
+    max-width: 440px;
+    margin: 0 auto;
+  }
+
+  .loading-state {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 40px 32px;
+    text-align: center;
+  }
+  .spinner-big {
+    display: inline-block;
+    width: 28px;
+    height: 28px;
+    border: 3px solid var(--line);
+    border-top-color: var(--ink);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  @media (max-width: 860px) {
+    .submit-card { padding: 32px 24px; }
+    .submit-card h2 { font-size: 28px; }
+    .form-grid { grid-template-columns: 1fr; }
+    .form-grid .full { grid-column: span 1; }
+    .proto-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-brand">
+      <span class="dot"></span>
+      Norton Reimagined <span class="sub">· Design Sprint</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="laura.html">Laura</a></li>
+      <li><a href="where-is-norton.html">Where is Norton</a></li>
+      <li><a href="prototypes.html" class="active">Prototypes</a></li>
+      <li><a href="resources.html">Resources</a></li>
+    </ul>
+  </div>
+</nav>
+
+<div class="page">
+
+  <span class="eyebrow">The Build Log</span>
+  <h1 class="page-title">Sprint <span class="mark">prototypes</span>.</h1>
+  <p class="lede">
+    Every prototype built during the sprint lives here — shared across the team, browseable
+    by everyone. Drop your link below with a quick title and summary and it'll show up for
+    the rest of the tiger team to review.
+  </p>
+
+  <!-- SUBMIT FORM -->
+  <div class="submit-card">
+    <span class="eyebrow">Submit</span>
+    <h2>Share a <em>prototype</em> with the team.</h2>
+    <p class="sub">Paste your link, give it a name, tell us what it is. Takes 15 seconds.</p>
+
+    <div class="form-grid">
+      <div class="field">
+        <label for="author">Your Name</label>
+        <input type="text" id="author" placeholder="e.g. Tiffany" maxlength="60">
+      </div>
+      <div class="field">
+        <label for="title">Prototype Title</label>
+        <input type="text" id="title" placeholder="e.g. Norton Horizon — Forecast dashboard" maxlength="120">
+      </div>
+      <div class="field full">
+        <label for="url">Prototype URL</label>
+        <input type="url" id="url" placeholder="https://..." maxlength="500">
+      </div>
+      <div class="field full">
+        <label for="summary">Summary</label>
+        <textarea id="summary" placeholder="One or two sentences on what this prototype is and what it's trying to solve for Laura..." maxlength="400"></textarea>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button class="btn" id="submitBtn" onclick="submitPrototype()">Submit Prototype</button>
+      <button class="btn btn-dark" onclick="clearForm()" style="background:#1a1a1a; color:#fff; border:1px solid #3a3a3a;">Clear</button>
+      <span class="form-msg" id="formMsg"></span>
+    </div>
+  </div>
+
+  <!-- LIST -->
+  <div class="list-head">
+    <h2>Submitted <em>prototypes</em></h2>
+    <span class="count" id="count">Loading...</span>
+  </div>
+
+  <div id="listContainer">
+    <div class="loading-state">
+      <div class="spinner-big"></div>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  <span class="brand">Norton Reimagined · Digital Fiduciary Advisory</span>
+  <span>Shared Build Log · Tiger Team</span>
+</div>
+
+<script>
+// ===== Prototype list: calls /api/prototypes on same origin =====
+
+const API_URL = '/api/prototypes';
+
+async function loadPrototypes() {
+  const container = document.getElementById('listContainer');
+  const countEl = document.getElementById('count');
+
+  try {
+    const res = await fetch(API_URL);
+    if (!res.ok) throw new Error(`${res.status}`);
+    const data = await res.json();
+    const list = data.prototypes || [];
+
+    if (list.length === 0) {
+      container.innerHTML = `
+        <div class="empty-state">
+          <div class="icon">🧪</div>
+          <h3>No prototypes yet</h3>
+          <p>Be the first to submit. Paste your link above and the team will see it instantly.</p>
+        </div>`;
+      countEl.textContent = '0 submissions';
+      return;
+    }
+
+    countEl.textContent = `${list.length} submission${list.length === 1 ? '' : 's'}`;
+
+    // Newest first
+    list.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+
+    container.innerHTML = '<div class="proto-grid">' + list.map(p => {
+      const date = p.createdAt
+        ? new Date(p.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })
+        : '';
+      return `
+        <div class="proto">
+          <div class="proto-meta">
+            <span class="proto-author">${escapeHtml(p.author || 'Anonymous')}</span>
+            <span class="proto-date">${escapeHtml(date)}</span>
+          </div>
+          <h3>${escapeHtml(p.title || 'Untitled')}</h3>
+          <p class="desc">${escapeHtml(p.summary || '')}</p>
+          <div class="link-row">
+            <a href="${escapeAttr(p.url)}" target="_blank" rel="noopener">
+              Open prototype <span class="arrow">→</span>
+            </a>
+          </div>
+        </div>`;
+    }).join('') + '</div>';
+  } catch (err) {
+    console.error('Failed to load prototypes:', err);
+    container.innerHTML = `
+      <div class="empty-state">
+        <div class="icon">⚠️</div>
+        <h3>Can't load prototypes yet</h3>
+        <p>The backend endpoint isn't responding. If this is a fresh deploy, check that the <code>/api/prototypes</code> Cloudflare Pages Function is live and the KV binding is set.</p>
+      </div>`;
+    document.getElementById('count').textContent = '—';
+  }
+}
+
+async function submitPrototype() {
+  const author = document.getElementById('author').value.trim();
+  const title = document.getElementById('title').value.trim();
+  const url = document.getElementById('url').value.trim();
+  const summary = document.getElementById('summary').value.trim();
+  const msgEl = document.getElementById('formMsg');
+  const btn = document.getElementById('submitBtn');
+
+  msgEl.className = 'form-msg';
+  msgEl.textContent = '';
+
+  // Validation
+  if (!author || !title || !url || !summary) {
+    msgEl.className = 'form-msg error';
+    msgEl.textContent = 'All fields are required.';
+    return;
+  }
+  try {
+    new URL(url);
+  } catch {
+    msgEl.className = 'form-msg error';
+    msgEl.textContent = 'Please enter a valid URL (including https://).';
+    return;
+  }
+
+  btn.disabled = true;
+  const origLabel = btn.textContent;
+  btn.textContent = 'Submitting...';
+
+  try {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ author, title, url, summary })
+    });
+    if (!res.ok) {
+      const errText = await res.text();
+      throw new Error(`${res.status}: ${errText.slice(0, 140)}`);
+    }
+    msgEl.className = 'form-msg success';
+    msgEl.textContent = '✓ Submitted. Thanks!';
+    clearForm(true);
+    await loadPrototypes();
+    setTimeout(() => { msgEl.textContent = ''; msgEl.className = 'form-msg'; }, 4000);
+  } catch (err) {
+    console.error(err);
+    msgEl.className = 'form-msg error';
+    msgEl.textContent = `Failed to submit: ${err.message}`;
+  } finally {
+    btn.disabled = false;
+    btn.textContent = origLabel;
+  }
+}
+
+function clearForm(keepAuthor) {
+  if (!keepAuthor) document.getElementById('author').value = '';
+  document.getElementById('title').value = '';
+  document.getElementById('url').value = '';
+  document.getElementById('summary').value = '';
+}
+
+function escapeHtml(s) {
+  return String(s || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+function escapeAttr(s) {
+  return escapeHtml(s);
+}
+
+// Load on page open
+loadPrototypes();
+</script>
+
+</body>
+</html>

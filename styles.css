@@ -1,0 +1,304 @@
+/* ==========================================================================
+   Norton Reimagined Sprint — Shared Styles
+   Design language: Inter Tight · #242424 ink · #FFE800 yellow · #F8F8F7 paper
+   ========================================================================== */
+
+:root {
+  --ink: #242424;
+  --ink-soft: #5a5a5a;
+  --ink-softer: #8a8a8a;
+  --paper: #F8F8F7;
+  --card: #FFFFFF;
+  --yellow: #FFE800;
+  --line: #E6E6E4;
+  --green: #0a7a3d;
+  --red: #b01818;
+  --amber: #f0a020;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: 'Inter Tight', -apple-system, system-ui, sans-serif;
+  font-feature-settings: "ss01", "cv11";
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.45;
+}
+
+a { color: inherit; text-decoration: none; }
+
+/* ==========================================================================
+   Navigation
+   ========================================================================== */
+.nav {
+  background: var(--ink);
+  color: #fff;
+  border-bottom: 3px solid var(--yellow);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.nav-inner {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 18px 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: -0.01em;
+}
+.nav-brand .dot {
+  width: 10px;
+  height: 10px;
+  background: var(--yellow);
+  border-radius: 50%;
+  display: inline-block;
+}
+.nav-brand .sub {
+  font-weight: 400;
+  color: #c9c9c9;
+  font-size: 13px;
+  letter-spacing: 0;
+}
+.nav-links {
+  display: flex;
+  gap: 6px;
+  list-style: none;
+  flex-wrap: wrap;
+}
+.nav-links a {
+  display: inline-block;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #c9c9c9;
+  border-radius: 999px;
+  transition: all 0.15s;
+}
+.nav-links a:hover {
+  color: #fff;
+  background: rgba(255,255,255,0.08);
+}
+.nav-links a.active {
+  color: var(--ink);
+  background: var(--yellow);
+  font-weight: 700;
+}
+
+/* ==========================================================================
+   Page layout
+   ========================================================================== */
+.page {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 56px 56px 80px;
+}
+
+.eyebrow {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  background: var(--ink);
+  color: var(--yellow);
+  padding: 6px 12px;
+  border-radius: 999px;
+}
+
+h1.page-title {
+  font-size: 68px;
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 1.02;
+  margin-top: 18px;
+}
+h1.page-title .mark {
+  background: var(--yellow);
+  padding: 0 10px;
+  border-radius: 6px;
+}
+
+.lede {
+  margin-top: 18px;
+  font-size: 19px;
+  color: var(--ink-soft);
+  max-width: 780px;
+  line-height: 1.5;
+}
+
+/* ==========================================================================
+   Cards & Grid
+   ========================================================================== */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 18px;
+  margin-top: 28px;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 26px 28px;
+}
+
+.card h3.card-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.card h3.card-label::before {
+  content: "";
+  width: 14px; height: 14px;
+  background: var(--yellow);
+  border-radius: 3px;
+  display: inline-block;
+}
+
+.card h2 {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  line-height: 1.2;
+  margin-bottom: 14px;
+}
+
+.card p { font-size: 15px; color: var(--ink); line-height: 1.5; }
+
+.card ul { list-style: none; padding: 0; }
+.card li {
+  font-size: 14.5px;
+  line-height: 1.5;
+  padding: 9px 0 9px 22px;
+  border-bottom: 1px solid var(--line);
+  position: relative;
+}
+.card li:last-child { border-bottom: none; }
+.card li::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 17px;
+  width: 8px; height: 8px;
+  background: var(--yellow);
+  border-radius: 2px;
+}
+
+.col-3 { grid-column: span 3; }
+.col-4 { grid-column: span 4; }
+.col-6 { grid-column: span 6; }
+.col-8 { grid-column: span 8; }
+.col-12 { grid-column: span 12; }
+
+/* Section break within grid */
+.section-break {
+  grid-column: span 12;
+  margin-top: 24px;
+  padding-top: 6px;
+}
+.section-break .eyebrow-2 {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.section-break h2 {
+  font-size: 40px;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+  margin-top: 6px;
+  max-width: 760px;
+}
+.section-break h2 em {
+  font-style: normal;
+  background: var(--yellow);
+  padding: 0 8px;
+  border-radius: 4px;
+}
+
+/* ==========================================================================
+   Footer
+   ========================================================================== */
+.footer {
+  max-width: 1180px;
+  margin: 40px auto 0;
+  padding: 22px 56px 40px;
+  border-top: 1px solid var(--line);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+  color: var(--ink-soft);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.footer .brand { font-weight: 700; color: var(--ink); }
+
+/* ==========================================================================
+   Buttons
+   ========================================================================== */
+.btn {
+  display: inline-block;
+  background: var(--yellow);
+  color: var(--ink);
+  border: none;
+  padding: 14px 28px;
+  border-radius: 999px;
+  font-family: 'Inter Tight', sans-serif;
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+  text-align: center;
+}
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px rgba(255, 232, 0, 0.35);
+}
+.btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+.btn-ghost {
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid var(--ink);
+}
+.btn-ghost:hover { background: var(--ink); color: #fff; }
+
+.btn-dark {
+  background: var(--ink);
+  color: #fff;
+}
+
+/* ==========================================================================
+   Responsive
+   ========================================================================== */
+@media (max-width: 860px) {
+  .page { padding: 32px 24px 60px; }
+  .nav-inner { padding: 16px 24px; }
+  h1.page-title { font-size: 44px; }
+  .col-3, .col-4, .col-6, .col-8 { grid-column: span 12; }
+  .section-break h2 { font-size: 28px; }
+  .footer { padding: 22px 24px 40px; }
+}

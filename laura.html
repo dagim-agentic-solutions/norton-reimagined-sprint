@@ -1,0 +1,1316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Laura, the Outsourcer — Persona Cheat Sheet</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #242424;
+    --ink-soft: #5a5a5a;
+    --paper: #F8F8F7;
+    --card: #FFFFFF;
+    --yellow: #FFE800;
+    --line: #E6E6E4;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Inter Tight', -apple-system, system-ui, sans-serif;
+    font-feature-settings: "ss01", "cv11";
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.45;
+  }
+  .page {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 56px 56px 80px;
+  }
+
+  /* ---------- Nav ---------- */
+  .nav {
+    background: var(--ink);
+    color: #fff;
+    border-bottom: 3px solid var(--yellow);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .nav-inner {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 18px 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+  }
+  .nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 700;
+    font-size: 15px;
+    letter-spacing: -0.01em;
+    color: #fff;
+    text-decoration: none;
+  }
+  .nav-brand .dot {
+    width: 10px;
+    height: 10px;
+    background: var(--yellow);
+    border-radius: 50%;
+    display: inline-block;
+  }
+  .nav-brand .sub {
+    font-weight: 400;
+    color: #c9c9c9;
+    font-size: 13px;
+    letter-spacing: 0;
+  }
+  .nav-links {
+    display: flex;
+    gap: 6px;
+    list-style: none;
+    flex-wrap: wrap;
+    padding: 0;
+    margin: 0;
+  }
+  .nav-links a {
+    display: inline-block;
+    padding: 8px 14px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #c9c9c9;
+    border-radius: 999px;
+    transition: all 0.15s;
+    text-decoration: none;
+  }
+  .nav-links a:hover {
+    color: #fff;
+    background: rgba(255,255,255,0.08);
+  }
+  .nav-links a.active {
+    color: var(--ink);
+    background: var(--yellow);
+    font-weight: 700;
+  }
+
+  /* ---------- Header ---------- */
+  .eyebrow {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    background: var(--ink);
+    color: var(--yellow);
+    padding: 6px 12px;
+    border-radius: 999px;
+  }
+  h1 {
+    font-size: 68px;
+    font-weight: 800;
+    letter-spacing: -0.035em;
+    line-height: 1.02;
+    margin-top: 18px;
+  }
+  h1 .mark {
+    background: var(--yellow);
+    padding: 0 10px;
+    border-radius: 6px;
+  }
+  .lede {
+    margin-top: 18px;
+    font-size: 19px;
+    color: var(--ink-soft);
+    max-width: 780px;
+    line-height: 1.5;
+  }
+  .meta-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 22px;
+  }
+  .chip {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--ink);
+    background: var(--card);
+    border: 1px solid var(--line);
+    padding: 7px 13px;
+    border-radius: 999px;
+  }
+  .chip b { font-weight: 600; }
+
+  /* ---------- Hero quote ---------- */
+  .hero-quote {
+    margin-top: 36px;
+    background: var(--ink);
+    color: #fff;
+    border-radius: 8px;
+    padding: 36px 40px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-quote::before {
+    content: "";
+    position: absolute;
+    top: 0; right: 0;
+    width: 180px; height: 100%;
+    background: var(--yellow);
+    clip-path: polygon(40% 0, 100% 0, 100% 100%, 0 100%);
+  }
+  .hero-quote q {
+    position: relative;
+    font-size: 28px;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    line-height: 1.25;
+    quotes: "\201C" "\201D";
+    display: block;
+    max-width: 760px;
+  }
+  .hero-quote q::before, .hero-quote q::after { color: var(--yellow); }
+  .hero-quote .attrib {
+    position: relative;
+    margin-top: 14px;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--yellow);
+    font-weight: 600;
+  }
+
+  /* ---------- Grid ---------- */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 18px;
+    margin-top: 28px;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 26px 28px;
+  }
+  .card h3 {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .card h3::before {
+    content: "";
+    width: 14px; height: 14px;
+    background: var(--yellow);
+    border-radius: 3px;
+    display: inline-block;
+  }
+  .card h2 {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.015em;
+    line-height: 1.2;
+    margin-bottom: 14px;
+  }
+  .card p { font-size: 15px; color: var(--ink); line-height: 1.5; }
+  .card ul { list-style: none; padding: 0; }
+  .card li {
+    font-size: 14.5px;
+    line-height: 1.5;
+    padding: 9px 0 9px 22px;
+    border-bottom: 1px solid var(--line);
+    position: relative;
+  }
+  .card li:last-child { border-bottom: none; }
+  .card li::before {
+    content: "";
+    position: absolute;
+    left: 0; top: 17px;
+    width: 8px; height: 8px;
+    background: var(--yellow);
+    border-radius: 2px;
+  }
+
+  .col-4 { grid-column: span 4; }
+  .col-6 { grid-column: span 6; }
+  .col-8 { grid-column: span 8; }
+  .col-12 { grid-column: span 12; }
+
+  /* ---------- Snapshot card ---------- */
+  .snapshot .row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 11px 0;
+    border-bottom: 1px dashed var(--line);
+  }
+  .snapshot .row:last-child { border-bottom: none; }
+  .snapshot .k {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink-soft);
+    font-weight: 600;
+  }
+  .snapshot .v {
+    font-size: 14px;
+    font-weight: 600;
+    text-align: right;
+    max-width: 60%;
+  }
+
+  /* ---------- JTBD ---------- */
+  .jtbd-list { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .jtbd {
+    background: var(--paper);
+    border-radius: 8px;
+    padding: 18px 20px;
+    border-left: 4px solid var(--yellow);
+  }
+  .jtbd .num {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--ink-soft);
+    letter-spacing: 0.1em;
+  }
+  .jtbd p {
+    font-size: 14.5px;
+    font-weight: 500;
+    margin-top: 4px;
+    line-height: 1.4;
+  }
+
+  /* ---------- 4P framework ---------- */
+  .fourp {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+  }
+  .p-box {
+    background: var(--paper);
+    border-radius: 8px;
+    padding: 20px;
+    border-top: 4px solid var(--ink);
+  }
+  .p-box:nth-child(2) { border-top-color: var(--yellow); }
+  .p-box:nth-child(4) { border-top-color: var(--yellow); }
+  .p-box h4 {
+    font-size: 17px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    letter-spacing: -0.01em;
+  }
+  .p-box p {
+    font-size: 13px;
+    color: var(--ink-soft);
+    line-height: 1.45;
+  }
+
+  /* ---------- Behaviors section ---------- */
+  .section-break {
+    grid-column: span 12;
+    margin-top: 24px;
+    padding-top: 6px;
+  }
+  .section-break .eyebrow-2 {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+  .section-break h2 {
+    font-size: 40px;
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    line-height: 1.05;
+    margin-top: 6px;
+    max-width: 760px;
+  }
+  .section-break h2 em {
+    font-style: normal;
+    background: var(--yellow);
+    padding: 0 8px;
+    border-radius: 4px;
+  }
+
+  /* Day in the life */
+  .day {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+  }
+  .day-block {
+    background: var(--paper);
+    border-radius: 8px;
+    padding: 18px 20px;
+  }
+  .day-block .time {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 4px 8px;
+    background: var(--yellow);
+    border-radius: 4px;
+    display: inline-block;
+    margin-bottom: 10px;
+  }
+  .day-block h4 {
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .day-block p {
+    font-size: 13px;
+    color: var(--ink-soft);
+    line-height: 1.45;
+  }
+
+  /* Digital footprint */
+  .footprint {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+  .fp-col h4 {
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--ink);
+  }
+  .fp-col ul { list-style: none; padding: 0; }
+  .fp-col li {
+    font-size: 13.5px;
+    padding: 7px 0;
+    border: none !important;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .fp-col li::before {
+    content: "" !important;
+    width: 5px !important;
+    height: 5px !important;
+    background: var(--yellow) !important;
+    border-radius: 50% !important;
+    position: static !important;
+    flex-shrink: 0;
+  }
+  .fp-col li span.site { font-weight: 600; color: var(--ink); }
+  .fp-col li span.why { color: var(--ink-soft); font-size: 12.5px; }
+
+  /* AI stance */
+  .ai-split {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    background: var(--paper);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .ai-half {
+    padding: 24px 26px;
+  }
+  .ai-half.curious {
+    background: var(--yellow);
+  }
+  .ai-half h4 {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .ai-half h5 {
+    font-size: 19px;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.015em;
+    margin-bottom: 12px;
+  }
+  .ai-half p {
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  .ai-half.wary { color: #fff; background: var(--ink); }
+
+  /* Anxieties */
+  .anxieties {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+  .anx {
+    background: var(--paper);
+    border-radius: 8px;
+    padding: 20px;
+    border-left: 4px solid #b01818;
+  }
+  .anx .rank {
+    font-size: 11px;
+    font-weight: 700;
+    color: #b01818;
+    letter-spacing: 0.1em;
+  }
+  .anx h4 {
+    font-size: 16px;
+    font-weight: 700;
+    margin: 4px 0 8px;
+    letter-spacing: -0.01em;
+  }
+  .anx p {
+    font-size: 13px;
+    color: var(--ink-soft);
+    line-height: 1.45;
+  }
+
+  /* ---------- Do / Don't ---------- */
+  .dos-donts { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  .dos, .donts {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 26px 28px;
+  }
+  .dos h3, .donts h3 {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+  .dos h3 { color: #0a7a3d; }
+  .donts h3 { color: #b01818; }
+  .dos li, .donts li {
+    font-size: 14.5px;
+    padding: 9px 0 9px 26px;
+    border-bottom: 1px solid var(--line);
+    position: relative;
+    list-style: none;
+  }
+  .dos li:last-child, .donts li:last-child { border-bottom: none; }
+  .dos li::before {
+    content: "✓"; position: absolute; left: 0; top: 8px;
+    color: #0a7a3d; font-weight: 800;
+  }
+  .donts li::before {
+    content: "✕"; position: absolute; left: 0; top: 8px;
+    color: #b01818; font-weight: 800;
+  }
+
+  /* ---------- Pressure test section ---------- */
+  .pressure {
+    margin-top: 56px;
+    background: var(--ink);
+    color: #fff;
+    border-radius: 12px;
+    padding: 48px 52px;
+    position: relative;
+    overflow: hidden;
+  }
+  .pressure::before {
+    content: "";
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 260px; height: 260px;
+    background: var(--yellow);
+    border-radius: 50%;
+    opacity: 0.12;
+  }
+  .pressure .eyebrow {
+    background: var(--yellow);
+    color: var(--ink);
+  }
+  .pressure h2 {
+    font-size: 44px;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.05;
+    margin-top: 16px;
+    max-width: 720px;
+  }
+  .pressure h2 em {
+    font-style: normal;
+    background: var(--yellow);
+    color: var(--ink);
+    padding: 0 10px;
+    border-radius: 6px;
+  }
+  .pressure .sub {
+    margin-top: 14px;
+    font-size: 16px;
+    color: #c9c9c9;
+    max-width: 640px;
+    line-height: 1.5;
+  }
+  .pressure .input-wrap {
+    margin-top: 28px;
+    position: relative;
+    z-index: 2;
+  }
+  .pressure label {
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--yellow);
+    margin-bottom: 10px;
+  }
+  .pressure textarea {
+    width: 100%;
+    min-height: 140px;
+    background: #1a1a1a;
+    border: 1px solid #3a3a3a;
+    border-radius: 8px;
+    padding: 18px 20px;
+    font-family: 'Inter Tight', sans-serif;
+    font-size: 15px;
+    color: #fff;
+    resize: vertical;
+    line-height: 1.5;
+    transition: border-color 0.2s;
+  }
+  .pressure textarea:focus {
+    outline: none;
+    border-color: var(--yellow);
+  }
+  .pressure textarea::placeholder {
+    color: #7a7a7a;
+  }
+  .pressure .actions {
+    margin-top: 16px;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .btn-test {
+    background: var(--yellow);
+    color: var(--ink);
+    border: none;
+    padding: 14px 28px;
+    border-radius: 999px;
+    font-family: 'Inter Tight', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    letter-spacing: -0.01em;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .btn-test:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 24px rgba(255, 232, 0, 0.25);
+  }
+  .btn-test:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+  }
+  .btn-clear {
+    background: transparent;
+    color: #c9c9c9;
+    border: 1px solid #3a3a3a;
+    padding: 13px 22px;
+    border-radius: 999px;
+    font-family: 'Inter Tight', sans-serif;
+    font-weight: 500;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  .btn-clear:hover { border-color: #5a5a5a; color: #fff; }
+
+  /* Result card */
+  .result {
+    margin-top: 28px;
+    background: var(--paper);
+    color: var(--ink);
+    border-radius: 8px;
+    padding: 32px 36px;
+    position: relative;
+    z-index: 2;
+    display: none;
+  }
+  .result.visible { display: block; }
+  .result.loading .result-body { opacity: 0.5; }
+  .result-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 24px;
+    padding-bottom: 22px;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 22px;
+    flex-wrap: wrap;
+  }
+  .result-title {
+    flex: 1;
+    min-width: 240px;
+  }
+  .result-title .lbl {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+  .result-title h3 {
+    font-size: 22px;
+    font-weight: 700;
+    margin-top: 4px;
+    letter-spacing: -0.015em;
+    line-height: 1.2;
+  }
+  .score-badge {
+    text-align: center;
+    background: var(--ink);
+    color: #fff;
+    border-radius: 12px;
+    padding: 16px 24px;
+    min-width: 130px;
+  }
+  .score-badge .score-num {
+    font-size: 48px;
+    font-weight: 800;
+    line-height: 1;
+    color: var(--yellow);
+    letter-spacing: -0.03em;
+  }
+  .score-badge .score-lbl {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #c9c9c9;
+    margin-top: 6px;
+  }
+  .score-verdict {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 6px 12px;
+    border-radius: 999px;
+    margin-top: 10px;
+  }
+  .verdict-loves { background: #0a7a3d; color: #fff; }
+  .verdict-likes { background: var(--yellow); color: var(--ink); }
+  .verdict-meh { background: #e6e6e4; color: var(--ink); }
+  .verdict-skeptical { background: #f0a020; color: var(--ink); }
+  .verdict-rejects { background: #b01818; color: #fff; }
+
+  .result-body { transition: opacity 0.2s; }
+  .result-body .summary {
+    font-size: 16px;
+    line-height: 1.5;
+    font-style: italic;
+    color: var(--ink);
+    background: #fff;
+    padding: 16px 20px;
+    border-radius: 8px;
+    border-left: 4px solid var(--yellow);
+    margin-bottom: 22px;
+  }
+  .result-columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 22px;
+  }
+  .result-col h4 {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .result-col.wins h4 { color: #0a7a3d; }
+  .result-col.risks h4 { color: #b01818; }
+  .result-col ul { list-style: none; padding: 0; }
+  .result-col li {
+    font-size: 14px;
+    padding: 10px 0 10px 24px;
+    border-bottom: 1px solid var(--line);
+    position: relative;
+    line-height: 1.45;
+  }
+  .result-col li:last-child { border-bottom: none; }
+  .result-col.wins li::before {
+    content: "✓";
+    position: absolute;
+    left: 0; top: 9px;
+    color: #0a7a3d;
+    font-weight: 800;
+  }
+  .result-col.risks li::before {
+    content: "!";
+    position: absolute;
+    left: 2px; top: 9px;
+    color: #b01818;
+    font-weight: 800;
+  }
+  .recommendation {
+    margin-top: 24px;
+    background: var(--ink);
+    color: #fff;
+    border-radius: 8px;
+    padding: 20px 24px;
+  }
+  .recommendation .lbl {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--yellow);
+    margin-bottom: 6px;
+  }
+  .recommendation p {
+    font-size: 15px;
+    line-height: 1.5;
+  }
+
+  .spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(36, 36, 36, 0.25);
+    border-top-color: var(--ink);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    vertical-align: middle;
+    margin-right: 8px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .error-msg {
+    margin-top: 20px;
+    background: #fff;
+    color: #b01818;
+    border-radius: 8px;
+    padding: 16px 20px;
+    font-size: 14px;
+    border-left: 4px solid #b01818;
+    display: none;
+  }
+  .error-msg.visible { display: block; }
+
+  /* ---------- Footer ---------- */
+  .footer {
+    margin-top: 40px;
+    padding-top: 22px;
+    border-top: 1px solid var(--line);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11px;
+    color: var(--ink-soft);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .footer .brand { font-weight: 700; color: var(--ink); }
+
+  @media (max-width: 860px) {
+    .page { padding: 32px 24px 60px; }
+    h1 { font-size: 44px; }
+    .col-4, .col-6, .col-8 { grid-column: span 12; }
+    .jtbd-list, .fourp, .dos-donts, .day, .footprint, .anxieties, .ai-split, .result-columns { grid-template-columns: 1fr; }
+    .hero-quote q { font-size: 22px; }
+    .pressure { padding: 32px 24px; }
+    .pressure h2 { font-size: 30px; }
+    .section-break h2 { font-size: 28px; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-brand">
+      <span class="dot"></span>
+      Norton Reimagined <span class="sub">· Design Sprint</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="laura.html" class="active">Laura</a></li>
+      <li><a href="where-is-norton.html">Where is Norton</a></li>
+      <li><a href="prototypes.html">Prototypes</a></li>
+      <li><a href="resources.html">Resources</a></li>
+    </ul>
+  </div>
+</nav>
+
+<div class="page">
+
+  <!-- HEADER -->
+  <span class="eyebrow">Norton Reimagined · Target Persona · v2</span>
+  <h1>Laura,<br>the <span class="mark">Outsourcer</span>.</h1>
+  <p class="lede">
+    Laura is the guardian of her household's digital life — but she doesn't want the job.
+    She wants a trusted expert to quietly handle it in the background, the way insurance or
+    utilities do. Norton is that expert.
+  </p>
+  <div class="meta-row">
+    <span class="chip"><b>Age</b> &nbsp;35–55</span>
+    <span class="chip"><b>Stage</b> &nbsp;Working parent, full household</span>
+    <span class="chip"><b>Income</b> &nbsp;Mass-market premium</span>
+    <span class="chip"><b>Tech</b> &nbsp;Comfortable, not curious</span>
+    <span class="chip"><b>Mindset</b> &nbsp;Unknowledgeable majority</span>
+  </div>
+
+  <!-- HERO QUOTE -->
+  <div class="hero-quote">
+    <q>I don't want to understand cybersecurity. I want to know it's handled — and to trust the people handling it.</q>
+    <div class="attrib">— Laura, in her own words</div>
+  </div>
+
+  <!-- ROW 1: Snapshot + Mindset -->
+  <div class="grid">
+
+    <div class="card col-4 snapshot">
+      <h3>Snapshot</h3>
+      <div class="row"><span class="k">Household</span><span class="v">Partner + kids at home</span></div>
+      <div class="row"><span class="k">Devices</span><span class="v">5–10 across family</span></div>
+      <div class="row"><span class="k">Work</span><span class="v">Full-time, juggling</span></div>
+      <div class="row"><span class="k">Mental load</span><span class="v">High — carries it all</span></div>
+      <div class="row"><span class="k">Pays for</span><span class="v">All-in-one, subscription</span></div>
+      <div class="row"><span class="k">Avoids</span><span class="v">Tweaking settings</span></div>
+      <div class="row"><span class="k">Feels about cyber</span><span class="v">Basic life admin</span></div>
+    </div>
+
+    <div class="card col-8">
+      <h3>Mindset &amp; Motivations</h3>
+      <h2>Responsible guardian, reluctant manager.</h2>
+      <ul>
+        <li>Sees herself as the one keeping family, finances, and devices safe — and feels the weight of it.</li>
+        <li>Would rather <b>pay more and not worry</b> than juggle multiple tools or constantly tweak settings.</li>
+        <li>Risk-cautious and routine-oriented; stressed by the idea of unseen threats slipping through.</li>
+        <li>Believes cyber safety should "just work" — like insurance or utilities — without demanding daily attention.</li>
+        <li>Tech-comfortable but not "IT people." Adopts tools that <b>reduce effort and anxiety</b>, not ones that demand learning.</li>
+      </ul>
+    </div>
+
+    <!-- JTBDs -->
+    <div class="card col-12">
+      <h3>Jobs to Be Done — What Laura Hires Norton For</h3>
+      <div class="jtbd-list">
+        <div class="jtbd">
+          <div class="num">JTBD 01</div>
+          <p>Protect my whole household — every device, account, and family member — with as little admin from me as possible.</p>
+        </div>
+        <div class="jtbd">
+          <div class="num">JTBD 02</div>
+          <p>Block threats before we click. Catch the scams, dodgy sites, and sketchy downloads my family might miss.</p>
+        </div>
+        <div class="jtbd">
+          <div class="num">JTBD 03</div>
+          <p>Keep my kids safe online with simple, trustworthy controls — no configuration marathon required.</p>
+        </div>
+        <div class="jtbd">
+          <div class="num">JTBD 04</div>
+          <p>Tell me what to do when something looks wrong — in plain language, so I don't make it worse.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4P Framework -->
+    <div class="card col-12">
+      <h3>What "Peace of Mind" Means to Laura — The 4Ps</h3>
+      <h2 style="margin-bottom: 18px;">Proactive. Progressive. Principled. Pervasive.</h2>
+      <div class="fourp">
+        <div class="p-box">
+          <h4>Proactive</h4>
+          <p>Tell me the result. Don't ask me to run a scan, flip a toggle, or make a call I can't judge.</p>
+        </div>
+        <div class="p-box">
+          <h4>Progressive</h4>
+          <p>Go beyond viruses. Catch the new stuff — AI scams, deepfakes, threats I don't even know to fear.</p>
+        </div>
+        <div class="p-box">
+          <h4>Principled</h4>
+          <p>Be transparent about what's covered from day one. Upsells should feel logical, never like a trick.</p>
+        </div>
+        <div class="p-box">
+          <h4>Pervasive</h4>
+          <p>Everywhere, all at once. One provider, one account, every device, every family member.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- NEW: BEHAVIORS SECTION -->
+    <!-- ============================================ -->
+
+    <div class="section-break">
+      <div class="eyebrow-2">Part Two</div>
+      <h2>A day in <em>Laura's</em> digital life.</h2>
+    </div>
+
+    <!-- Day in the life -->
+    <div class="card col-12">
+      <h3>Where She Spends Her Time — Offline &amp; On</h3>
+      <div class="day">
+        <div class="day-block">
+          <span class="time">Morning</span>
+          <h4>Command center</h4>
+          <p>Coffee in hand, phone first: checks the family calendar, skims texts, scrolls a news app (Apple News, local TV). Glances at banking to confirm a bill cleared. Forwards a school email to her partner.</p>
+        </div>
+        <div class="day-block">
+          <span class="time">Workday</span>
+          <h4>Logged in, heads down</h4>
+          <p>Outlook/Gmail, Teams or Zoom, Google Docs or Office 365. LinkedIn open in a tab. Quick Amazon or Target run between meetings. She's efficient, not exploratory — tabs are tools, not playgrounds.</p>
+        </div>
+        <div class="day-block">
+          <span class="time">Evening</span>
+          <h4>Household operator</h4>
+          <p>Pays bills, books pediatrician, checks grades on the school portal, orders groceries (Instacart, Kroger, Walmart). Texts in the family group chat. Half-watches Netflix or Hulu while scrolling Facebook or Instagram.</p>
+        </div>
+        <div class="day-block">
+          <span class="time">Late</span>
+          <h4>Wind-down &amp; worry</h4>
+          <p>In bed on her phone: Facebook, Pinterest, a true-crime podcast, or WhatsApp with family. This is also when a scary news story or a "is this email real?" question sends her into a 10pm rabbit hole.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Digital footprint -->
+    <div class="card col-12">
+      <h3>Laura's Digital Footprint — Where She Actually Is</h3>
+      <h2>She's online for <em style="background: var(--yellow); padding: 0 6px; border-radius: 4px; font-style: normal;">logistics</em>, not leisure.</h2>
+      <p style="margin-bottom: 18px; color: var(--ink-soft);">Laura uses the internet to <b>run her life</b>: manage family, pay bills, shop, stay in touch, and get informed. She's not a power user, not a hobbyist, not chasing trends. Every site on her list earns its place by making something easier.</p>
+      <div class="footprint">
+        <div class="fp-col">
+          <h4>Running the Household</h4>
+          <ul>
+            <li><span class="site">Amazon / Target / Walmart</span></li>
+            <li><span class="site">Instacart, Kroger, grocery apps</span></li>
+            <li><span class="site">Chase, BofA, Wells Fargo apps</span></li>
+            <li><span class="site">Venmo, Zelle, PayPal</span></li>
+            <li><span class="site">School portals (PowerSchool, ClassDojo)</span></li>
+            <li><span class="site">MyChart, pediatrician portals</span></li>
+            <li><span class="site">Delta, Southwest, Airbnb, Expedia</span></li>
+          </ul>
+        </div>
+        <div class="fp-col">
+          <h4>Staying Connected</h4>
+          <ul>
+            <li><span class="site">Facebook</span> — family, local groups</li>
+            <li><span class="site">Instagram</span> — kids, friends, lurking</li>
+            <li><span class="site">WhatsApp / iMessage</span> — group chats</li>
+            <li><span class="site">Pinterest</span> — recipes, home, planning</li>
+            <li><span class="site">YouTube</span> — how-tos, kids' content</li>
+            <li><span class="site">LinkedIn</span> — work-adjacent</li>
+          </ul>
+        </div>
+        <div class="fp-col">
+          <h4>Getting Informed</h4>
+          <ul>
+            <li><span class="site">Google</span> — the front door to everything</li>
+            <li><span class="site">Apple News / local TV sites</span></li>
+            <li><span class="site">NYT, WaPo, or a local paper</span></li>
+            <li><span class="site">Reddit</span> — occasionally, for reviews</li>
+            <li><span class="site">True-crime / parenting podcasts</span></li>
+            <li><span class="site">Weather.com, AccuWeather</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- AI stance -->
+    <div class="card col-12">
+      <h3>What Laura Thinks About AI</h3>
+      <h2>Cautiously curious. Deeply suspicious.</h2>
+      <p style="margin-bottom: 18px; color: var(--ink-soft);">Laura isn't anti-AI — she's used ChatGPT to help write a tough email, and her phone keyboard already predicts her sentences. But her relationship with AI is <b>split</b>: she sees the utility <i>and</i> the threat, often in the same breath.</p>
+      <div class="ai-split">
+        <div class="ai-half curious">
+          <h4>✦ Where She's Open</h4>
+          <h5>"If it saves me time, I'll try it."</h5>
+          <p>Happy to let AI draft an email, summarize a school newsletter, or recommend a recipe. Uses Siri or Alexa for timers, lists, weather. Trusts AI most when it's <b>doing a chore she didn't want to do anyway</b> and the stakes are low.</p>
+        </div>
+        <div class="ai-half wary">
+          <h4>⚠ Where She's Wary</h4>
+          <h5>"How do I know what's real anymore?"</h5>
+          <p>Worries about AI scams — cloned voices pretending to be her kids, deepfake videos, fake customer service chats. Doesn't trust AI with her money or her identity. Wants a human (or a <b>trusted brand</b>) behind anything that matters.</p>
+        </div>
+      </div>
+      <div style="margin-top: 22px; padding: 18px 22px; background: var(--paper); border-radius: 8px; border-left: 4px solid var(--yellow);">
+        <div style="font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: 6px;">The Implication for Norton Neo</div>
+        <p style="font-size: 14.5px; line-height: 1.5;">Laura will welcome an AI that acts on her behalf <b>if and only if</b> it's wrapped in a brand she already trusts, explains itself in plain language, and is fighting the <b>other</b> AI — the scammy one. Norton Neo as a <i>defender</i> against AI threats is exactly the frame she needs.</p>
+      </div>
+    </div>
+
+    <!-- Anxieties -->
+    <div class="card col-12">
+      <h3>What Keeps Her Up at Night — Family Focus Areas</h3>
+      <h2>Her worries are specific. They are about <em>people</em>, not pixels.</h2>
+      <p style="margin-bottom: 18px; color: var(--ink-soft);">Laura doesn't lose sleep over "cybersecurity" as an abstraction. She loses sleep over her 12-year-old's TikTok, her aging mom clicking a phishing link, and a $4,000 charge she didn't recognize. These are the anxieties a product aimed at Laura must directly address.</p>
+      <div class="anxieties">
+        <div class="anx">
+          <div class="rank">Anxiety 01</div>
+          <h4>Her kids online</h4>
+          <p>Strangers in DMs, inappropriate content, TikTok/Snap/Roblox/Discord. Screen time battles. Sextortion and grooming headlines. Wants guardrails that work without turning her into the "mean" parent.</p>
+        </div>
+        <div class="anx">
+          <div class="rank">Anxiety 02</div>
+          <h4>Her parents getting scammed</h4>
+          <p>Aging parents are prime targets for romance scams, "grandchild in trouble" calls, tech-support fraud, IRS impersonation. She's become their unofficial IT and their last line of defense.</p>
+        </div>
+        <div class="anx">
+          <div class="rank">Anxiety 03</div>
+          <h4>Family finances &amp; identity</h4>
+          <p>Unauthorized charges, a compromised credit card, her kid's SSN stolen, a data breach at her bank. A single incident could cascade into months of cleanup she doesn't have time for.</p>
+        </div>
+        <div class="anx">
+          <div class="rank">Anxiety 04</div>
+          <h4>Falling for it herself</h4>
+          <p>That moment of panic when an email looks <i>almost</i> real. A fake UPS text. A "your account is locked" message. She's smart — but she's tired, distracted, and moving fast.</p>
+        </div>
+        <div class="anx">
+          <div class="rank">Anxiety 05</div>
+          <h4>The stuff she doesn't know to fear</h4>
+          <p>Deepfakes. AI voice clones. Data brokers. The dark web. She's heard the headlines but can't evaluate the threat. She wants Norton to worry about these <b>so she doesn't have to</b>.</p>
+        </div>
+        <div class="anx">
+          <div class="rank">Anxiety 06</div>
+          <h4>Being the family IT person</h4>
+          <p>"Mom, my iPad isn't working." "Honey, is this email real?" She's the household help desk and she's burnt out. She wants a product that <b>replaces her</b> in that role, not adds to it.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Do / Don't -->
+    <div class="col-12" style="margin-top: 4px;">
+      <div class="dos-donts">
+        <div class="dos">
+          <h3>Design FOR Laura</h3>
+          <ul>
+            <li>Default to <b>Neo deciding and acting</b>; show her the outcome after.</li>
+            <li>Lead with "You're protected" status; bury the mechanics.</li>
+            <li>Use household framing: "your family," "everyone's devices."</li>
+            <li>When you must interrupt, make the CTA a <b>single, clear action</b>.</li>
+            <li>Position upgrades as <b>deeper mandates</b>, not unlocked features.</li>
+            <li>Tone: calm, assured, protective. Norton as her fiduciary.</li>
+          </ul>
+        </div>
+        <div class="donts">
+          <h3>Don't Design FOR Laura</h3>
+          <ul>
+            <li>Don't show dashboards full of toggles, sliders, or config screens.</li>
+            <li>Don't ask her to <b>understand the threat</b> to make a decision.</li>
+            <li>Don't use jargon: no "IOCs," "endpoints," "heuristics," "DNS."</li>
+            <li>Don't bury cost or use dark-pattern upsells — she'll leave for good.</li>
+            <li>Don't gamify protection. She doesn't want a streak; she wants silence.</li>
+            <li>Don't mistake her for Jane. Laura is older, wealthier, and wants <b>less</b>, not more, control.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ============================================ -->
+  <!-- PRESSURE TEST SECTION -->
+  <!-- ============================================ -->
+  <div class="pressure">
+    <span class="eyebrow">Design Sprint Tool</span>
+    <h2>Pressure-test your concept against <em>Laura</em>.</h2>
+    <p class="sub">
+      Describe your product concept below — a feature, a flow, a value prop, a whole experience.
+      Claude will evaluate it against everything on this page and score how Laura would actually react.
+    </p>
+
+    <div class="input-wrap">
+      <label for="concept">Your Concept</label>
+      <textarea id="concept" placeholder="Example: A weekly Norton 'Family Digest' email that summarizes every threat we blocked for every family member, with color-coded severity and a one-tap button to 'ask Neo' about anything unclear..."></textarea>
+      <div class="actions">
+        <button class="btn-test" id="testBtn" onclick="runPressureTest()">
+          <span id="btnText">Pressure-Test with Laura</span>
+        </button>
+        <button class="btn-clear" onclick="clearAll()">Clear</button>
+      </div>
+      <div class="error-msg" id="errorMsg"></div>
+    </div>
+
+    <div class="result" id="result">
+      <div class="result-header">
+        <div class="result-title">
+          <div class="lbl">Laura's Reaction</div>
+          <h3 id="resultVerdictText">—</h3>
+          <div class="score-verdict" id="scoreVerdict">—</div>
+        </div>
+        <div class="score-badge">
+          <div class="score-num" id="scoreNum">—</div>
+          <div class="score-lbl">Laura Score / 100</div>
+        </div>
+      </div>
+      <div class="result-body" id="resultBody">
+        <div class="summary" id="summaryText"></div>
+        <div class="result-columns">
+          <div class="result-col wins">
+            <h4>✓ Why Laura Would Like It</h4>
+            <ul id="winsList"></ul>
+          </div>
+          <div class="result-col risks">
+            <h4>! Why Laura Would Push Back</h4>
+            <ul id="risksList"></ul>
+          </div>
+        </div>
+        <div class="recommendation">
+          <div class="lbl">Recommendation</div>
+          <p id="recText"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span class="brand">Norton Reimagined · Digital Fiduciary Advisory</span>
+    <span>Source: Project Spotlight (Jan 2026) · Norton Reimagine Qual Study · Acquisition Line-ups Phase 1</span>
+  </div>
+
+</div>
+
+<script>
+// ===== Pressure-test: thin client that calls the backend Pages Function =====
+// The Laura persona context lives server-side in functions/api/pressure-test.js
+// so it can't be tampered with from the browser and the prompt is consistent
+// across every participant. The client just sends { concept }.
+
+const PRESSURE_TEST_ENDPOINT = '/api/pressure-test';
+
+async function runPressureTest() {
+  const concept = document.getElementById('concept').value.trim();
+  const errorEl = document.getElementById('errorMsg');
+  const btn = document.getElementById('testBtn');
+  const btnText = document.getElementById('btnText');
+  const result = document.getElementById('result');
+
+  errorEl.classList.remove('visible');
+
+  if (!concept) {
+    errorEl.textContent = 'Please enter a concept to pressure-test.';
+    errorEl.classList.add('visible');
+    return;
+  }
+
+  if (concept.length < 15) {
+    errorEl.textContent = 'Give Laura a bit more to work with — describe your concept in a sentence or two.';
+    errorEl.classList.add('visible');
+    return;
+  }
+
+  if (concept.length > 2000) {
+    errorEl.textContent = 'Concept is too long — please keep it under 2000 characters.';
+    errorEl.classList.add('visible');
+    return;
+  }
+
+  btn.disabled = true;
+  btnText.innerHTML = '<span class="spinner"></span>Laura is thinking...';
+  result.classList.add('loading');
+
+  try {
+    const response = await fetch(PRESSURE_TEST_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ concept })
+    });
+
+    if (!response.ok) {
+      const errText = await response.text();
+      throw new Error(`${response.status}: ${errText.slice(0, 200)}`);
+    }
+
+    const parsed = await response.json();
+
+    // The backend returns the parsed Laura verdict JSON directly.
+    // If something went wrong upstream, it returns { error: "..." }.
+    if (parsed.error) {
+      throw new Error(parsed.error);
+    }
+
+    renderResult(parsed);
+  } catch (err) {
+    console.error('Pressure test error:', err);
+    errorEl.textContent = `Something went wrong: ${err.message}. Check the browser console for details, or try again in a moment.`;
+    errorEl.classList.add('visible');
+  } finally {
+    btn.disabled = false;
+    btnText.textContent = 'Pressure-Test with Laura';
+    result.classList.remove('loading');
+  }
+}
+
+function renderResult(data) {
+  const result = document.getElementById('result');
+  const scoreNum = document.getElementById('scoreNum');
+  const scoreVerdict = document.getElementById('scoreVerdict');
+  const verdictText = document.getElementById('resultVerdictText');
+  const summary = document.getElementById('summaryText');
+  const winsList = document.getElementById('winsList');
+  const risksList = document.getElementById('risksList');
+  const recText = document.getElementById('recText');
+
+  scoreNum.textContent = data.score;
+  verdictText.textContent = `"${data.headline}"`;
+  summary.textContent = data.summary;
+  recText.textContent = data.recommendation;
+
+  // Verdict badge styling
+  scoreVerdict.textContent = data.verdict;
+  scoreVerdict.className = 'score-verdict';
+  const v = (data.verdict || '').toUpperCase();
+  if (v.includes('LOVES')) scoreVerdict.classList.add('verdict-loves');
+  else if (v.includes('LIKES')) scoreVerdict.classList.add('verdict-likes');
+  else if (v.includes('MEH')) scoreVerdict.classList.add('verdict-meh');
+  else if (v.includes('SKEPTICAL')) scoreVerdict.classList.add('verdict-skeptical');
+  else if (v.includes('REJECTS')) scoreVerdict.classList.add('verdict-rejects');
+
+  winsList.innerHTML = '';
+  (data.wins || []).forEach(w => {
+    const li = document.createElement('li');
+    li.textContent = w;
+    winsList.appendChild(li);
+  });
+
+  risksList.innerHTML = '';
+  (data.risks || []).forEach(r => {
+    const li = document.createElement('li');
+    li.textContent = r;
+    risksList.appendChild(li);
+  });
+
+  result.classList.add('visible');
+  setTimeout(() => result.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+}
+
+function clearAll() {
+  document.getElementById('concept').value = '';
+  document.getElementById('result').classList.remove('visible');
+  document.getElementById('errorMsg').classList.remove('visible');
+  document.getElementById('concept').focus();
+}
+
+// Allow Cmd/Ctrl + Enter to submit
+document.getElementById('concept').addEventListener('keydown', (e) => {
+  if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+    runPressureTest();
+  }
+});
+</script>
+</body>
+</html>

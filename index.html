@@ -1,105 +1,504 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Norton Reimagined Sprint</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap"
-    rel="stylesheet"
-  />
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+<meta charset="UTF-8">
+<title>Norton Reimagined — Design Sprint</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<style>
+  /* Home-specific styles */
+  .hero {
+    background: var(--ink);
+    color: #fff;
+    padding: 80px 56px 100px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: "";
+    position: absolute;
+    top: -100px; right: -100px;
+    width: 400px; height: 400px;
+    background: var(--yellow);
+    border-radius: 50%;
+    opacity: 0.15;
+  }
+  .hero-inner {
+    max-width: 1180px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 2;
+  }
+  .hero .eyebrow {
+    background: var(--yellow);
+    color: var(--ink);
+  }
+  .hero h1 {
+    font-size: 84px;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    line-height: 0.98;
+    margin-top: 20px;
+    max-width: 900px;
+  }
+  .hero h1 em {
+    font-style: normal;
+    background: var(--yellow);
+    color: var(--ink);
+    padding: 0 12px;
+    border-radius: 8px;
+  }
+  .hero .lede {
+    color: #c9c9c9;
+    margin-top: 24px;
+    font-size: 20px;
+    max-width: 720px;
+  }
+  .hero-meta {
+    display: flex;
+    gap: 32px;
+    margin-top: 36px;
+    flex-wrap: wrap;
+  }
+  .hero-meta .item { }
+  .hero-meta .k {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--yellow);
+    margin-bottom: 4px;
+  }
+  .hero-meta .v {
+    font-size: 17px;
+    font-weight: 600;
+    color: #fff;
+  }
+  .hero-ctas {
+    margin-top: 36px;
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .hero-ctas .btn-dark {
+    background: #1a1a1a;
+    color: #fff;
+    border: 1px solid #3a3a3a;
+  }
+  .hero-ctas .btn-dark:hover { border-color: var(--yellow); }
 
-    :root {
-      --bg:      #F8F8F7;
-      --text:    #242424;
-      --yellow:  #FFE800;
-      --mid:     #6B6B6B;
-      --border:  #E0E0DE;
-    }
+  /* Section titles */
+  .section {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 72px 56px 0;
+  }
+  .section-head {
+    margin-bottom: 28px;
+  }
+  .section-head .eyebrow-2 {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+  .section-head h2 {
+    font-size: 40px;
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    line-height: 1.05;
+    margin-top: 6px;
+    max-width: 760px;
+  }
+  .section-head h2 em {
+    font-style: normal;
+    background: var(--yellow);
+    padding: 0 8px;
+    border-radius: 4px;
+  }
+  .section-head .sub {
+    margin-top: 12px;
+    font-size: 16px;
+    color: var(--ink-soft);
+    max-width: 720px;
+  }
 
-    body {
-      font-family: "Inter Tight", system-ui, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 2rem;
-    }
+  /* Objectives row */
+  .obj-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+  }
+  .obj {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 28px 28px 30px;
+    border-top: 4px solid var(--yellow);
+  }
+  .obj .num {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    color: var(--ink-soft);
+  }
+  .obj h3 {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.015em;
+    line-height: 1.2;
+    margin: 6px 0 10px;
+  }
+  .obj p {
+    font-size: 14.5px;
+    color: var(--ink-soft);
+    line-height: 1.5;
+  }
 
-    .badge {
-      display: inline-block;
-      background: var(--yellow);
-      color: var(--text);
-      font-size: 0.7rem;
-      font-weight: 700;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      padding: 0.3rem 0.75rem;
-      border-radius: 2px;
-      margin-bottom: 2rem;
-    }
+  /* Screenshot gallery */
+  .shot-gallery {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px;
+  }
+  .shot {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .shot img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-bottom: 1px solid var(--line);
+  }
+  .shot .caption {
+    padding: 16px 20px;
+  }
+  .shot .caption .tag {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+  .shot .caption h4 {
+    font-size: 16px;
+    font-weight: 700;
+    margin-top: 3px;
+    letter-spacing: -0.01em;
+  }
 
-    h1 {
-      font-size: clamp(2rem, 5vw, 3.5rem);
-      font-weight: 700;
-      line-height: 1.1;
-      letter-spacing: -0.02em;
-      max-width: 640px;
-      text-align: center;
-      margin-bottom: 1.25rem;
-    }
+  /* Agenda */
+  .agenda-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+  }
+  .agenda-day {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .agenda-day .header {
+    background: var(--ink);
+    color: #fff;
+    padding: 22px 24px;
+  }
+  .agenda-day .header .day {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    color: var(--yellow);
+  }
+  .agenda-day .header h3 {
+    font-size: 20px;
+    font-weight: 700;
+    margin-top: 4px;
+    letter-spacing: -0.015em;
+  }
+  .agenda-day img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
 
-    h1 span {
-      color: var(--mid);
-    }
+  /* Rules */
+  .rules-card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .rules-card img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
 
-    p.sub {
-      font-size: 1rem;
-      font-weight: 400;
-      color: var(--mid);
-      text-align: center;
-      max-width: 480px;
-      line-height: 1.6;
-    }
+  /* Quick access cards */
+  .nav-cards {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-top: 20px;
+  }
+  .nav-card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 24px 24px 26px;
+    transition: all 0.15s;
+    display: block;
+  }
+  .nav-card:hover {
+    border-color: var(--ink);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px rgba(36,36,36,0.08);
+  }
+  .nav-card .icon {
+    width: 40px; height: 40px;
+    background: var(--yellow);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 14px;
+    font-weight: 800;
+    font-size: 18px;
+  }
+  .nav-card h4 {
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    margin-bottom: 4px;
+  }
+  .nav-card p {
+    font-size: 13px;
+    color: var(--ink-soft);
+    line-height: 1.45;
+  }
+  .nav-card .arrow {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ink);
+    margin-top: 12px;
+  }
 
-    .divider {
-      width: 48px;
-      height: 3px;
-      background: var(--yellow);
-      margin: 2.5rem auto;
-      border-radius: 2px;
-    }
-
-    footer {
-      position: fixed;
-      bottom: 1.5rem;
-      font-size: 0.75rem;
-      color: var(--border);
-      letter-spacing: 0.05em;
-    }
-  </style>
+  @media (max-width: 860px) {
+    .hero { padding: 48px 24px 72px; }
+    .hero h1 { font-size: 48px; }
+    .section { padding: 48px 24px 0; }
+    .obj-grid, .shot-gallery, .agenda-grid, .nav-cards { grid-template-columns: 1fr; }
+    .hero-meta { gap: 20px; }
+  }
+</style>
 </head>
 <body>
 
-  <span class="badge">Design Sprint · Internal Only</span>
+<!-- ========================= NAVIGATION ========================= -->
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-brand">
+      <span class="dot"></span>
+      Norton Reimagined <span class="sub">· Design Sprint</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html" class="active">Home</a></li>
+      <li><a href="laura.html">Laura</a></li>
+      <li><a href="where-is-norton.html">Where is Norton</a></li>
+      <li><a href="prototypes.html">Prototypes</a></li>
+      <li><a href="resources.html">Resources</a></li>
+    </ul>
+  </div>
+</nav>
 
-  <h1>Norton Reimagined<br/><span>— coming soon —</span></h1>
+<!-- ========================= HERO ========================= -->
+<section class="hero">
+  <div class="hero-inner">
+    <span class="eyebrow">3-Day Design Sprint</span>
+    <h1>Reimagine Norton <em>for Laura</em>, the Outsourcer.</h1>
+    <p class="lede">
+      A tiger-team sprint to align on product vision, prototype a new Norton
+      experience, and identify the concept that resonates most with our target persona.
+      Three days. One winning idea.
+    </p>
+    <div class="hero-meta">
+      <div class="item">
+        <div class="k">Decider</div>
+        <div class="v">Travis</div>
+      </div>
+      <div class="item">
+        <div class="k">Sprint Lead</div>
+        <div class="v">Dagim</div>
+      </div>
+      <div class="item">
+        <div class="k">Format</div>
+        <div class="v">IA-driven prototyping</div>
+      </div>
+      <div class="item">
+        <div class="k">Validation</div>
+        <div class="v">Nightly user interviews</div>
+      </div>
+    </div>
+    <div class="hero-ctas">
+      <a href="laura.html" class="btn">Meet Laura →</a>
+      <a href="prototypes.html" class="btn btn-dark">Submit a Prototype</a>
+    </div>
+  </div>
+</section>
 
-  <div class="divider"></div>
+<!-- ========================= QUICK ACCESS ========================= -->
+<section class="section">
+  <div class="section-head">
+    <div class="eyebrow-2">The Microsite</div>
+    <h2>Everything the sprint team needs, <em>in one place</em>.</h2>
+  </div>
+  <div class="nav-cards">
+    <a href="laura.html" class="nav-card">
+      <div class="icon">L</div>
+      <h4>Laura Cheat Sheet</h4>
+      <p>Persona details, behaviors, anxieties — plus a live pressure-tester for your concepts.</p>
+      <div class="arrow">Open →</div>
+    </a>
+    <a href="where-is-norton.html" class="nav-card">
+      <div class="icon">N</div>
+      <h4>Where is Norton</h4>
+      <p>Current product surface, brand health signals, systemic gaps, and core metrics.</p>
+      <div class="arrow">Open →</div>
+    </a>
+    <a href="prototypes.html" class="nav-card">
+      <div class="icon">P</div>
+      <h4>Prototypes</h4>
+      <p>Submit and browse every prototype built during the sprint. Shared across the team.</p>
+      <div class="arrow">Open →</div>
+    </a>
+    <a href="resources.html" class="nav-card">
+      <div class="icon">R</div>
+      <h4>Resources</h4>
+      <p>Research decks, brand frameworks, relevant reading, and tools for the sprint.</p>
+      <div class="arrow">Open →</div>
+    </a>
+  </div>
+</section>
 
-  <p class="sub">
-    Laura cheat sheet &amp; concept pressure-tester loading shortly.<br/>
-    Reach out to the sprint lead if you need early access.
-  </p>
+<!-- ========================= OBJECTIVES ========================= -->
+<section class="section">
+  <div class="section-head">
+    <div class="eyebrow-2">Business Objectives</div>
+    <h2>Three strategic outcomes <em>this sprint serves</em>.</h2>
+    <p class="sub">Every concept, prototype, and decision should ladder back to at least one of these.</p>
+  </div>
+  <div class="obj-grid">
+    <div class="obj">
+      <div class="num">OBJECTIVE 01</div>
+      <h3>Increase Engagement</h3>
+      <p>Drive deeper, more frequent product usage. Laura should open Norton not just when something goes wrong, but as part of her daily routine. The reimagined experience must earn habitual engagement.</p>
+    </div>
+    <div class="obj">
+      <div class="num">OBJECTIVE 02</div>
+      <h3>Accelerate Growth Rate</h3>
+      <p>Expand the Norton subscriber base and increase ARPU through a compelling 3-tier model. The reimagined product must give Laura clear reasons to upgrade and stay.</p>
+    </div>
+    <div class="obj">
+      <div class="num">OBJECTIVE 03</div>
+      <h3>Unlock Agentic AI</h3>
+      <p>Move beyond AI-as-feature to AI-as-experience. Norton should leverage agentic tools that act on Laura's behalf — protecting, advising, and simplifying without requiring her to manage.</p>
+    </div>
+  </div>
+</section>
 
-  <footer>norton-reimagined-sprint · simplfinance.ai</footer>
+<!-- ========================= WHAT WE WANT TO DO ========================= -->
+<section class="section">
+  <div class="section-head">
+    <div class="eyebrow-2">Sprint Goals</div>
+    <h2>What we want to do.</h2>
+    <p class="sub">The seven locked outcomes by end of day three.</p>
+  </div>
+  <div class="shot-gallery">
+    <div class="shot">
+      <img src="sprint/objectives.png" alt="What do we want to do">
+      <div class="caption">
+        <div class="tag">Sprint Goals</div>
+        <h4>Seven outcomes to lock by end of day three</h4>
+      </div>
+    </div>
+    <div class="shot">
+      <img src="sprint/business-objectives.png" alt="Norton Reimagined Business Objectives">
+      <div class="caption">
+        <div class="tag">Business Objectives</div>
+        <h4>Three strategic outcomes this sprint serves</h4>
+      </div>
+    </div>
+    <div class="shot">
+      <img src="sprint/team-roles.png" alt="Team and Roles">
+      <div class="caption">
+        <div class="tag">Team &amp; Roles</div>
+        <h4>Tiger team with clear ownership</h4>
+      </div>
+    </div>
+    <div class="shot">
+      <img src="sprint/prototyping-approach.png" alt="Prototyping approach">
+      <div class="caption">
+        <div class="tag">Prototyping Approach</div>
+        <h4>IA-driven, page-by-page, with cumulative testing</h4>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========================= AGENDA ========================= -->
+<section class="section">
+  <div class="section-head">
+    <div class="eyebrow-2">The Three Days</div>
+    <h2>Agenda.</h2>
+    <p class="sub">Each day ends with real user interviews. Feedback accumulates. We adjust overnight.</p>
+  </div>
+  <div class="agenda-grid">
+    <div class="agenda-day">
+      <div class="header">
+        <div class="day">Day 01</div>
+        <h3>Concept Solutioning</h3>
+      </div>
+      <img src="sprint/day1.png" alt="Day 1 agenda">
+    </div>
+    <div class="agenda-day">
+      <div class="header">
+        <div class="day">Day 02</div>
+        <h3>Product Experience Solutioning</h3>
+      </div>
+      <img src="sprint/day2.png" alt="Day 2 agenda">
+    </div>
+    <div class="agenda-day">
+      <div class="header">
+        <div class="day">Day 03</div>
+        <h3>Iterate and Finalize</h3>
+      </div>
+      <img src="sprint/day3.png" alt="Day 3 agenda">
+    </div>
+  </div>
+</section>
+
+<!-- ========================= GROUND RULES ========================= -->
+<section class="section" style="padding-bottom: 40px;">
+  <div class="section-head">
+    <div class="eyebrow-2">How We Work</div>
+    <h2>Ground rules.</h2>
+    <p class="sub">Ten non-negotiables for the room. Egos at the door. Laura at the center.</p>
+  </div>
+  <div class="rules-card">
+    <img src="sprint/ground-rules.png" alt="Ground rules">
+  </div>
+</section>
+
+<!-- ========================= FOOTER ========================= -->
+<div class="footer">
+  <span class="brand">Norton Reimagined · Digital Fiduciary Advisory</span>
+  <span>3-day Design Sprint · Tiger Team</span>
+</div>
 
 </body>
 </html>

@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Where is Norton — Norton Reimagined Sprint</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<style>
+  /* Product catalog */
+  .pillar {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 26px 28px;
+    margin-bottom: 18px;
+  }
+  .pillar-head {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 18px;
+  }
+  .pillar-icon {
+    width: 48px; height: 48px;
+    background: var(--yellow);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+  .pillar-title { flex: 1; }
+  .pillar-title .tag {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+  .pillar-title h2 {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.015em;
+    margin: 2px 0 6px;
+  }
+  .pillar-title p {
+    font-size: 14px;
+    color: var(--ink-soft);
+    line-height: 1.5;
+  }
+  .feature-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+  .feature {
+    background: var(--paper);
+    border-radius: 6px;
+    padding: 14px 16px;
+    border-left: 3px solid var(--yellow);
+  }
+  .feature h5 {
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    margin-bottom: 3px;
+  }
+  .feature p {
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    line-height: 1.45;
+  }
+
+  /* Problem cards */
+  .problems-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+  .problem {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 24px 26px;
+    border-left: 4px solid var(--red);
+  }
+  .problem .tag {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: 6px;
+  }
+  .problem h3 {
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -0.015em;
+    line-height: 1.2;
+    margin-bottom: 10px;
+  }
+  .problem p {
+    font-size: 14px;
+    color: var(--ink);
+    line-height: 1.5;
+  }
+  .problem .stat {
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px dashed var(--line);
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+  .problem .stat .big {
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--red);
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+  .problem .stat .small {
+    font-size: 11px;
+    color: var(--ink-soft);
+    text-align: right;
+    max-width: 60%;
+    line-height: 1.3;
+  }
+
+  /* Gap cards (warning, not critical) */
+  .gap {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 22px 24px;
+    border-left: 4px solid var(--amber);
+  }
+  .gap .tag {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 6px;
+  }
+  .gap h4 {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    letter-spacing: -0.015em;
+  }
+  .gap p {
+    font-size: 13.5px;
+    color: var(--ink-soft);
+    line-height: 1.5;
+  }
+
+  /* Placeholder section */
+  .placeholder {
+    background: var(--card);
+    border: 2px dashed var(--line);
+    border-radius: 8px;
+    padding: 40px 32px;
+    text-align: center;
+  }
+  .placeholder .tag {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    background: var(--paper);
+    padding: 4px 10px;
+    border-radius: 999px;
+    display: inline-block;
+  }
+  .placeholder h3 {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.015em;
+    margin: 14px 0 8px;
+  }
+  .placeholder p {
+    font-size: 14px;
+    color: var(--ink-soft);
+    max-width: 560px;
+    margin: 0 auto;
+    line-height: 1.5;
+  }
+  .placeholder .skeleton {
+    margin-top: 24px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+  .placeholder .skel-box {
+    background: var(--paper);
+    border-radius: 6px;
+    height: 72px;
+  }
+
+  .section-title {
+    grid-column: span 12;
+    margin: 36px 0 4px;
+  }
+  .section-title .eyebrow-2 {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+  .section-title h2 {
+    font-size: 36px;
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    line-height: 1.05;
+    margin-top: 6px;
+  }
+  .section-title h2 em {
+    font-style: normal;
+    background: var(--yellow);
+    padding: 0 8px;
+    border-radius: 4px;
+  }
+  .section-title .sub {
+    margin-top: 10px;
+    font-size: 15px;
+    color: var(--ink-soft);
+    max-width: 720px;
+  }
+
+  @media (max-width: 860px) {
+    .feature-grid { grid-template-columns: 1fr; }
+    .problems-grid { grid-template-columns: 1fr; }
+    .placeholder .skeleton { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-brand">
+      <span class="dot"></span>
+      Norton Reimagined <span class="sub">· Design Sprint</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="laura.html">Laura</a></li>
+      <li><a href="where-is-norton.html" class="active">Where is Norton</a></li>
+      <li><a href="prototypes.html">Prototypes</a></li>
+      <li><a href="resources.html">Resources</a></li>
+    </ul>
+  </div>
+</nav>
+
+<div class="page">
+
+  <span class="eyebrow">The Starting Line</span>
+  <h1 class="page-title">Where is <span class="mark">Norton</span> today.</h1>
+  <p class="lede">
+    Before we reimagine anything, we need a shared picture of the current surface —
+    what Norton ships, the health of the brand, the systemic gaps, and the metrics
+    we're trying to move. This is the baseline every prototype is measured against.
+  </p>
+
+  <div class="grid">
+
+    <!-- =================== CURRENT PRODUCTS =================== -->
+    <div class="section-title">
+      <div class="eyebrow-2">Current State</div>
+      <h2>What Norton <em>ships today</em>.</h2>
+      <p class="sub">Four pillars, organized by the job they do. The footprint is broad — the problem isn't feature gaps, it's that Laura doesn't know most of these exist, and the ones she does use are invisible.</p>
+    </div>
+
+    <div class="col-12">
+
+      <!-- Pillar 1: Device Security -->
+      <div class="pillar">
+        <div class="pillar-head">
+          <div class="pillar-icon">🛡</div>
+          <div class="pillar-title">
+            <div class="tag">Pillar 01 · Norton 360</div>
+            <h2>Device &amp; Online Security</h2>
+            <p>The core antivirus heritage — protecting devices, browsers, and network activity. This is what most customers still think Norton is.</p>
+          </div>
+        </div>
+        <div class="feature-grid">
+          <div class="feature"><h5>Antivirus &amp; Anti-Malware</h5><p>Real-time scanning, threat detection, behavioral monitoring across Windows, Mac, iOS, Android.</p></div>
+          <div class="feature"><h5>Smart Firewall</h5><p>Two-way firewall monitoring inbound and outbound traffic for PC and Mac.</p></div>
+          <div class="feature"><h5>Secure VPN</h5><p>Bank-grade encryption on public Wi-Fi, up to 10 devices on top tiers.</p></div>
+          <div class="feature"><h5>Safe Web &amp; Safe Search</h5><p>Browser extension that blocks malicious sites and warns on suspicious links in results.</p></div>
+          <div class="feature"><h5>Password Manager</h5><p>Store, generate, auto-fill credentials across devices. Free and bundled tiers.</p></div>
+          <div class="feature"><h5>Cloud Backup (PC)</h5><p>10–500 GB of cloud storage depending on tier. Ransomware mitigation.</p></div>
+          <div class="feature"><h5>PC SafeCam</h5><p>Webcam hijack detection and notification for Windows.</p></div>
+          <div class="feature"><h5>Smart Scan</h5><p>The on-demand diagnostic that checks device health, vulnerabilities, and dark-web exposure.</p></div>
+          <div class="feature"><h5>Genie Scam Protection</h5><p>AI-powered scam detection for texts, emails, and calls. Newer addition.</p></div>
+        </div>
+      </div>
+
+      <!-- Pillar 2: Identity -->
+      <div class="pillar">
+        <div class="pillar-head">
+          <div class="pillar-icon">🆔</div>
+          <div class="pillar-title">
+            <div class="tag">Pillar 02 · LifeLock</div>
+            <h2>Identity Theft Protection</h2>
+            <p>The reactive identity brand. Monitors for signs of identity compromise and reimburses losses when things go wrong. Strong among Norton's 45+ cohort.</p>
+          </div>
+        </div>
+        <div class="feature-grid">
+          <div class="feature"><h5>Dark Web Monitoring</h5><p>Scans forums and breach databases for exposed personal info — SSN, email, phone, bank accounts.</p></div>
+          <div class="feature"><h5>Credit Monitoring</h5><p>1-bureau or 3-bureau depending on tier, with real-time alerts on credit file changes.</p></div>
+          <div class="feature"><h5>Identity Alerts</h5><p>New account openings, address changes, court records, payday loan applications.</p></div>
+          <div class="feature"><h5>Stolen Wallet Protection</h5><p>Help canceling and replacing contents if wallet is lost or stolen.</p></div>
+          <div class="feature"><h5>ID Restoration Specialists</h5><p>U.S.-based agents who work cases to restore identity if theft occurs.</p></div>
+          <div class="feature"><h5>Million-Dollar Protection</h5><p>Reimbursement for stolen funds, personal expenses, and legal fees up to $1M on top tier.</p></div>
+        </div>
+      </div>
+
+      <!-- Pillar 3: Privacy -->
+      <div class="pillar">
+        <div class="pillar-head">
+          <div class="pillar-icon">🔒</div>
+          <div class="pillar-title">
+            <div class="tag">Pillar 03 · Privacy</div>
+            <h2>Privacy &amp; Personal Data</h2>
+            <p>The most recent investment area — removing personal info from data brokers and controlling what's exposed online. Still underutilized by the base.</p>
+          </div>
+        </div>
+        <div class="feature-grid">
+          <div class="feature"><h5>Privacy Monitor</h5><p>Scans top people-search sites and flags where personal info appears.</p></div>
+          <div class="feature"><h5>Privacy Monitor Assistant</h5><p>Helps opt out and remove personal info from data broker sites.</p></div>
+          <div class="feature"><h5>Social Media Monitoring</h5><p>Monitors Facebook, Instagram, LinkedIn, etc. for compromised or risky activity.</p></div>
+          <div class="feature"><h5>AntiTrack</h5><p>Anti-fingerprinting technology that blocks websites from profiling Laura's browser.</p></div>
+        </div>
+      </div>
+
+      <!-- Pillar 4: Family -->
+      <div class="pillar">
+        <div class="pillar-head">
+          <div class="pillar-icon">👨‍👩‍👧</div>
+          <div class="pillar-title">
+            <div class="tag">Pillar 04 · Family</div>
+            <h2>Family &amp; Parental Controls</h2>
+            <p>Tools for the household. The most on-brief for Laura's stated anxieties — but poorly discovered and rarely activated by existing subscribers.</p>
+          </div>
+        </div>
+        <div class="feature-grid">
+          <div class="feature"><h5>Norton Family</h5><p>Parental controls — screen time, content filtering, location tracking, school time mode.</p></div>
+          <div class="feature"><h5>Device Coverage</h5><p>Up to 10 devices across a household on Select/Ultimate/Advantage tiers.</p></div>
+          <div class="feature"><h5>Video Supervision</h5><p>Monitors what kids watch on YouTube and Hulu on their devices.</p></div>
+          <div class="feature"><h5>School Time</h5><p>Restricts access during school hours to only approved educational sites.</p></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- =================== BRAND HEALTH PROBLEMS =================== -->
+    <div class="section-title">
+      <div class="eyebrow-2">What's Broken</div>
+      <h2>Brand health <em>problems</em>.</h2>
+      <p class="sub">The signals leadership is seeing — from brand perception to product usage to competitive pressure. This is the "why now" for the reimagination.</p>
+    </div>
+
+    <div class="col-12">
+      <div class="problems-grid">
+
+        <div class="problem">
+          <div class="tag">Problem 01 · Perception</div>
+          <h3>Norton is perceived as a legacy antivirus brand</h3>
+          <p>In a category that has moved toward AI, identity, and holistic "digital life" protection, Norton is still filed mentally under "the thing you installed on your Dell in 2008." The brand has extended far beyond antivirus — but the perception hasn't kept up.</p>
+          <div class="stat">
+            <div class="big">→</div>
+            <div class="small">Brand equity lags actual product capability</div>
+          </div>
+        </div>
+
+        <div class="problem">
+          <div class="tag">Problem 02 · Engagement</div>
+          <h3>Set-and-forget is both the promise and the problem</h3>
+          <p>Laura wants it handled — so Norton stays silent. But silence means she never sees the value she's paying for. Engagement is low, perceived value is low, and renewal becomes a quiet negotiation with a charge she doesn't remember authorizing.</p>
+          <div class="stat">
+            <div class="big">↓</div>
+            <div class="small">Low session frequency drives perceived-value churn</div>
+          </div>
+        </div>
+
+        <div class="problem">
+          <div class="tag">Problem 03 · Audience</div>
+          <h3>The base skews older — and is aging out</h3>
+          <p>Norton's paying base concentrates in 45–65+, with a median HHI of ~$142K. Strong on loyalty, but structurally declining. Younger builder-phase users don't install a security suite — they assume their phone or bank handles it. New acquisition is expensive.</p>
+          <div class="stat">
+            <div class="big">2%</div>
+            <div class="small">of the current base fits a younger "builder" profile</div>
+          </div>
+        </div>
+
+        <div class="problem">
+          <div class="tag">Problem 04 · Competitive</div>
+          <h3>Category boundaries are dissolving</h3>
+          <p>Banks now offer dark web monitoring. Apple offers private relay. Google offers password managers. iOS has on-device threat detection. The standalone security category is being absorbed by platforms — and Norton has to justify its seat at a table that's getting smaller.</p>
+          <div class="stat">
+            <div class="big">↘</div>
+            <div class="small">Platform disintermediation of standalone security</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- =================== SYSTEMIC GAPS =================== -->
+    <div class="section-title">
+      <div class="eyebrow-2">Where We Miss</div>
+      <h2>Systemic gaps.</h2>
+      <p class="sub">Not bugs — structural holes. These are places where Norton could credibly play and isn't, or where the product model doesn't match how Laura actually lives.</p>
+    </div>
+
+    <div class="col-6">
+      <div class="gap">
+        <div class="tag">Gap 01</div>
+        <h4>No cross-layer correlation</h4>
+        <p>Norton sees device signals. It sees identity signals. It sees dark web signals. It rarely connects them. A scam text, a suspicious login, and a new credit inquiry within 48 hours should trigger one unified alert — not three disconnected ones Laura has to piece together.</p>
+      </div>
+    </div>
+    <div class="col-6">
+      <div class="gap">
+        <div class="tag">Gap 02</div>
+        <h4>Household is a billing unit, not a protection unit</h4>
+        <p>"Up to 10 devices" is a license count, not a family model. Laura has no view into what's happening on her mom's iPad or her 12-year-old's phone. The product is sold as a family plan but operates as a set of individual accounts.</p>
+      </div>
+    </div>
+    <div class="col-6">
+      <div class="gap">
+        <div class="tag">Gap 03</div>
+        <h4>Agentic AI is missing from the surface</h4>
+        <p>Genie Scam Protection is a start — but it's still a classifier, not an agent. Laura wants Norton to <i>decide and act</i> on her behalf, not hand her a yellow warning triangle. The brand is positioned for agency but the product is still set up to ask permission.</p>
+      </div>
+    </div>
+    <div class="col-6">
+      <div class="gap">
+        <div class="tag">Gap 04</div>
+        <h4>No forward-looking posture</h4>
+        <p>Every Norton feature is reactive — it alerts on something that has already happened. Nothing tells Laura what to prepare for. She's buying a house, starting a 529, planning a trip — Norton's models know all of this and say nothing about the risks ahead.</p>
+      </div>
+    </div>
+    <div class="col-6">
+      <div class="gap">
+        <div class="tag">Gap 05</div>
+        <h4>The money layer is disconnected from the protection layer</h4>
+        <p>Norton Money exists. N360 exists. To Laura they're the same brand, but the products don't talk to each other — a financial anomaly in Norton Money doesn't trigger identity protection in LifeLock. The "one Norton" story is a promise the surface area doesn't deliver.</p>
+      </div>
+    </div>
+    <div class="col-6">
+      <div class="gap">
+        <div class="tag">Gap 06</div>
+        <h4>Upsell is transactional, not advisory</h4>
+        <p>Upgrade prompts look like storefronts, not recommendations from a fiduciary. "Add VPN for $4.99/mo" doesn't match how Laura thinks about her risks. She wants someone to say "given your situation, here's what you need" — and mean it.</p>
+      </div>
+    </div>
+
+    <!-- =================== PRICING PLACEHOLDER =================== -->
+    <div class="section-title">
+      <div class="eyebrow-2">To Be Defined</div>
+      <h2>Pricing model.</h2>
+      <p class="sub">A 3-tier mandate-based model is one of the locked outcomes of this sprint. Current SKUs will be mapped here once the tier framework is settled.</p>
+    </div>
+
+    <div class="col-12">
+      <div class="placeholder">
+        <div class="tag">Placeholder · To be populated</div>
+        <h3>Three tiers. One narrative arc.</h3>
+        <p>This section will hold the three-tier pricing framework once the sprint team locks it — likely some variation of <b>protect → prepare → manage</b>, priced to match Laura's willingness-to-pay for mental-load relief.</p>
+        <div class="skeleton">
+          <div class="skel-box"></div>
+          <div class="skel-box"></div>
+          <div class="skel-box"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- =================== CORE METRICS PLACEHOLDER =================== -->
+    <div class="section-title">
+      <div class="eyebrow-2">To Be Defined</div>
+      <h2>Core metrics.</h2>
+      <p class="sub">The North Star and supporting metrics this sprint's winning concept will be measured against. To be finalized with Travis and Leena.</p>
+    </div>
+
+    <div class="col-12">
+      <div class="placeholder">
+        <div class="tag">Placeholder · To be populated</div>
+        <h3>North Star · Engagement · Retention · ARPU</h3>
+        <p>This section will hold the metric framework once it's agreed. Likely candidates include weekly active households, Laura-verified satisfaction score, tier-upgrade conversion, and 12-month retention delta versus the current experience.</p>
+        <div class="skeleton">
+          <div class="skel-box"></div>
+          <div class="skel-box"></div>
+          <div class="skel-box"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<div class="footer">
+  <span class="brand">Norton Reimagined · Digital Fiduciary Advisory</span>
+  <span>Current State · Working Draft</span>
+</div>
+
+</body>
+</html>
