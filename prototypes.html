@@ -1071,10 +1071,10 @@ async function postComment(protoId) {
 async function deleteComment(commentId, protoId) {
   if (!confirm('Delete this note?')) return;
   try {
-    const res = await fetch(`${COMMENTS_API}/${commentId}`, {
+    const res = await fetch(COMMENTS_API, {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ protoId }),
+      body: JSON.stringify({ protoId, commentId }),
     });
     if (!res.ok) throw new Error(`Error ${res.status}`);
     _loadedComments[protoId] = null;

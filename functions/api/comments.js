@@ -79,15 +79,14 @@ export async function onRequest(context) {
     return json({ comment }, 201);
   }
 
-  // ── DELETE /api/comments/<commentId> ─────────────────────────────────────
-  const pathParts = url.pathname.replace(/^\/api\/comments\/?/, '').split('/').filter(Boolean);
-  if (request.method === 'DELETE' && pathParts.length === 1) {
-    const commentId = pathParts[0];
+  // ── DELETE /api/comments — body: { protoId, commentId } ─────────────────
+  if (request.method === 'DELETE') {
     let body;
     try { body = await request.json(); } catch { return err('Invalid JSON'); }
 
-    const { protoId } = body || {};
-    if (!protoId) return err('protoId is required in body');
+    const { protoId, commentId } = body || {};
+    if (!protoId)   return err('protoId is required');
+    if (!commentId) return err('commentId is required');
 
     const raw = await kv.get(kvKey(protoId));
     if (!raw) return err('No comments found for this prototype', 404);
