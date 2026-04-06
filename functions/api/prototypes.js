@@ -343,8 +343,8 @@ async function deployToVercel(files, projectName, token) {
   }
 
   const data = await res.json();
-  // data.url is the deployment URL (permanent, unique to this deployment)
-  // Use the project alias for an evergreen URL: {name}.vercel.app
-  // The deployment URL is also permanent so either works; we prefer the alias.
-  return `https://${projectName}.vercel.app`;
+  // data.url is the actual deployment URL assigned by Vercel (permanent + unique).
+  // Do NOT construct the URL — use exactly what Vercel returns.
+  if (!data.url) throw new Error("Vercel did not return a deployment URL.");
+  return `https://${data.url}`;
 }
