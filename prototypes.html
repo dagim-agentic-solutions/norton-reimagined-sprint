@@ -352,6 +352,43 @@
     color: #ff4444;
     margin-top: 4px;
   }
+
+  /* Laura score badge on prototype cards */
+  .laura-score {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 12px;
+    padding: 10px 12px;
+    background: #f8f8f7;
+    border-radius: 5px;
+    border: 1px solid #e8e8e6;
+  }
+  .score-badge {
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: -.02em;
+    line-height: 1;
+    min-width: 36px;
+  }
+  .score-badge.loves  { color: #1a7a1a; }
+  .score-badge.likes  { color: #4a7a1a; }
+  .score-badge.meh    { color: #9a7a00; }
+  .score-badge.skeptical { color: #c05000; }
+  .score-badge.rejects   { color: #c01a1a; }
+  .score-verdict {
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    margin-bottom: 2px;
+  }
+  .score-reco {
+    font-size: 11px;
+    color: #6b6b6b;
+    line-height: 1.4;
+  }
+
 </style>
 </head>
 <body>
@@ -487,6 +524,14 @@ async function loadPrototypes() {
               ${p.sourceType === 'file' ? `View file (${escapeHtml(p.fileName || 'uploaded')})` : 'Open prototype'} <span class="arrow">→</span>
             </a>
           </div>
+          ${p.lauraScore != null ? `
+          <div class="laura-score">
+            <div class="score-badge ${lauraClass(p.lauraVerdict)}">${p.lauraScore}</div>
+            <div>
+              <div class="score-verdict">${escapeHtml(p.lauraVerdict || '')}</div>
+              <div class="score-reco">${escapeHtml(p.lauraRecommendation || '')}</div>
+            </div>
+          </div>` : ''}
           <button class="proto-delete" onclick="openDeleteModal('${escapeAttr(p.id)}')">✕ Delete</button>
         </div>`;
     }).join('') + '</div>';
@@ -732,6 +777,18 @@ async function confirmDelete() {
 document.getElementById('deleteModal').addEventListener('click', function(e) {
   if (e.target === this) closeDeleteModal();
 });
+
+
+function lauraClass(verdict) {
+  if (!verdict) return '';
+  const v = verdict.toLowerCase();
+  if (v.includes('loves'))    return 'loves';
+  if (v.includes('likes'))    return 'likes';
+  if (v.includes('meh'))      return 'meh';
+  if (v.includes('skeptical')) return 'skeptical';
+  if (v.includes('rejects'))  return 'rejects';
+  return '';
+}
 
 </script>
 

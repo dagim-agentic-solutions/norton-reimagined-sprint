@@ -170,8 +170,8 @@ export async function onRequestPost({ request, env }) {
     sourceType = "vercel";
   }
 
-  // ── Persist prototype ──────────────────────────────────────────────────────
-  const prototype = {
+  // ── Build prototype object ─────────────────────────────────────────────────
+  let prototype = {
     id,
     name:        name.trim(),
     title:       title.trim(),
@@ -182,6 +182,15 @@ export async function onRequestPost({ request, env }) {
     ...(hasFile && !hasUrl ? { fileName: fileName.trim(), vercelProject } : {}),
   };
 
+  // ── Auto-score against Laura (non-fatal) ───────────────────────────────────
+  // Pass fileContent for file uploads so we can extract text directly.
+  // For URL submissions we'll fetch the page. Failures are silently ignored.
+  const lauraResult = await scoreLaura(prototype, hasFile && !hasUrl ? fileContent : null, env);
+  if (lauraResult) {
+    prototype = { ...prototype, ...lauraResult };
+  }
+
+  // ── Persist ────────────────────────────────────────────────────────────────
   try { await kv.put(`proto:${id}`, JSON.stringify(prototype)); }
   catch { return json({ error: "Failed to save prototype. Please try again." }, 503); }
 
@@ -195,6 +204,138 @@ export async function onRequestPost({ request, env }) {
   }
 
   return json({ prototype }, 201);
+}
+
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// LAURA AUTO-SCORING
+// Runs automatically on every prototype submission. Non-fatal — prototype saves
+// even if scoring fails. Extracts readable text from the prototype content and
+// evaluates it against the full Laura persona using Anthropic directly.
+// ═══════════════════════════════════════════════════════════════════════════════
+
+const LAURA_CONTEXT_SCORE = `
+You are evaluating a product prototype on behalf of "Laura, the Outsourcer" —
+the target persona for Norton Reimagined, a Digital Fiduciary Advisory platform.
+
+LAURA IN ONE LINE: She is the guardian of her household's digital life — but
+she doesn't want the job. She wants a trusted expert to quietly handle it in
+the background, the way insurance or utilities do.
+
+WHO SHE IS:
+- 35–55, working parent, full household (partner + kids), 5–10 devices across family
+- Mass-market premium income, comfortable paying for quality protection
+- Tech-comfortable but not "IT people" — adopts tools that reduce effort and anxiety
+- "Unknowledgeable" mindset — not curious about how cyber works, just wants it to work
+- Sees cyber safety as basic life admin, like insurance or utilities
+- Carries the mental load of keeping family safe and is burnt out being the household IT person
+
+HER 4 JOBS TO BE DONE:
+1. Protect my whole household with as little admin from me as possible
+2. Block threats before we click (scams, dodgy sites, sketchy downloads)
+3. Keep my kids safe online with simple, trustworthy controls
+4. Tell me what to do when something looks wrong, in plain language
+
+WHAT "PEACE OF MIND" MEANS TO HER — THE 4Ps:
+- PROACTIVE: Tell her the result. Don't ask her to run scans or flip toggles.
+- PROGRESSIVE: Go beyond viruses — catch AI scams, deepfakes, new threats.
+- PRINCIPLED: Transparent from day one. No dark-pattern upsells.
+- PERVASIVE: Everywhere, all at once. One provider, every device, every family member.
+
+WHAT SHE LOVES: Default-on protection, household framing, calm assured tone, zero config.
+WHAT SHE REJECTS: Dashboards of toggles, jargon, gamification, dark patterns, added admin.
+
+SCORING GUIDE (Laura Score 0–100):
+- 90–100 LOVES IT: Solves a top JTBD, feels effortless, removes mental load.
+- 75–89 LIKES IT: Clearly useful, aligned with 4Ps, low friction.
+- 55–74 MEH: Mixed signals — solves something real but asks too much.
+- 35–54 SKEPTICAL: Violates core principles (too much control, jargon, unclear value).
+- 0–34 REJECTS IT: Fundamentally misreads Laura, adds to mental load.
+`;
+
+function extractTextFromHtml(html) {
+  return html
+    .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+    .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+    .replace(/<!--[\s\S]*?-->/g, ' ')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&nbsp;/g, ' ').replace(/&#?[a-z0-9]+;/gi, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+async function scoreLaura(prototype, fileContent, env) {
+  if (!env.ANTHROPIC_API_KEY) return null;
+
+  let extractedText = '';
+
+  // 1. Get content to analyse
+  if (fileContent && typeof fileContent === 'string') {
+    extractedText = extractTextFromHtml(fileContent);
+  } else if (prototype.url && prototype.sourceType === 'url') {
+    try {
+      const res = await fetch(prototype.url, {
+        headers: { 'User-Agent': 'NortonSprint-LauraBot/1.0' },
+        signal: AbortSignal.timeout(6000),
+      });
+      if (res.ok) {
+        const html = await res.text();
+        extractedText = extractTextFromHtml(html);
+      }
+    } catch {
+      return null; // URL unreachable — skip scoring silently
+    }
+  }
+
+  if (!extractedText || extractedText.trim().length < 30) return null;
+
+  // 2. Build concept string — title + extracted text, capped at 1800 chars
+  const concept = `Prototype title: "${prototype.title}"\nSubmitted by: ${prototype.name}\nSummary: ${prototype.summary}\n\nPrototype content (extracted text):\n${extractedText.slice(0, 1500)}`;
+
+  // 3. Call Anthropic
+  const prompt = `${LAURA_CONTEXT_SCORE}
+
+---
+PROTOTYPE TO EVALUATE:
+${concept}
+
+---
+Respond with ONLY a valid JSON object — no prose, no markdown fences:
+{
+  "score": <integer 0-100>,
+  "verdict": "<LOVES IT | LIKES IT | MEH | SKEPTICAL | REJECTS IT>",
+  "recommendation": "<1-2 sentences — the single most important change to make this land better for Laura, or why it already works>"
+}
+
+The verdict MUST match the score band:
+90-100 → LOVES IT | 75-89 → LIKES IT | 55-74 → MEH | 35-54 → SKEPTICAL | 0-34 → REJECTS IT`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': env.ANTHROPIC_API_KEY,
+        'anthropic-version': '2023-06-01',
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-5',
+        max_tokens: 300,
+        messages: [{ role: 'user', content: prompt }],
+      }),
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    const raw = (data?.content?.[0]?.text ?? '').replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '').trim();
+    const result = JSON.parse(raw);
+    return {
+      lauraScore:          result.score          ?? null,
+      lauraVerdict:        result.verdict         ?? null,
+      lauraRecommendation: result.recommendation  ?? null,
+    };
+  } catch {
+    return null; // Scoring failure is always non-fatal
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
