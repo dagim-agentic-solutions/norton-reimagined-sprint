@@ -598,16 +598,7 @@
           <li>Tab bar: pill-style, ink background, yellow active indicator</li>
           <li>Safe area: 44pt top, 34pt bottom</li>
           <li>Touch targets: minimum 44×44pt</li>
-          <li>Tone: calm, protective — never alarmist</li>
           <li>Status first: "You're protected" before any action</li>
-        </ul>
-        <h5 style="margin-top:14px;">Voice & Tone</h5>
-        <ul>
-          <li>Outcome-first: lead with result, not feature</li>
-          <li>Household framing: "your family", "everyone's devices"</li>
-          <li>No jargon: IOCs, endpoints, heuristics, DNS → banned</li>
-          <li>Norton as fiduciary: trusted, calm, decisive</li>
-          <li>Show what happened, not what you did to make it happen</li>
         </ul>
       </div>
     </div>
@@ -754,6 +745,16 @@
       For your prototype: what is the single moment — ideally within the first 60 seconds of use — when Laura thinks "this is already helping me"?
     </p>
     <textarea class="cb-textarea" id="firstValueMoment" rows="4" placeholder="e.g. Laura opens the app after a 60-second setup and immediately sees 'All 8 of your family's devices are clean and protected.' No scanning needed — it already checked. That's the moment she knows Norton is quietly working for her."></textarea>
+  </div>
+
+  <!-- Voice & Tone -->
+  <div class="cb-section">
+    <div class="sec-label">
+      <span class="sec-num" id="toneSecNum">—</span>
+      <h3>Voice &amp; tone</h3>
+    </div>
+    <p class="sec-hint">How should this concept speak to Laura? Describe the emotional register, personality, and communication style you want — calm and reassuring, confident and decisive, warm and approachable, etc. Be specific. This will directly shape the copy and UI language in the generated output.</p>
+    <textarea class="cb-textarea" id="voiceTone" rows="4" placeholder="e.g. Calm, decisive, and warm — like a trusted friend who happens to be a security expert. Never scary or technical. Speaks in outcomes ('your family is protected') not mechanics ('scan completed'). Uses 'we' when Norton acts, 'you' when addressing Laura. Short sentences. No exclamation marks."></textarea>
   </div>
 
   <!-- Generate -->
@@ -1223,6 +1224,7 @@ function generate() {
   const caps          = getSelectedCaps();
   const jtbds         = getJtbds().filter(j => j.when && j.want && j.soican);
   const comps         = getComps();
+  const voiceTone     = document.getElementById('voiceTone').value.trim();
   const isIOS         = buildType === 'ios';
   const iaTabs        = isIOS ? getIaTabs() : [];
   const onboardingStory = isIOS ? document.getElementById('onboardingStory').value.trim() : '';
@@ -1247,9 +1249,7 @@ function generate() {
 - Colors: #242424 ink · #FFE800 yellow accent · #F8F8F7 paper background · #FFFFFF card
 - Border radius: 8px cards · 999px pills/tags · 36px device frame (iOS)
 - Nav style: pill navigation, sticky/fixed top
-- Tone: calm, assured, protective — Norton as her fiduciary
-- Never use jargon (IOCs, endpoints, heuristics, DNS)
-- Always show outcomes, not mechanics`;
+${voiceTone ? `\nVOICE & TONE (defined by the concept author):\n${voiceTone}` : '- Tone: calm, assured, protective — Norton as her fiduciary\n- Always show outcomes, not mechanics'}`;
 
   // IA / nav section for prompt
   const iaSection = iaTabs.length
@@ -1281,7 +1281,7 @@ ${iaSection ? '\n' + iaSection + '\n' : ''}${onboardingSection ? '\n' + onboardi
 - "You're protected" status — bury the mechanics
 - Household framing ("your family", "everyone's devices")
 - Single clear CTA when interruption is necessary
-- Calm, assured, protective tone throughout
+- Follow the voice & tone defined above
 TECHNICAL REQUIREMENTS:
 - Single React component with default export
 - No external dependencies beyond React
@@ -1304,9 +1304,9 @@ PAGE SECTION STRUCTURE (in order):
 10. Footer — minimal, trustworthy
 COPY PRINCIPLES:
 - Outcome-first: lead with the result, not the feature
-- Laura's voice: plain language, no tech jargon
-- Household framing throughout
-- Calm and assured — never scary or alarmist
+- Plain language, no tech jargon (IOCs, endpoints, DNS, heuristics are banned)
+- Household framing throughout ("your family", "everyone's devices")
+- Follow the voice & tone defined above
 TECHNICAL REQUIREMENTS:
 - Single self-contained HTML file
 - Responsive (mobile-first, breakpoints at 640px and 1024px)
