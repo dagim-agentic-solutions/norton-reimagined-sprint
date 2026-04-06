@@ -997,6 +997,7 @@ function toggleFeaturedCap(cap) {
 
   if (_featuredState[cap].checked) {
     item?.style.setProperty('background','var(--ink)');
+    item?.style.setProperty('color','#fff');
     item?.style.setProperty('border-color','var(--ink)');
     check.style.cssText = 'background:var(--yellow);border-color:var(--yellow);color:var(--ink);';
     if (picker) picker.style.display = 'block';
@@ -1005,6 +1006,7 @@ function toggleFeaturedCap(cap) {
     if (defaultRadio) { defaultRadio.checked = true; updateRoleStyles(cap); }
   } else {
     item?.style.removeProperty('background');
+    item?.style.removeProperty('color');
     item?.style.setProperty('border-color','var(--line)');
     check.style.cssText = '';
     if (picker) picker.style.display = 'none';
