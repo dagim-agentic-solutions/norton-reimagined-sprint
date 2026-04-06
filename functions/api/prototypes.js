@@ -317,35 +317,43 @@ function filesToVercelPayload(rawFiles) {
 }
 
 async function deployToVercel(files, projectName, token) {
-  // files: Vercel file payload array [{ file, data, encoding }]
-  const res = await fetch("https://api.vercel.com/v13/deployments", {
+  const authHeader = { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" };
+
+  // 1. Create deployment
+  const deployRes = await fetch("https://api.vercel.com/v13/deployments", {
     method: "POST",
-    headers: {
-      "Authorization": `Bearer ${token}`,
-      "Content-Type":  "application/json",
-    },
+    headers: authHeader,
     body: JSON.stringify({
       name: projectName,
       files,
       projectSettings: {
-        framework:        null,
-        buildCommand:     null,
-        outputDirectory:  null,
-        installCommand:   null,
+        framework:       null,
+        buildCommand:    null,
+        outputDirectory: null,
+        installCommand:  null,
       },
       target: "production",
-      public: true, // disable deployment protection — anyone with the link can view
     }),
   });
 
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(err.error?.message || `Vercel responded with ${res.status}`);
+  if (!deployRes.ok) {
+    const err = await deployRes.json().catch(() => ({}));
+    throw new Error(err.error?.message || `Vercel responded with ${deployRes.status}`);
   }
 
-  const data = await res.json();
-  // data.url is the actual deployment URL assigned by Vercel (permanent + unique).
-  // Do NOT construct the URL — use exactly what Vercel returns.
-  if (!data.url) throw new Error("Vercel did not return a deployment URL.");
-  return `https://${data.url}`;
+  const deployData = await deployRes.json();
+  if (!deployData.url) throw new Error("Vercel did not return a deployment URL.");
+
+  // 2. Disable deployment protection on the project so anyone with the link can view
+  // This patches the project to remove SSO/password protection entirely.
+  await fetch(`https://api.vercel.com/v9/projects/${encodeURIComponent(projectName)}`, {
+    method: "PATCH",
+    headers: authHeader,
+    body: JSON.stringify({
+      ssoProtection:      null,
+      passwordProtection: null,
+    }),
+  }).catch(() => {}); // non-fatal — URL still works, just might ask for auth
+
+  return `https://${deployData.url}`;
 }
