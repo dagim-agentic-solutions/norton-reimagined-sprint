@@ -1392,19 +1392,21 @@ function closeDeckModal() {
 }
 
 async function submitDeck() {
-  const password = document.getElementById('deckPassword').value.trim();
-  const errEl    = document.getElementById('deckErr');
-  const statusEl = document.getElementById('deckStatus');
+  const password  = document.getElementById('deckPassword').value.trim();
+  const errEl     = document.getElementById('deckErr');
+  const statusEl  = document.getElementById('deckStatus');
   const submitBtn = document.getElementById('deckSubmitBtn');
 
   errEl.textContent = '';
   if (!password) { errEl.textContent = 'Password required.'; return; }
 
   submitBtn.disabled = true;
-  submitBtn.textContent = 'Generating…';
-  statusEl.textContent = '⏳ Building your pitch deck — this takes about 60 seconds…';
+  submitBtn.textContent = 'Starting…';
+  statusEl.textContent = '⏳ Sending to Gamma…';
   document.getElementById('deckModalForm').querySelector('input').disabled = true;
 
+  // Step 1: start generation — returns generationId immediately
+  let generationId;
   try {
     const res = await fetch('/api/generate-deck', {
       method: 'POST',
@@ -1426,18 +1428,50 @@ async function submitDeck() {
       document.getElementById('deckModalForm').querySelector('input').disabled = false;
       return;
     }
-    statusEl.textContent = '';
-    document.getElementById('deckModalForm').style.display = 'none';
-    const resultEl = document.getElementById('deckResult');
-    document.getElementById('deckLink').href = data.gammaUrl;
-    resultEl.classList.add('show');
+    generationId = data.generationId;
   } catch (e) {
-    errEl.textContent = 'Network error — try again.';
+    errEl.textContent = 'Could not reach server — check your connection and try again.';
     submitBtn.disabled = false;
     submitBtn.textContent = 'Generate Deck';
     statusEl.textContent = '';
     document.getElementById('deckModalForm').querySelector('input').disabled = false;
+    return;
   }
+
+  // Step 2: browser polls /api/generate-deck?id=xxx every 4s
+  const maxPolls = 40; // up to ~160s
+  let dots = 0;
+  for (let i = 0; i < maxPolls; i++) {
+    await new Promise(r => setTimeout(r, 4000));
+    dots = (dots % 3) + 1;
+    statusEl.textContent = '⏳ Building your deck' + '.'.repeat(dots) + ' (~60s total)';
+    try {
+      const pollRes = await fetch('/api/generate-deck?id=' + encodeURIComponent(generationId));
+      const pollData = await pollRes.json();
+      if (pollData.status === 'completed' && pollData.gammaUrl) {
+        statusEl.textContent = '';
+        document.getElementById('deckModalForm').style.display = 'none';
+        document.getElementById('deckLink').href = pollData.gammaUrl;
+        document.getElementById('deckResult').classList.add('show');
+        return;
+      }
+      if (pollData.status === 'failed') {
+        errEl.textContent = 'Gamma reported a generation failure. Try again.';
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Generate Deck';
+        statusEl.textContent = '';
+        document.getElementById('deckModalForm').querySelector('input').disabled = false;
+        return;
+      }
+    } catch { /* keep polling on transient errors */ }
+  }
+
+  // Timed out
+  errEl.textContent = 'Timed out waiting for Gamma. Try again — it usually completes in 60s.';
+  submitBtn.disabled = false;
+  submitBtn.textContent = 'Generate Deck';
+  statusEl.textContent = '';
+  document.getElementById('deckModalForm').querySelector('input').disabled = false;
 }
 
 function lauraClass(verdict) {

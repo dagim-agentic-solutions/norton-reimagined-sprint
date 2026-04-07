@@ -1,14 +1,16 @@
 /**
- * POST /api/generate-deck
- * Password-gated endpoint: generates a Gamma pitch deck for a prototype.
+ * /api/generate-deck
  *
- * Request body: { password, protoId, title, summary, url }
- * Response:     { gammaUrl } on success, { error } on failure
+ * POST { password, title, summary, url }
+ *   → validates password, kicks off async Gamma generation
+ *   → returns { generationId }  (fast — well under 30s CF limit)
  *
- * Flow: validate password → build rich pitch text → POST to Gamma → poll → return gammaUrl
+ * GET  ?id=<generationId>
+ *   → polls Gamma once and returns { status, gammaUrl? }
+ *   → browser polls this every 4s until status === "completed" or "failed"
  */
 
-const DECK_PASSWORD_HASH = "norton2026sprint"; // checked server-side; never exposed to browser
+const DECK_PASSWORD_HASH = "norton2026sprint";
 
 const LAURA_CONTEXT = `
 LAURA — THE TARGET PERSONA:
@@ -38,8 +40,7 @@ The sprint hypothesis: If Norton can make the complex simple, the invisible visi
 `;
 
 function buildPitchText(title, summary, url) {
-  return `
-# PITCH DECK: ${title}
+  return `# PITCH DECK: ${title}
 ## Norton Reimagined Design Sprint
 
 ---
@@ -57,7 +58,7 @@ ${NORTON_CONTEXT}
 **What it is:**
 ${summary}
 
-**Live prototype:** ${url}
+**Live prototype:** ${url || "(link not provided)"}
 
 ---
 
@@ -99,22 +100,52 @@ Clear ask from the sprint team: validation, feedback, go/no-go signal, or next s
 
 TONE: Premium consumer brand, confident but not corporate. Warm and direct. Designed to resonate with both Laura and Norton leadership. No jargon. Show why this matters.
 
-FORMAT: 16:9 presentation. High visual impact. Clean. Data where relevant but story-first.
-`;
+FORMAT: 16:9 presentation. High visual impact. Clean. Data where relevant but story-first.`;
 }
 
 const ALLOWED_ORIGIN = "*";
 function corsHeaders() {
   return {
     "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
-    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type",
   };
 }
+
 export async function onRequestOptions() {
   return new Response(null, { status: 204, headers: corsHeaders() });
 }
 
+// ── GET: single poll for status ───────────────────────────────────────────────
+export async function onRequestGet({ request, env }) {
+  const headers = { "Content-Type": "application/json", ...corsHeaders() };
+  const url = new URL(request.url);
+  const id = url.searchParams.get("id");
+  if (!id) {
+    return new Response(JSON.stringify({ error: "Missing id param." }), { status: 400, headers });
+  }
+  const gammaKey = env.GAMMA_API_KEY;
+  if (!gammaKey) {
+    return new Response(JSON.stringify({ error: "Gamma API not configured." }), { status: 500, headers });
+  }
+  try {
+    const res = await fetch(`https://public-api.gamma.app/v1.0/generations/${id}`, {
+      headers: { "X-API-KEY": gammaKey },
+    });
+    if (!res.ok) {
+      return new Response(JSON.stringify({ status: "pending" }), { status: 200, headers });
+    }
+    const data = await res.json();
+    return new Response(JSON.stringify({
+      status: data.status || "pending",
+      gammaUrl: data.gammaUrl || null,
+    }), { status: 200, headers });
+  } catch {
+    return new Response(JSON.stringify({ status: "pending" }), { status: 200, headers });
+  }
+}
+
+// ── POST: validate password + start generation ────────────────────────────────
 export async function onRequestPost({ request, env }) {
   const headers = { "Content-Type": "application/json", ...corsHeaders() };
 
@@ -123,7 +154,7 @@ export async function onRequestPost({ request, env }) {
     return new Response(JSON.stringify({ error: "Invalid JSON." }), { status: 400, headers });
   }
 
-  // 1. Password check (server-side only)
+  // 1. Password check
   const pass = (body.password || "").trim();
   const expectedHash = env.DECK_PASSWORD || DECK_PASSWORD_HASH;
   if (pass !== expectedHash) {
@@ -142,9 +173,8 @@ export async function onRequestPost({ request, env }) {
     return new Response(JSON.stringify({ error: "Gamma API not configured." }), { status: 500, headers });
   }
 
-  // 4. Create Gamma generation
+  // 4. Start generation (async — returns immediately with generationId)
   const pitchText = buildPitchText(title, summary, url || "");
-  let generationId;
   try {
     const createRes = await fetch("https://public-api.gamma.app/v1.0/generations", {
       method: "POST",
@@ -158,7 +188,11 @@ export async function onRequestPost({ request, env }) {
         format: "presentation",
         numCards: 10,
         cardOptions: { dimensions: "16x9" },
-        textOptions: { amount: "medium", tone: "professional and inspiring", audience: "product and business stakeholders at a consumer tech company" },
+        textOptions: {
+          amount: "medium",
+          tone: "professional and inspiring",
+          audience: "product and business stakeholders at a consumer tech company",
+        },
         imageOptions: { source: "pexels" },
         sharingOptions: { externalAccess: "view" },
       }),
@@ -168,35 +202,8 @@ export async function onRequestPost({ request, env }) {
       return new Response(JSON.stringify({ error: `Gamma error: ${err.slice(0, 200)}` }), { status: 502, headers });
     }
     const createData = await createRes.json();
-    generationId = createData.generationId;
+    return new Response(JSON.stringify({ generationId: createData.generationId }), { status: 200, headers });
   } catch (err) {
-    return new Response(JSON.stringify({ error: `Network error: ${err.message}` }), { status: 502, headers });
+    return new Response(JSON.stringify({ error: `Network error starting generation: ${err.message}` }), { status: 502, headers });
   }
-
-  // 5. Poll for completion (max 90 seconds, 3s intervals)
-  const maxAttempts = 30;
-  let gammaUrl = null;
-  for (let i = 0; i < maxAttempts; i++) {
-    await new Promise(r => setTimeout(r, 3000));
-    try {
-      const pollRes = await fetch(`https://public-api.gamma.app/v1.0/generations/${generationId}`, {
-        headers: { "X-API-KEY": gammaKey },
-      });
-      if (!pollRes.ok) continue;
-      const pollData = await pollRes.json();
-      if (pollData.status === "completed" && pollData.gammaUrl) {
-        gammaUrl = pollData.gammaUrl;
-        break;
-      }
-      if (pollData.status === "failed") {
-        return new Response(JSON.stringify({ error: "Gamma generation failed." }), { status: 502, headers });
-      }
-    } catch { continue; }
-  }
-
-  if (!gammaUrl) {
-    return new Response(JSON.stringify({ error: "Deck generation timed out. Try again." }), { status: 504, headers });
-  }
-
-  return new Response(JSON.stringify({ gammaUrl }), { status: 200, headers });
 }
