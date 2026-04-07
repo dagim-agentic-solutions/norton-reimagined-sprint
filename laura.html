@@ -903,6 +903,244 @@
     .btn { width: 100%; text-align: center; }
     textarea { font-size: 16px; } /* prevents iOS zoom */
   }
+
+/* ── Elevator Pitch Tool ─────────────────────────────────────────────── */
+.ep-tool {
+  background: var(--ink);
+  color: #fff;
+  border-radius: 16px;
+  padding: 56px 60px;
+  margin-top: 40px;
+  position: relative;
+  overflow: hidden;
+}
+.ep-tool::before {
+  content: "";
+  position: absolute;
+  top: -80px; right: -80px;
+  width: 340px; height: 340px;
+  background: var(--yellow);
+  border-radius: 50%;
+  opacity: 0.06;
+  pointer-events: none;
+}
+.ep-tool .eyebrow {
+  background: var(--yellow);
+  color: var(--ink);
+  border-color: var(--yellow);
+}
+.ep-tool h2 {
+  font-size: 40px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  margin-top: 14px;
+}
+.ep-tool h2 em { font-style: normal; background: var(--yellow); color: var(--ink); padding: 0 10px; border-radius: 6px; }
+.ep-tool .sub { color: #c0c0c0; font-size: 15px; max-width: 580px; line-height: 1.6; margin-top: 12px; }
+.ep-input-wrap { margin-top: 28px; }
+.ep-input-wrap label { display: block; font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--yellow); margin-bottom: 10px; }
+.ep-input-wrap textarea {
+  width: 100%;
+  background: rgba(255,255,255,0.07);
+  border: 1.5px solid rgba(255,255,255,0.18);
+  border-radius: 8px;
+  padding: 16px 18px;
+  font-family: 'Inter Tight', sans-serif;
+  font-size: 15px;
+  color: #fff;
+  line-height: 1.5;
+  min-height: 110px;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.15s;
+  box-sizing: border-box;
+}
+.ep-input-wrap textarea:focus { border-color: var(--yellow); }
+.ep-input-wrap textarea::placeholder { color: rgba(255,255,255,0.35); }
+.ep-char-count { font-size: 11px; color: rgba(255,255,255,0.35); text-align: right; margin-top: 5px; }
+.ep-actions { margin-top: 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.btn-ep-start {
+  background: var(--yellow);
+  color: var(--ink);
+  border: none;
+  border-radius: 999px;
+  padding: 14px 32px;
+  font-family: 'Inter Tight', sans-serif;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.btn-ep-start:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(255,232,0,0.35); }
+.btn-ep-start:disabled { opacity: 0.5; cursor: not-allowed; }
+.ep-error { font-size: 13px; color: #ff8080; margin-top: 10px; min-height: 18px; }
+.ep-pitch-summary {
+  background: rgba(255,255,255,0.07);
+  border-left: 3px solid var(--yellow);
+  border-radius: 6px;
+  padding: 12px 16px;
+  font-size: 13px;
+  color: rgba(255,255,255,0.7);
+  line-height: 1.5;
+  margin-bottom: 24px;
+  font-style: italic;
+}
+.ep-thread { display: flex; flex-direction: column; gap: 14px; margin-bottom: 24px; }
+.ep-msg {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  animation: ep-fade-in 0.3s ease;
+}
+@keyframes ep-fade-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+.ep-msg-avatar {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 800;
+}
+.ep-msg.laura .ep-msg-avatar { background: var(--yellow); color: var(--ink); }
+.ep-msg.participant .ep-msg-avatar { background: rgba(255,255,255,0.15); color: #fff; }
+.ep-msg-bubble {
+  flex: 1;
+  padding: 12px 16px;
+  border-radius: 10px;
+  font-size: 14px;
+  line-height: 1.55;
+}
+.ep-msg.laura .ep-msg-bubble { background: rgba(255,255,255,0.08); color: #fff; border-bottom-left-radius: 3px; }
+.ep-msg.participant .ep-msg-bubble { background: var(--yellow); color: var(--ink); font-weight: 500; border-bottom-right-radius: 3px; align-self: flex-end; }
+.ep-msg.participant { flex-direction: row-reverse; }
+.ep-msg-name { font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.5; margin-bottom: 4px; }
+.ep-msg.laura .ep-msg-name { color: var(--yellow); opacity: 0.8; }
+.ep-msg-thinking { display: flex; gap: 5px; align-items: center; padding: 12px 16px; background: rgba(255,255,255,0.08); border-radius: 10px; border-bottom-left-radius: 3px; }
+.ep-dot { width: 7px; height: 7px; background: rgba(255,255,255,0.5); border-radius: 50%; animation: ep-bounce 1.2s infinite; }
+.ep-dot:nth-child(2) { animation-delay: 0.2s; }
+.ep-dot:nth-child(3) { animation-delay: 0.4s; }
+@keyframes ep-bounce { 0%,80%,100% { transform: translateY(0); } 40% { transform: translateY(-6px); } }
+.ep-reply-wrap { margin-top: 8px; }
+.ep-reply-row { display: flex; gap: 10px; align-items: flex-end; }
+.ep-reply-row textarea {
+  flex: 1;
+  background: rgba(255,255,255,0.07);
+  border: 1.5px solid rgba(255,255,255,0.18);
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-family: 'Inter Tight', sans-serif;
+  font-size: 14px;
+  color: #fff;
+  resize: none;
+  outline: none;
+  transition: border-color 0.15s;
+  box-sizing: border-box;
+}
+.ep-reply-row textarea:focus { border-color: var(--yellow); }
+.ep-reply-row textarea::placeholder { color: rgba(255,255,255,0.35); }
+.btn-ep-send {
+  background: var(--yellow);
+  color: var(--ink);
+  border: none;
+  border-radius: 8px;
+  padding: 12px 22px;
+  font-family: 'Inter Tight', sans-serif;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s;
+  flex-shrink: 0;
+}
+.btn-ep-send:hover:not(:disabled) { background: #e6d000; }
+.btn-ep-send:disabled { opacity: 0.5; cursor: not-allowed; }
+.ep-turn-indicator { font-size: 11px; color: rgba(255,255,255,0.35); margin-top: 6px; text-align: right; letter-spacing: 0.06em; }
+/* Verdict */
+.ep-verdict {
+  margin-top: 32px;
+  background: rgba(255,255,255,0.05);
+  border: 1.5px solid rgba(255,255,255,0.12);
+  border-radius: 12px;
+  padding: 28px 32px;
+  animation: ep-fade-in 0.5s ease;
+}
+.ep-verdict-header { display: flex; align-items: center; gap: 20px; margin-bottom: 16px; flex-wrap: wrap; }
+.ep-verdict-badge {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  padding: 8px 20px;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+.ep-verdict-badge.sold { background: #0a7a3d; color: #fff; }
+.ep-verdict-badge.cautious { background: var(--yellow); color: var(--ink); }
+.ep-verdict-badge.not-convinced { background: rgba(255,200,0,0.15); color: var(--yellow); border: 1.5px solid var(--yellow); }
+.ep-verdict-badge.walked { background: rgba(255,80,80,0.15); color: #ff8080; border: 1.5px solid #ff8080; }
+.ep-verdict-score { font-size: 40px; font-weight: 800; letter-spacing: -0.03em; }
+.ep-verdict-score-lbl { font-size: 11px; color: rgba(255,255,255,0.4); letter-spacing: 0.08em; text-transform: uppercase; margin-top: 2px; }
+.ep-verdict-headline { font-size: 18px; font-weight: 700; margin-bottom: 10px; line-height: 1.3; }
+.ep-verdict-reasoning { font-size: 14px; color: rgba(255,255,255,0.7); line-height: 1.55; }
+.ep-verdict-concerns { margin-top: 14px; }
+.ep-verdict-concerns h5 { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.4); margin-bottom: 8px; }
+.ep-verdict-concerns ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 6px; }
+.ep-verdict-concerns ul li { font-size: 13px; color: rgba(255,255,255,0.65); padding-left: 16px; position: relative; }
+.ep-verdict-concerns ul li::before { content: "!"; position: absolute; left: 0; color: var(--yellow); font-weight: 800; }
+/* CTA block */
+.ep-cta-block {
+  margin-top: 28px;
+  background: var(--yellow);
+  color: var(--ink);
+  border-radius: 12px;
+  padding: 28px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  animation: ep-fade-in 0.5s ease 0.2s both;
+}
+.ep-cta-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.6; }
+.ep-cta-block h3 { font-size: 20px; font-weight: 800; letter-spacing: -0.02em; margin: 0; line-height: 1.2; }
+.ep-cta-block p { font-size: 14px; line-height: 1.5; opacity: 0.75; max-width: 520px; margin: 0; }
+.btn-ep-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--ink);
+  color: #fff;
+  border-radius: 999px;
+  padding: 13px 28px;
+  font-family: 'Inter Tight', sans-serif;
+  font-size: 14px;
+  font-weight: 800;
+  text-decoration: none;
+  margin-top: 6px;
+  transition: transform 0.15s, box-shadow 0.15s;
+  align-self: flex-start;
+}
+.btn-ep-cta:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(36,36,36,0.3); }
+.btn-ep-reset {
+  display: block;
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.35);
+  font-family: 'Inter Tight', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  margin-top: 20px;
+  padding: 0;
+  transition: color 0.15s;
+}
+.btn-ep-reset:hover { color: rgba(255,255,255,0.7); }
+@media (max-width: 860px) {
+  .ep-tool { padding: 36px 24px; }
+  .ep-tool h2 { font-size: 28px; }
+}
 </style>
 </head>
 <body>
@@ -1251,6 +1489,65 @@
     </div>
   </div>
 
+  <!-- ============================================ -->
+  <!-- ELEVATOR PITCH TOOL -->
+  <!-- ============================================ -->
+  <div class="ep-tool">
+    <span class="eyebrow">Sprint Tool</span>
+    <h2>Pitch Laura <em>directly</em>.</h2>
+    <p class="sub">
+      Write your elevator pitch. Laura will respond as herself — skeptical, direct, and grounded in her real priorities.
+      Up to 5 rounds. If you convince her, you'll know. If you don't, you'll know that too.
+    </p>
+
+    <!-- Step 1: pitch input -->
+    <div id="epStep1">
+      <div class="ep-input-wrap">
+        <label for="epPitch">Your Elevator Pitch</label>
+        <textarea id="epPitch" placeholder="e.g. Imagine a Norton app that sends you one text every morning — either 'Your family is protected' or 'One thing needs your attention.' No dashboards, no jargon, no weekly reports. Just a single signal. If something needs fixing, we fix it for you." maxlength="600"></textarea>
+        <div class="ep-char-count"><span id="epCharCount">0</span> / 600</div>
+      </div>
+      <div class="ep-actions">
+        <button class="btn-ep-start" id="epStartBtn" onclick="epStart()">
+          <span id="epStartBtnText">Pitch Laura →</span>
+        </button>
+      </div>
+      <div class="ep-error" id="epError"></div>
+    </div>
+
+    <!-- Step 2: conversation -->
+    <div id="epConversation" style="display:none;">
+      <div class="ep-pitch-summary" id="epPitchSummary"></div>
+      <div class="ep-thread" id="epThread"></div>
+
+      <!-- Reply input (hidden after round 5) -->
+      <div class="ep-reply-wrap" id="epReplyWrap">
+        <div class="ep-reply-row">
+          <textarea id="epReply" placeholder="Your response to Laura…" maxlength="500" rows="3" onkeydown="if((event.metaKey||event.ctrlKey)&&event.key==='Enter')epSend()"></textarea>
+          <button class="btn-ep-send" id="epSendBtn" onclick="epSend()">
+            <span id="epSendBtnText">Send</span>
+          </button>
+        </div>
+        <div class="ep-turn-indicator" id="epTurnIndicator">Round 1 of 5</div>
+      </div>
+
+      <!-- Final verdict -->
+      <div class="ep-verdict" id="epVerdict" style="display:none;"></div>
+
+      <!-- CTA to real interview tool -->
+      <div class="ep-cta-block" id="epCta" style="display:none;">
+        <div class="ep-cta-eyebrow">Want to go deeper?</div>
+        <h3>Interview Laura with the Gen Research Tool</h3>
+        <p>This simulator is a fast gut-check. The Gen Research team has built a full AI interview tool that takes your concept further — longer sessions, richer feedback, and research-grade analysis. Use it to validate before you build.</p>
+        <a href="https://gen.thealphabase.com/" target="_blank" rel="noopener" class="btn-ep-cta">
+          Open the Laura Interview Tool →
+        </a>
+      </div>
+
+      <button class="btn-ep-reset" onclick="epReset()">↺ Start a new pitch</button>
+    </div>
+  </div>
+
   <div class="footer">
     <span class="brand">Norton Reimagined</span>
     <span>Source: Project Spotlight (Jan 2026) · Norton Reimagine Qual Study · Acquisition Line-ups Phase 1</span>
@@ -1385,6 +1682,222 @@ document.getElementById('concept').addEventListener('keydown', (e) => {
     runPressureTest();
   }
 });
+
+// ===== Elevator Pitch Tool =====
+const EP_API = '/api/elevator-pitch';
+let epPitchText = '';
+let epHistory = [];  // [{role:'user'|'assistant', content:'...'}]
+let epTurn = 0;      // Laura's turns (max 5)
+let epBusy = false;
+
+document.getElementById('epPitch').addEventListener('input', function() {
+  document.getElementById('epCharCount').textContent = this.value.length;
+});
+
+async function epStart() {
+  if (epBusy) return;
+  const pitch = document.getElementById('epPitch').value.trim();
+  const errorEl = document.getElementById('epError');
+  errorEl.textContent = '';
+
+  if (!pitch) { errorEl.textContent = 'Write your elevator pitch first.'; return; }
+  if (pitch.length < 20) { errorEl.textContent = 'Give Laura more to work with — describe what your idea actually is.'; return; }
+
+  epBusy = true;
+  const btn = document.getElementById('epStartBtn');
+  const btnText = document.getElementById('epStartBtnText');
+  btnText.innerHTML = '<span style="display:inline-block;width:14px;height:14px;border:2px solid #24242440;border-top-color:var(--ink);border-radius:50%;animation:ep-spin .7s linear infinite;vertical-align:middle;margin-right:6px;"></span>Validating…';
+  btn.disabled = true;
+
+  // Inject spin keyframes if not present
+  if (!document.getElementById('ep-spin-style')) {
+    const s = document.createElement('style');
+    s.id = 'ep-spin-style';
+    s.textContent = '@keyframes ep-spin { to { transform: rotate(360deg); } }';
+    document.head.appendChild(s);
+  }
+
+  try {
+    const res = await fetch(EP_API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'validate', pitch })
+    });
+    const data = await res.json();
+    if (!data.valid) {
+      errorEl.textContent = data.feedback || 'That doesn\'t read as an elevator pitch. Describe your product idea.';
+      epBusy = false;
+      btnText.textContent = 'Pitch Laura →';
+      btn.disabled = false;
+      return;
+    }
+  } catch (e) {
+    // On network error, proceed anyway
+  }
+
+  epPitchText = pitch;
+  epHistory = [];
+  epTurn = 0;
+
+  // Show conversation view
+  document.getElementById('epStep1').style.display = 'none';
+  document.getElementById('epConversation').style.display = 'block';
+  document.getElementById('epPitchSummary').textContent = '\u201C' + pitch + '\u201D';
+  document.getElementById('epThread').innerHTML = '';
+  document.getElementById('epVerdict').style.display = 'none';
+  document.getElementById('epCta').style.display = 'none';
+  document.getElementById('epReplyWrap').style.display = 'block';
+
+  // First message from participant to kick off the conversation
+  epHistory.push({ role: 'user', content: 'Hi, I\u2019d like to pitch you an idea. ' + pitch });
+  epAppendMsg('participant', 'You', pitch);
+  await epGetLauraReply();
+
+  epBusy = false;
+  btnText.textContent = 'Pitch Laura →';
+  btn.disabled = false;
+}
+
+async function epSend() {
+  if (epBusy) return;
+  const replyEl = document.getElementById('epReply');
+  const reply = replyEl.value.trim();
+  if (!reply) return;
+
+  epBusy = true;
+  const btn = document.getElementById('epSendBtn');
+  btn.disabled = true;
+  document.getElementById('epSendBtnText').textContent = 'Sending…';
+
+  replyEl.value = '';
+  epAppendMsg('participant', 'You', reply);
+  epHistory.push({ role: 'user', content: reply });
+  await epGetLauraReply();
+
+  epBusy = false;
+  btn.disabled = false;
+  document.getElementById('epSendBtnText').textContent = 'Send';
+}
+
+async function epGetLauraReply() {
+  // Show thinking indicator
+  const thread = document.getElementById('epThread');
+  const thinking = document.createElement('div');
+  thinking.className = 'ep-msg laura';
+  thinking.id = 'epThinking';
+  thinking.innerHTML = '<div class="ep-msg-avatar">L</div><div class="ep-msg-thinking"><div class="ep-dot"></div><div class="ep-dot"></div><div class="ep-dot"></div></div>';
+  thread.appendChild(thinking);
+  thinking.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+  try {
+    const res = await fetch(EP_API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'respond', pitch: epPitchText, history: epHistory })
+    });
+    const data = await res.json();
+
+    document.getElementById('epThinking')?.remove();
+
+    if (data.error) { epAppendMsg('laura', 'Laura', 'Something went wrong — try again.'); return; }
+
+    epHistory.push({ role: 'assistant', content: data.reply });
+    epTurn++;
+    epAppendMsg('laura', 'Laura', data.reply);
+    epUpdateTurnIndicator();
+
+    if (data.final) {
+      // Hide reply box, show verdict
+      document.getElementById('epReplyWrap').style.display = 'none';
+      epShowVerdict(data.verdict || {});
+    }
+  } catch (e) {
+    document.getElementById('epThinking')?.remove();
+    epAppendMsg('laura', 'Laura', 'Something went wrong — please try again.');
+  }
+}
+
+function epAppendMsg(side, name, text) {
+  const thread = document.getElementById('epThread');
+  const div = document.createElement('div');
+  div.className = 'ep-msg ' + side;
+  const initial = side === 'laura' ? 'L' : 'Y';
+  div.innerHTML = '<div class="ep-msg-avatar">' + initial + '</div>' +
+    '<div class="ep-msg-bubble">' +
+      '<div class="ep-msg-name">' + escHtmlEP(name) + '</div>' +
+      '<div>' + escHtmlEP(text).replace(/\n/g, '<br>') + '</div>' +
+    '</div>';
+  thread.appendChild(div);
+  div.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function epUpdateTurnIndicator() {
+  const ind = document.getElementById('epTurnIndicator');
+  if (ind) ind.textContent = 'Round ' + epTurn + ' of 5';
+}
+
+function epShowVerdict(v) {
+  const el = document.getElementById('epVerdict');
+  const score = v.score || 0;
+  const convinced = v.convinced || false;
+  const verdict = (v.verdict || 'NOT CONVINCED').toUpperCase();
+  const headline = v.headline || '';
+  const reasoning = v.reasoning || '';
+  const concerns = v.remaining_concerns || [];
+
+  let badgeClass = 'not-convinced', badgeLabel = verdict;
+  if (verdict.includes('SOLD')) { badgeClass = 'sold'; badgeLabel = 'SOLD'; }
+  else if (verdict.includes('CAUTIOUSLY')) { badgeClass = 'cautious'; badgeLabel = 'CAUTIOUSLY INTERESTED'; }
+  else if (verdict.includes('WALKED')) { badgeClass = 'walked'; badgeLabel = 'WALKED AWAY'; }
+
+  let concernsHtml = '';
+  if (concerns.length > 0) {
+    concernsHtml = '<div class="ep-verdict-concerns"><h5>Remaining concerns</h5><ul>' +
+      concerns.map(c => '<li>' + escHtmlEP(c) + '</li>').join('') + '</ul></div>';
+  }
+
+  el.innerHTML =
+    '<div class="ep-verdict-header">' +
+      '<div class="ep-verdict-badge ' + badgeClass + '">' + badgeLabel + '</div>' +
+      '<div><div class="ep-verdict-score">' + score + '<span style="font-size:18px;opacity:.5;">/100</span></div>' +
+      '<div class="ep-verdict-score-lbl">Laura Satisfaction Score</div></div>' +
+    '</div>' +
+    '<div class="ep-verdict-headline">\u201C' + escHtmlEP(headline) + '\u201D</div>' +
+    '<div class="ep-verdict-reasoning">' + escHtmlEP(reasoning) + '</div>' +
+    concernsHtml;
+
+  el.style.display = 'block';
+  el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  setTimeout(() => {
+    document.getElementById('epCta').style.display = 'block';
+    document.getElementById('epCta').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }, 600);
+}
+
+function epReset() {
+  epPitchText = '';
+  epHistory = [];
+  epTurn = 0;
+  epBusy = false;
+  document.getElementById('epPitch').value = '';
+  document.getElementById('epCharCount').textContent = '0';
+  document.getElementById('epError').textContent = '';
+  document.getElementById('epThread').innerHTML = '';
+  document.getElementById('epReply').value = '';
+  document.getElementById('epVerdict').style.display = 'none';
+  document.getElementById('epCta').style.display = 'none';
+  document.getElementById('epReplyWrap').style.display = 'block';
+  document.getElementById('epConversation').style.display = 'none';
+  document.getElementById('epStep1').style.display = 'block';
+  document.getElementById('epTurnIndicator').textContent = 'Round 1 of 5';
+  document.getElementById('epStartBtn').disabled = false;
+  document.getElementById('epStartBtnText').textContent = 'Pitch Laura →';
+}
+
+function escHtmlEP(s) {
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
 </script>
 <script src="search.js"></script>
 <script src="nav.js"></script>
