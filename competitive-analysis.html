@@ -311,18 +311,9 @@
     <h2>How well does each competitor <em>serve Laura</em>?</h2>
   </div>
   <p style="margin-top:10px;font-size:14px;color:var(--ink-soft);max-width:780px;">Scored 0–100 on how well each product fits Laura's mindset — passive protection, household framing, zero jargon, no mental load. Not a security feature score. A Laura score.</p>
+  <p style="margin-top:6px;font-size:12px;color:var(--ink-softer);">Tap any competitor to see what, if anything, it actually solves for Laura.</p>
 
   <div class="laura-fit-grid">
-    <div class="laura-fit-card">
-      <div class="laura-fit-score score-amber">61</div>
-      <div class="laura-fit-name">Norton Today</div>
-      <div class="laura-fit-verdict">Powerful but asks too much</div>
-    </div>
-    <div class="laura-fit-card" style="border-color:var(--yellow);background:#fffce6;">
-      <div class="laura-fit-score score-green">88</div>
-      <div class="laura-fit-name">Norton Reimagined</div>
-      <div class="laura-fit-verdict">Sprint target — designed for her</div>
-    </div>
     <div class="laura-fit-card">
       <div class="laura-fit-score score-red">22</div>
       <div class="laura-fit-name">Microsoft Defender</div>
@@ -386,6 +377,7 @@
         </div>
         <span class="threat-badge threat-struct">Structural</span>
       </div>
+      <div class="comp-screen"><h6>App glimpse</h6><p>Windows Security dashboard full of toggles — family protection lives three clicks deep, and there's no morning brief telling Laura what changed.</p></div>
       <div class="comp-body">
         <div class="comp-row"><span class="comp-row-label">Price</span><span class="comp-row-val">Free (bundled)</span></div>
         <div class="comp-row"><span class="comp-row-label">Reach</span><span class="comp-row-val">1.4B Windows devices</span></div>
@@ -406,6 +398,7 @@
         </div>
         <span class="threat-badge threat-struct">Structural</span>
       </div>
+      <div class="comp-screen"><h6>App glimpse</h6><p>Stolen Device Protection modal: beautiful, but assumes every device in the house wears an Apple logo.</p></div>
       <div class="comp-body">
         <div class="comp-row"><span class="comp-row-label">Price</span><span class="comp-row-val">Free (platform-native)</span></div>
         <div class="comp-row"><span class="comp-row-label">BHI</span><span class="comp-row-val">125 (+4)</span></div>
@@ -425,6 +418,7 @@
         </div>
         <span class="threat-badge threat-struct">Structural</span>
       </div>
+      <div class="comp-screen"><h6>App glimpse</h6><p>Android scam call pop-up — powerful, but tied to the Pixel dialer. Nothing for the rest of the household.</p></div>
       <div class="comp-body">
         <div class="comp-row"><span class="comp-row-label">Price</span><span class="comp-row-val">Free (platform-native)</span></div>
         <div class="comp-row"><span class="comp-row-label">BHI</span><span class="comp-row-val">152 (+4)</span></div>
@@ -454,6 +448,7 @@
         </div>
         <span class="threat-badge threat-high">High</span>
       </div>
+      <div class="comp-screen"><h6>App glimpse</h6><p>Household onboarding wizard: five steps, twelve toggles, and a router-style UI that scares Laura away.</p></div>
       <div class="comp-body">
         <div class="comp-row"><span class="comp-row-label">Price</span><span class="comp-row-val">$39.99–$199.99/yr</span></div>
         <div class="comp-row"><span class="comp-row-label">NPS</span><span class="comp-row-val">Trailing Norton</span></div>
@@ -474,6 +469,7 @@
         </div>
         <span class="threat-badge threat-med">Medium</span>
       </div>
+      <div class="comp-screen"><h6>App glimpse</h6><p>Bitdefender dashboard — dense charts and threat counters. Great for engineers, overwhelming for Laura.</p></div>
       <div class="comp-body">
         <div class="comp-row"><span class="comp-row-label">Price</span><span class="comp-row-val">$29.99–$159.99/yr</span></div>
         <div class="comp-row"><span class="comp-row-label">Strength</span><span class="comp-row-val">Detection rates, performance</span></div>
@@ -493,6 +489,7 @@
         </div>
         <span class="threat-badge threat-low">Low (for Laura)</span>
       </div>
+      <div class="comp-screen"><h6>App glimpse</h6><p>Scan results pane screaming red after the fact. Zero anticipation, all remediation.</p></div>
       <div class="comp-body">
         <div class="comp-row"><span class="comp-row-label">Price</span><span class="comp-row-val">$44.99–$119.97/yr</span></div>
         <div class="comp-row"><span class="comp-row-label">Laura fit</span><span class="comp-row-val" style="color:var(--red);">29/100</span></div>
@@ -521,6 +518,7 @@
         </div>
         <span class="threat-badge threat-high">High</span>
       </div>
+      <div class="comp-screen"><h6>App glimpse</h6><p>NordVPN home screen — fast tunnel switching, latency graphs, privacy stats. Loved by tinkerers, not by parents.</p></div>
       <div class="comp-body">
         <div class="comp-row"><span class="comp-row-label">Price</span><span class="comp-row-val">$59.88–$179.88/yr</span></div>
         <div class="comp-row"><span class="comp-row-label">NPS rank</span><span class="comp-row-val" style="color:var(--green);">1st globally</span></div>
@@ -541,6 +539,7 @@
         </div>
         <span class="threat-badge threat-high">High — Watch Closely</span>
       </div>
+      <div class="comp-screen"><h6>App glimpse</h6><p>Aura family dashboard — identity cards alongside financial alerts. Closest to the Norton Reimagined feel, but still manual.</p></div>
       <div class="comp-body">
         <div class="comp-row"><span class="comp-row-label">Price</span><span class="comp-row-val">$144–$264/yr (family)</span></div>
         <div class="comp-row"><span class="comp-row-label">Laura fit</span><span class="comp-row-val" style="color:var(--amber);">58/100</span></div>
@@ -724,6 +723,24 @@
   <span>Competitive Analysis · Sprint Reference</span>
 </div>
 
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('.laura-fit-card').forEach(function(card) {
+    const detailEl = card.querySelector('.laura-fit-detail');
+    const text = card.dataset.detail || '';
+    card.addEventListener('click', function() {
+      if (!detailEl) return;
+      if (card.classList.contains('open')) {
+        card.classList.remove('open');
+      } else {
+        document.querySelectorAll('.laura-fit-card.open').forEach(function(openCard) { openCard.classList.remove('open'); });
+        detailEl.textContent = text;
+        card.classList.add('open');
+      }
+    });
+  });
+});
+</script>
 <script src="search.js"></script>
 <script src="nav.js"></script>
 </body>
