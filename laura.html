@@ -1261,35 +1261,48 @@
     pointer-events: none;
     box-shadow: 0 2px 12px rgba(36,36,36,0.18);
   }
-  /* EP locked zone: covers header + main column, leaves sidebar free */
-  .ep-locked-zone {
+  /* EP: lock the yellow header via pseudo-element (no DOM wrapper needed) */
+  .ep-locked-header {
     position: relative;
-    overflow: hidden;
-    /* Takes the left column slot in the ep-tool-body grid */
-    display: flex;
-    flex-direction: column;
-  }
-  .ep-locked-zone > *:not(.tool-locked-overlay) {
     pointer-events: none;
     user-select: none;
     -webkit-user-select: none;
   }
-  .ep-locked-zone .tool-locked-overlay {
-    border-radius: 0;
+  .ep-locked-header::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(255,232,0,0.45);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+    z-index: 5;
+    pointer-events: all;
+  }
+
+  /* EP main column: locked with overlay */
+  .ep-tool-main-locked {
+    position: relative;
+    overflow: hidden;
+  }
+  .ep-tool-main-locked > *:not(.tool-locked-overlay) {
+    pointer-events: none;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .ep-tool-main-locked .tool-locked-overlay {
     position: absolute;
     inset: 0;
     padding: 18px 20px;
-    background: rgba(248,248,247,0.72);
+    background: rgba(255,255,255,0.72);
     backdrop-filter: blur(3px);
     -webkit-backdrop-filter: blur(3px);
     z-index: 10;
     display: flex;
     align-items: flex-start;
     justify-content: flex-end;
+    border-radius: 0;
     pointer-events: all;
   }
-  /* ep-tool-main is now a plain flex child of the locked zone */
-  .ep-tool-main-locked { }
 </style>
   <link rel="icon" type="image/svg+xml" href="assets/norton-checkmark.svg">
   <link rel="icon" type="image/png" sizes="32x32" href="assets/icon-32.png">
@@ -1666,11 +1679,8 @@
   <!-- ELEVATOR PITCH TOOL -->
   <!-- ============================================ -->
   <div class="ep-tool" id="elevator-pitch">
-    <!-- Locked zone: header + main (sidebar stays outside) -->
-    <div class="ep-locked-zone ep-tool-main-locked">
-      <div class="tool-locked-overlay"><span class="tool-coming-soon-pill">Coming Soon</span></div>
     <!-- Yellow header — visually distinct from the dark pressure-test above -->
-    <div class="ep-tool-header">
+    <div class="ep-tool-header ep-locked-header">
       <span class="eyebrow">Sprint Tool</span>
       <h2>Pitch Laura <em>directly</em>.</h2>
       <p class="sub">
@@ -1681,7 +1691,8 @@
 
     <!-- Two-column body: main area + sidebar with always-visible CTA -->
     <div class="ep-tool-body">
-      <div class="ep-tool-main">
+      <div class="ep-tool-main ep-tool-main-locked">
+        <div class="tool-locked-overlay"><span class="tool-coming-soon-pill">Coming Soon</span></div>
 
         <!-- Step 1: pitch input -->
         <div id="epStep1">
@@ -1731,7 +1742,6 @@
         </div>
 
       </div><!-- /ep-tool-main -->
-    </div><!-- /ep-locked-zone -->
 
       <!-- Always-visible sidebar CTA -->
       <div class="ep-tool-sidebar">
@@ -1769,16 +1779,16 @@ if (!TOOLS_LOCKED) {
   // Remove all locked overlays
   document.querySelectorAll('.tool-locked-overlay').forEach(el => el.remove());
   // Re-enable pointer events inside locked zones
-  document.querySelectorAll('.ep-locked-zone > *, .ep-tool-main-locked > *').forEach(el => {
+  document.querySelectorAll('.ep-tool-main-locked > *:not(.tool-locked-overlay)').forEach(el => {
     el.style.pointerEvents = '';
     el.style.userSelect = '';
   });
-  // Unwrap ep-locked-zone (insert its children in place, keep structure)
-  document.querySelectorAll('.ep-locked-zone').forEach(zone => {
-    const parent = zone.parentNode;
-    while (zone.firstChild) parent.insertBefore(zone.firstChild, zone);
-    zone.remove();
+  document.querySelectorAll('.ep-locked-header').forEach(el => {
+    el.style.pointerEvents = '';
+    el.style.userSelect = '';
+    el.classList.remove('ep-locked-header');
   });
+  document.querySelector('.ep-tool-main-locked')?.classList.remove('ep-tool-main-locked');
   // Unwrap pressure-test tool-locked-wrap
   document.querySelectorAll('.tool-locked-wrap').forEach(wrap => {
     const parent = wrap.parentNode;
