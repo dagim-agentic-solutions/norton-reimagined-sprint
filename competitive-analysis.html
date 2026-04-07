@@ -236,7 +236,22 @@
   border-radius: 8px;
   padding: 16px 18px;
   text-align: center;
+  cursor: pointer;
+  transition: border-color .15s, box-shadow .15s;
 }
+.laura-fit-card.open {
+  border-color: var(--ink-soft);
+  box-shadow: 0 8px 24px rgba(0,0,0,.08);
+}
+.laura-fit-detail {
+  display: none;
+  font-size: 12px;
+  color: var(--ink-soft);
+  line-height: 1.45;
+  margin-top: 10px;
+  text-align: left;
+}
+.laura-fit-card.open .laura-fit-detail { display: block; }
 .laura-fit-score {
   font-size: 36px;
   font-weight: 800;
@@ -322,36 +337,43 @@
       <div class="laura-fit-score score-red">22</div>
       <div class="laura-fit-name">Microsoft Defender</div>
       <div class="laura-fit-verdict">OS-native but invisible to her</div>
+      <div class="laura-fit-detail">Keeps Windows devices safe quietly, but never closes the loop with a household summary. Laura never knows if anything happened — so she still carries the mental load.</div>
     </div>
     <div class="laura-fit-card" role="button" tabindex="0">
       <div class="laura-fit-score score-red">18</div>
       <div class="laura-fit-name">Google / Apple</div>
       <div class="laura-fit-verdict">Siloed to one ecosystem</div>
+      <div class="laura-fit-detail">Great if every device in the house is Apple — useless the moment someone has an Android phone or Windows laptop. No identity, no family brief, no guidance when something looks wrong.</div>
     </div>
     <div class="laura-fit-card" role="button" tabindex="0">
       <div class="laura-fit-score score-amber">55</div>
       <div class="laura-fit-name">McAfee+</div>
       <div class="laura-fit-verdict">Household framing but clunky UX</div>
+      <div class="laura-fit-detail">They talk to families, but the flow still feels like setting up a router — toggles, checkboxes, jargon. Laura gives up before she sees value.</div>
     </div>
     <div class="laura-fit-card" role="button" tabindex="0">
       <div class="laura-fit-score score-amber">48</div>
       <div class="laura-fit-name">NordVPN</div>
       <div class="laura-fit-verdict">Great product, wrong JTBD for her</div>
+      <div class="laura-fit-detail">Phenomenal for privacy fans, but VPN is not Laura's job to be done. They teach her how to tinker, not how to feel taken care of.</div>
     </div>
     <div class="laura-fit-card" role="button" tabindex="0">
       <div class="laura-fit-score score-red">31</div>
       <div class="laura-fit-name">Bitdefender</div>
       <div class="laura-fit-verdict">Expert-first, Laura-last</div>
+      <div class="laura-fit-detail">Bitdefender wins awards, but every screen assumes you speak security. It's fast, thorough, and totally uninterested in telling Laura what it did for her.</div>
     </div>
     <div class="laura-fit-card" role="button" tabindex="0">
       <div class="laura-fit-score score-amber">58</div>
       <div class="laura-fit-name">Aura</div>
       <div class="laura-fit-verdict">Identity-first, all-in-one attempt</div>
+      <div class="laura-fit-detail">Aura tries to be the all-in-one Laura actually needs. The experience is close — but it still feels like configuring a product, not delegating the job.</div>
     </div>
     <div class="laura-fit-card" role="button" tabindex="0">
       <div class="laura-fit-score score-red">29</div>
       <div class="laura-fit-name">Malwarebytes</div>
       <div class="laura-fit-verdict">Reactive, technical, no household lens</div>
+      <div class="laura-fit-detail">Reactive clean-up. By the time Malwarebytes helps, the family is already stressed. Zero household framing, zero automation.</div>
     </div>
   </div>
 
