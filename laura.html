@@ -1229,6 +1229,45 @@
   .ep-tool-main { padding: 24px; border-right: none; border-bottom: 1.5px solid var(--line); }
   .ep-tool-sidebar { padding: 24px; }
 }
+
+  /* ── Coming-soon overlay for locked tools ──────────────────────────────── */
+  .tool-locked-wrap {
+    position: relative;
+  }
+  .tool-locked-wrap .tool-locked-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(248,248,247,0.72);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+    border-radius: inherit;
+    z-index: 10;
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-end;
+    padding: 18px 20px;
+    pointer-events: all;
+  }
+  .tool-coming-soon-pill {
+    background: var(--ink);
+    color: var(--yellow);
+    font-family: 'Inter Tight', sans-serif;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 6px 14px;
+    border-radius: 999px;
+    pointer-events: none;
+    box-shadow: 0 2px 12px rgba(36,36,36,0.18);
+  }
+  /* EP tool: only lock the main column, leave sidebar interactive */
+  .ep-tool-main-locked {
+    position: relative;
+  }
+  .ep-tool-main-locked .tool-locked-overlay {
+    border-radius: 0;
+  }
 </style>
   <link rel="icon" type="image/svg+xml" href="assets/norton-checkmark.svg">
   <link rel="icon" type="image/png" sizes="32x32" href="assets/icon-32.png">
@@ -1541,6 +1580,8 @@
   <!-- ============================================ -->
   <!-- PRESSURE TEST SECTION -->
   <!-- ============================================ -->
+  <div class="tool-locked-wrap">
+  <div class="tool-locked-overlay"><span class="tool-coming-soon-pill">Coming Soon</span></div>
   <div class="pressure" id="pressure-test">
     <span class="eyebrow">Design Sprint Tool</span>
     <h2>Pressure-test your concept against <em>Laura</em>.</h2>
@@ -1597,6 +1638,7 @@
       </div>
     </div>
   </div>
+  </div><!-- /tool-locked-wrap -->
 
   <!-- ============================================ -->
   <!-- ELEVATOR PITCH TOOL -->
@@ -1614,7 +1656,7 @@
 
     <!-- Two-column body: main area + sidebar with always-visible CTA -->
     <div class="ep-tool-body">
-      <div class="ep-tool-main">
+      <div class="ep-tool-main ep-tool-main-locked"><div class="tool-locked-overlay"><span class="tool-coming-soon-pill">Coming Soon</span></div>
 
         <!-- Step 1: pitch input -->
         <div id="epStep1">
