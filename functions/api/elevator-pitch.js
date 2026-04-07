@@ -50,6 +50,19 @@ RESPONSE FORMAT:
 - Never use markdown, bullet points, or headers in your response
 - Stay completely in character`;
 
+const SPRINT_CHECKS_CONTEXT = `
+ADDITIONAL SPRINT QUALITY CHECKS — evaluate these alongside Laura's verdict:
+
+1. GEN BRAND CANNIBALIZATION
+Norton is part of Gen Digital, which also owns LifeLock (identity theft, credit monitoring, SSN alerts), Avast, AVG, and ReputationDefender. A strong concept integrates Gen capabilities rather than duplicating them. If this concept directly rebuilds LifeLock's core offering (e.g., a standalone credit dashboard), flag it.
+
+2. NORTON GROWTH ALIGNMENT
+This concept should increase ARPU, reduce churn, build engagement beyond passive "set and forget," enable upsell to premium/LifeLock, and differentiate from free bundled alternatives (Windows Defender, Apple Security, Google Scam Detection). If it doesn't address growth mechanics, flag it.
+
+3. PROTECTION ANGLE
+Every sprint concept must have a meaningful security or safety dimension — device protection, identity protection, scam detection, privacy monitoring, threat intelligence, safe browsing, or parental controls. A concept with no protection angle doesn't belong in this sprint.
+`;
+
 const FINAL_VERDICT_PROMPT = `
 After reviewing the full conversation, provide a final verdict.
 
@@ -60,7 +73,12 @@ Respond with ONLY valid JSON — no prose, no markdown fences:
   "verdict": "<one of: SOLD | CAUTIOUSLY INTERESTED | NOT CONVINCED | WALKED AWAY>",
   "headline": "<one sentence capturing Laura's final feeling, max 18 words>",
   "reasoning": "<2-3 sentences explaining why Laura is or isn't convinced>",
-  "remaining_concerns": ["<concern 1>", "<concern 2>"] // empty if convinced
+  "remaining_concerns": ["<concern 1>", "<concern 2>"],
+  "sprint_checks": {
+    "cannibalization": "<PASS | WARN | FAIL> — <one sentence about Gen brand overlap>",
+    "growth_alignment": "<PASS | WARN | FAIL> — <one sentence about Norton growth fit>",
+    "protection_angle": "<PASS | WARN | FAIL> — <one sentence about security/safety layer>"
+  }
 }
 
 Scoring guide:
@@ -159,6 +177,7 @@ Respond ONLY with valid JSON, no prose:
     const lauraTurns = history.filter(m => m.role === "assistant").length;
 
     const systemPrompt = `${LAURA_PERSONA}
+${SPRINT_CHECKS_CONTEXT}
 
 The participant is pitching you the following product concept:
 "${pitch}"
@@ -180,7 +199,7 @@ ${lauraTurns >= 4 ? "This is your FINAL response. After addressing any remaining
           { role: "user", content: "Based on our conversation, what's your final verdict on this pitch?" },
         ];
         const verdictRaw = await callClaude(
-          `You are Laura, the Outsourcer. You just had a 5-turn conversation about a product pitch. Provide your final verdict.\n${FINAL_VERDICT_PROMPT}`,
+          `You are Laura, the Outsourcer. You just had a 5-turn conversation about a product pitch. Provide your final verdict.\n${SPRINT_CHECKS_CONTEXT}\n${FINAL_VERDICT_PROMPT}`,
           verdictMessages,
           600
         );

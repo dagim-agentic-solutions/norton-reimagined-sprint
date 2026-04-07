@@ -787,6 +787,43 @@
     line-height: 1.5;
   }
 
+  /* Sprint health checks */
+  .sprint-checks {
+    margin-top: 18px;
+    padding: 18px 20px;
+    background: var(--paper);
+    border: 1.5px solid var(--line);
+    border-radius: 8px;
+  }
+  .sprint-check-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .sprint-check-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 13px;
+    line-height: 1.45;
+  }
+  .sprint-check-badge {
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    padding: 3px 9px;
+    border-radius: 999px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .sprint-check-badge.pass { background: #d4f5e2; color: #0a7a3d; }
+  .sprint-check-badge.warn { background: #fff3cd; color: #8a5700; }
+  .sprint-check-badge.fail { background: #fde8e8; color: #b01818; }
+  .sprint-check-label { font-weight: 700; color: var(--ink-soft); margin-right: 4px; }
+  .sprint-check-text { color: var(--ink-soft); }
+
   .spinner {
     display: inline-block;
     width: 16px;
@@ -1497,6 +1534,11 @@
           <div class="lbl">Recommendation</div>
           <p id="recText"></p>
         </div>
+        <!-- Sprint health checks -->
+        <div class="sprint-checks" id="sprintChecks" style="display:none;">
+          <div class="lbl" style="margin-bottom:10px;">Sprint Health Checks</div>
+          <div class="sprint-check-grid" id="sprintCheckGrid"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -1705,8 +1747,39 @@ function renderResult(data) {
     risksList.appendChild(li);
   });
 
+  // Sprint health checks
+  const checksEl  = document.getElementById('sprintChecks');
+  const checksGrid = document.getElementById('sprintCheckGrid');
+  const checks = data.sprint_checks;
+  if (checks) {
+    const LABELS = {
+      cannibalization: 'Gen Brand Fit',
+      growth_alignment: 'Norton Growth',
+      protection_angle: 'Protection Angle',
+    };
+    checksGrid.innerHTML = '';
+    Object.entries(checks).forEach(([key, val]) => {
+      const statusMatch = String(val).match(/^(PASS|WARN|FAIL)/i);
+      const status = statusMatch ? statusMatch[1].toLowerCase() : 'warn';
+      const detail = String(val).replace(/^(PASS|WARN|FAIL)\s*[—\-]\s*/i, '');
+      const item = document.createElement('div');
+      item.className = 'sprint-check-item';
+      item.innerHTML = `<span class="sprint-check-badge ${status}">${status.toUpperCase()}</span>` +
+        `<span><span class="sprint-check-label">${LABELS[key] || key}:</span>` +
+        `<span class="sprint-check-text">${escapeHtmlInline(detail)}</span></span>`;
+      checksGrid.appendChild(item);
+    });
+    checksEl.style.display = 'block';
+  } else {
+    checksEl.style.display = 'none';
+  }
+
   result.classList.add('visible');
   setTimeout(() => result.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+}
+
+function escapeHtmlInline(s) {
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
 function clearAll() {
@@ -1970,6 +2043,27 @@ function epShowVerdict(v) {
       concerns.map(c => '<li>' + escHtmlEP(c) + '</li>').join('') + '</ul></div>';
   }
 
+  // Sprint health checks
+  const checks = v.sprint_checks || null;
+  const CHECK_LABELS = { cannibalization: 'Gen Brand Fit', growth_alignment: 'Norton Growth', protection_angle: 'Protection Angle' };
+  let checksHtml = '';
+  if (checks) {
+    const rows = Object.entries(checks).map(([key, val]) => {
+      const sm = String(val).match(/^(PASS|WARN|FAIL)/i);
+      const status = sm ? sm[1].toLowerCase() : 'warn';
+      const detail = String(val).replace(/^(PASS|WARN|FAIL)\s*[—\-]\s*/i, '');
+      const badgeColors = { pass: 'background:#d4f5e2;color:#0a7a3d;', warn: 'background:#fff3cd;color:#8a5700;', fail: 'background:#fde8e8;color:#b01818;' };
+      return '<div style="display:flex;gap:8px;align-items:flex-start;font-size:12px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.1);">' +
+        '<span style="font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border-radius:999px;white-space:nowrap;flex-shrink:0;margin-top:1px;' + (badgeColors[status] || badgeColors.warn) + '">' + status.toUpperCase() + '</span>' +
+        '<span><strong style="color:rgba(255,255,255,.6);margin-right:4px;">' + escHtmlEP(CHECK_LABELS[key] || key) + ':</strong>' +
+        '<span style="color:rgba(255,255,255,.55);">' + escHtmlEP(detail) + '</span></span>' +
+        '</div>';
+    }).join('');
+    checksHtml = '<div style="margin-top:16px;padding:14px 16px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:8px;">' +
+      '<div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:8px;">Sprint Health Checks</div>' +
+      rows + '</div>';
+  }
+
   el.innerHTML =
     '<div class="ep-verdict-header">' +
       '<div class="ep-verdict-badge ' + badgeClass + '">' + badgeLabel + '</div>' +
@@ -1978,7 +2072,7 @@ function epShowVerdict(v) {
     '</div>' +
     '<div class="ep-verdict-headline">\u201C' + escHtmlEP(headline) + '\u201D</div>' +
     '<div class="ep-verdict-reasoning">' + escHtmlEP(reasoning) + '</div>' +
-    concernsHtml;
+    concernsHtml + checksHtml;
 
   el.style.display = 'block';
   el.scrollIntoView({ behavior: 'smooth', block: 'start' });

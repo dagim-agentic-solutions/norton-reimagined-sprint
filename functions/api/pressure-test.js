@@ -96,6 +96,25 @@ SCORING GUIDE (Laura Score 0–100):
   jargon, unclear value, gamified, dark pattern).
 - 0–34 "REJECTS IT": Fundamentally misreads Laura. Builds FOR Jane, demands
   configuration, adds to her mental load, or breaks her trust.
+
+---
+
+ADDITIONAL EVALUATION DIMENSIONS — apply alongside the Laura score:
+
+1. GEN BRAND CANNIBALIZATION CHECK
+Norton is one brand within Gen Digital, which also owns LifeLock (identity theft protection, credit monitoring, SSN alerts, identity restoration), Avast, AVG, and ReputationDefender.
+A strong Norton Reimagined concept should NOT simply duplicate what LifeLock already does well (e.g., building a standalone credit monitoring dashboard that competes with LifeLock's core offering). The right approach is to reference or integrate those Gen capabilities (e.g., "powered by LifeLock's identity layer") rather than rebuild them. If the concept directly cannibalizes another Gen brand's core product without differentiation, flag this explicitly in the risks section with the note: "⚠️ Overlaps with LifeLock/[brand] — consider integrating rather than competing."
+
+2. NORTON GROWTH & ENGAGEMENT ALIGNMENT
+This sprint exists to grow Norton — specifically: increase ARPU, reduce churn, convert entry-tier users to premium, and build habits that make Norton indispensable rather than invisible-until-renewal. Evaluate whether this concept:
+- Drives engagement beyond "set and forget" — creates touchpoints that reinforce value without adding admin burden
+- Enables upsell pathways to higher-tier plans or LifeLock attach
+- Differentiates Norton meaningfully from free/bundled alternatives (Windows Defender, Apple security, Google Scam Detection) that erode the entry tier
+- Builds emotional attachment, not just functional coverage
+If the concept doesn't address these growth dimensions, flag it in risks: "⚠️ Strong for Laura but weak on Norton growth mechanics — needs an upgrade path or engagement hook."
+
+3. PROTECTION ANGLE REQUIREMENT
+Every concept submitted to this sprint must have a meaningful security or protection dimension. Norton's brand equity is built on keeping people safe — a concept that is purely a financial wellness tool, a content feed, or a social feature with no protection angle dilutes that brand equity and doesn't belong in this sprint. If the concept lacks a clear protection layer (device security, identity protection, scam detection, privacy monitoring, threat intelligence, safe browsing, parental controls, or similar), flag it in risks: "⚠️ Missing protection angle — this concept doesn't extend Norton's core safety mission."
 `;
 
 // ─── Response schema instruction ─────────────────────────────────────────────
@@ -110,12 +129,22 @@ Use exactly this shape:
   "summary": "<2-3 sentences>",
   "wins": ["<reason 1>", "<reason 2>", "<reason 3>"],
   "risks": ["<reason 1>", "<reason 2>", "<reason 3>"],
-  "recommendation": "<1-2 sentences>"
+  "recommendation": "<1-2 sentences>",
+  "sprint_checks": {
+    "cannibalization": "<PASS | WARN | FAIL> — <one sentence: does this overlap with LifeLock or another Gen brand? If WARN/FAIL, name the brand and suggest how to integrate instead>",
+    "growth_alignment": "<PASS | WARN | FAIL> — <one sentence: does this drive ARPU, engagement, or upsell? What's missing if not?>",
+    "protection_angle": "<PASS | WARN | FAIL> — <one sentence: does this have a meaningful security/safety layer? Name it, or flag its absence>"
+  }
 }
 
 The verdict MUST match the score band:
   90-100 → LOVES IT | 75-89 → LIKES IT | 55-74 → MEH |
   35-54 → SKEPTICAL | 0-34 → REJECTS IT
+
+sprint_checks status rules:
+  PASS = clearly addresses the dimension
+  WARN = partially addresses it or has a risk worth noting
+  FAIL = the concept violates or ignores this dimension entirely
 `;
 
 // ─── CORS ─────────────────────────────────────────────────────────────────────
