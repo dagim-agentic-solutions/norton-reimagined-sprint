@@ -950,7 +950,17 @@
     <div class="tone-grid" id="toneGrid"></div>
   </div>
 
-  <!-- Generate -->
+  <!-- Additional Details -->
+  <div class="cb-section">
+    <div class="sec-label">
+      <span class="sec-num" id="addlSecNum">—</span>
+      <h3>Additional details <span style="font-size:12px;font-weight:400;color:var(--ink-softer);">— optional</span></h3>
+    </div>
+    <p class="sec-hint">Anything else Claude should know? Use this to specify edge cases, design constraints, specific interactions, content to include, or any other context that would help generate a better output.</p>
+    <textarea class="cb-textarea" id="additionalDetails" rows="4" placeholder="e.g. The onboarding should skip directly to the dashboard if the user has already set up their account. Include a dark mode toggle. Make sure the pricing section uses the $9.99/month price point..."></textarea>
+  </div>
+
+<!-- Generate -->
   <div class="generate-wrap">
     <button class="btn-generate" onclick="generate()">✦ Generate My Claude Prompt</button>
     <div class="gen-err" id="genErr"></div>
@@ -1630,6 +1640,7 @@ function generate() {
   errEl.textContent = '';
 
   const concept       = document.getElementById('concept').value.trim();
+  const additionalDetails = document.getElementById('additionalDetails').value.trim();
   // Logo
   const logoSection = useNortonLogo
     ? `LOGO ASSETS:
@@ -1806,7 +1817,7 @@ ${logoSection}
 ═══════════════════════════════════════════
 ${platformSection}
 
-═══════════════════════════════════════════
+${additionalDetails ? '═══════════════════════════════════════════\nADDITIONAL DETAILS & CONSTRAINTS\n═══════════════════════════════════════════\n' + additionalDetails + '\n\n' : ''}═══════════════════════════════════════════
 WHAT LAURA REJECTS — do not include any of these
 ═══════════════════════════════════════════
 - Dashboards full of toggles, sliders, or config screens
