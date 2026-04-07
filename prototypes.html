@@ -599,7 +599,7 @@
       <li><a href="prototypes.html" class="active">Prototypes</a></li>
       <li><a href="resources.html">Resources</a></li>
       <li><a href="concept-builder.html">Concept Builder <span style="background:var(--yellow);color:var(--ink);font-size:9px;font-weight:800;padding:1px 6px;border-radius:999px;vertical-align:middle;letter-spacing:.04em;">β</span></a></li>
-          <li><a href="competitive-analysis.html">Competitive <span style="background:var(--yellow);color:var(--ink);font-size:9px;font-weight:800;padding:1px 6px;border-radius:999px;vertical-align:middle;letter-spacing:.04em;">β</span></a></li>
+      <li><a href="competitive-analysis.html">Competitive <span style="background:var(--yellow);color:var(--ink);font-size:9px;font-weight:800;padding:1px 6px;border-radius:999px;vertical-align:middle;letter-spacing:.04em;">β</span></a></li>
     </ul>
   </div>
 </nav>
@@ -1240,8 +1240,7 @@ async function openResults() {
           <div class="rank-votes">${votes} vote${votes===1?'':'s'}</div>
         </div>
       </li>`;
-    }).join('') + '      <li><a href="competitive-analysis.html">Competitive <span style="background:var(--yellow);color:var(--ink);font-size:9px;font-weight:800;padding:1px 6px;border-radius:999px;vertical-align:middle;letter-spacing:.04em;">β</span></a></li>
-    </ul>';
+    }).join('') + '</ul>';
   }
 
   document.getElementById('results-list-container').innerHTML = listHtml;
