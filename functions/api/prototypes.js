@@ -25,7 +25,7 @@ const TEXT_EXTS        = new Set(["html","htm","css","js","ts","jsx","tsx","json
 
 const CORS = {
   "Access-Control-Allow-Origin":  "*",
-  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+  "Access-Control-Allow-Methods": "GET, POST, DELETE, OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type",
 };
 
@@ -68,6 +68,37 @@ export async function onRequestGet({ env }) {
   }
 
   return json({ prototypes });
+}
+
+
+// ── DELETE: remove a prototype ────────────────────────────────────────────────
+export async function onRequestDelete({ request, env }) {
+  const kv = env.PROTOTYPES_KV;
+  if (!kv) return json({ error: "Datastore unavailable." }, 503);
+
+  // Extract id from the URL path: /api/prototypes/{id}
+  const url = new URL(request.url);
+  const parts = url.pathname.split("/").filter(Boolean);
+  const id = parts[parts.length - 1];
+
+  if (!id || id === "prototypes") {
+    return json({ error: "Missing prototype id in URL." }, 400);
+  }
+
+  try {
+    // Remove from index
+    const raw = await kv.get("index");
+    const ids = raw ? JSON.parse(raw) : [];
+    const newIds = ids.filter((i) => i !== id);
+    await kv.put("index", JSON.stringify(newIds));
+
+    // Remove prototype data
+    await kv.delete(`proto:${id}`);
+
+    return json({ ok: true });
+  } catch (err) {
+    return json({ error: `Delete failed: ${err.message}` }, 500);
+  }
 }
 
 // ── POST: submit a new prototype ──────────────────────────────────────────────
