@@ -408,3 +408,11 @@ h1.page-title .mark {
   line-height: 1.4;
   color: var(--ink);
 }
+.comp-screen-source {
+  display: block;
+  margin-top: 6px;
+  font-size: 10px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--ink-softer);
+}
