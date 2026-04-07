@@ -106,16 +106,23 @@
   }
 
   function initNavButton() {
-    const nav = document.getElementById('nav-links');
-    if (!nav || nav.querySelector('.nav-search-btn')) return;
-    const li = document.createElement('li');
+    const navList = document.getElementById('nav-links');
+    if (navList) {
+      navList.querySelectorAll('.nav-search-btn').forEach(btn => btn.parentElement && btn.parentElement.remove());
+    }
+    const navInner = document.querySelector('.nav-inner');
+    const toggle = document.getElementById('nav-toggle');
+    if (!navInner || navInner.querySelector('.nav-search-btn')) return;
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.className = 'nav-search-btn';
-    btn.textContent = 'Search';
+    btn.innerHTML = '<span class="nav-search-icon">🔍</span><span class="nav-search-text">Search</span>';
     btn.addEventListener('click', openSearch);
-    li.appendChild(btn);
-    nav.appendChild(li);
+    if (toggle) {
+      navInner.insertBefore(btn, toggle);
+    } else {
+      navInner.appendChild(btn);
+    }
   }
 
   document.addEventListener('DOMContentLoaded', () => {
