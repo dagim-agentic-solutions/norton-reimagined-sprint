@@ -108,7 +108,7 @@
   function initNavButton() {
     const navList = document.getElementById('nav-links');
     if (navList) {
-      navList.querySelectorAll('.nav-search-btn').forEach(btn => btn.parentElement && btn.parentElement.remove());
+      navList.querySelectorAll('.nav-search-btn').forEach(btn => btn.remove());
     }
     const navInner = document.querySelector('.nav-inner');
     const toggle = document.getElementById('nav-toggle');
@@ -116,7 +116,7 @@
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.className = 'nav-search-btn';
-    btn.innerHTML = '<span class="nav-search-icon">🔍</span><span class="nav-search-text">Search</span>';
+    btn.innerHTML = '<span class="nav-search-icon" aria-hidden="true">🔍</span><span class="sr-only">Open search</span>';
     btn.addEventListener('click', openSearch);
     if (toggle) {
       navInner.insertBefore(btn, toggle);
