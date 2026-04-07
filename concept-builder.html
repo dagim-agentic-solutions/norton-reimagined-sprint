@@ -1076,6 +1076,15 @@ const ROLE_OPTIONS = [
               ${r.label}
             </label>`).join('')}
         </div>
+        <div style="margin-top:10px;">
+          <div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:5px;">Customise this feature <span style="font-weight:400;text-transform:none;letter-spacing:0;">— optional</span></div>
+          <textarea id="ftw-${cap.replace(/\s+/g,'_')}" maxlength="300" rows="2"
+            placeholder="e.g. Always visible on the home screen as a live status card…"
+            oninput="saveFeatTweak('${cap}', this.value)"
+            style="width:100%;background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.2);border-radius:6px;padding:8px 10px;font-size:12px;font-family:inherit;color:#fff;resize:vertical;min-height:52px;outline:none;box-sizing:border-box;transition:border-color .15s;"
+            onfocus="this.style.borderColor='var(--yellow)'" onblur="this.style.borderColor='rgba(255,255,255,.2)'"></textarea>
+          <div style="font-size:10px;color:rgba(255,255,255,.35);text-align:right;margin-top:3px;"><span id="ftw-cc-${cap.replace(/\s+/g,'_')}">0</span> / 300</div>
+        </div>
       </div>`;
 
     wrapper.appendChild(item);
@@ -1113,6 +1122,15 @@ const ROLE_OPTIONS = [
               ${r.label}
             </label>`).join('')}
         </div>
+        <div style="margin-top:10px;">
+          <div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:5px;">Customise this feature <span style="font-weight:400;text-transform:none;letter-spacing:0;">— optional</span></div>
+          <textarea id="rtw-${key}" maxlength="300" rows="2"
+            placeholder="e.g. Show a weekly trend graph, or surface only when a new breach is detected…"
+            oninput="saveRegTweak('${cap}', this.value)"
+            style="width:100%;background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.2);border-radius:6px;padding:8px 10px;font-size:12px;font-family:inherit;color:#fff;resize:vertical;min-height:52px;outline:none;box-sizing:border-box;transition:border-color .15s;"
+            onfocus="this.style.borderColor='var(--yellow)'" onblur="this.style.borderColor='rgba(255,255,255,.2)'"></textarea>
+          <div style="font-size:10px;color:rgba(255,255,255,.35);text-align:right;margin-top:3px;"><span id="rtw-cc-${key}">0</span> / 300</div>
+        </div>
       </div>`;
 
     wrapper.appendChild(item);
@@ -1121,7 +1139,22 @@ const ROLE_OPTIONS = [
 })();
 
 // Track regular cap state
-const _regularState = {}; // { 'Secure VPN': { checked: bool, role: 'primary'|'part'|'cross' } }
+const _regularState = {}; // { cap: { checked, role, tweak } }
+const _regTweaks   = {}; // { cap: string }
+const _featTweaks  = {}; // { cap: string }
+
+function saveRegTweak(cap, val) {
+  _regTweaks[cap] = val;
+  const key = cap.replace(/[^a-zA-Z0-9]/g,'_');
+  const cc = document.getElementById('rtw-cc-' + key);
+  if (cc) cc.textContent = val.length;
+}
+function saveFeatTweak(cap, val) {
+  _featTweaks[cap] = val;
+  const key = cap.replace(/\s+/g,'_');
+  const cc = document.getElementById('ftw-cc-' + key);
+  if (cc) cc.textContent = val.length;
+}
 
 function toggleRegularCap(cap) {
   const key = cap.replace(/[^a-zA-Z0-9]/g,'_');
@@ -1219,13 +1252,15 @@ function getSelectedCaps() {
     .filter(([,s]) => s.checked)
     .map(([cap, s]) => {
       const roleLabel = ROLE_OPTIONS.find(r => r.value === s.role)?.label || s.role;
-      return `${cap} [${roleLabel}]`;
+      const tweak = (_featTweaks[cap] || '').trim();
+      return `${cap} [${roleLabel}]${tweak ? ' — ' + tweak : ''}`;
     });
   const regular = Object.entries(_regularState)
     .filter(([,s]) => s.checked)
     .map(([cap, s]) => {
       const roleLabel = ROLE_OPTIONS.find(r => r.value === s.role)?.label || s.role;
-      return `${cap} [${roleLabel}]`;
+      const tweak = (_regTweaks[cap] || '').trim();
+      return `${cap} [${roleLabel}]${tweak ? ' — ' + tweak : ''}`;
     });
   const custom = _customCaps.map(c => {
     const roleLabel = ROLE_OPTIONS.find(r => r.value === c.role)?.label || c.role;
