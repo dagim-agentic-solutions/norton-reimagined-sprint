@@ -267,63 +267,66 @@
     .proto-grid { grid-template-columns: 1fr; }
   }
 
-  /* Delete button */
-  .proto-delete {
-    background: none;
-    border: none;
-    color: #6b6b6b;
-    font-size: 11px;
-    font-family: inherit;
-    cursor: pointer;
-    padding: 2px 0;
-    text-transform: uppercase;
-    letter-spacing: .06em;
-    font-weight: 600;
-    transition: color .15s;
-    margin-top: 8px;
-  }
-  .proto-delete:hover { color: #ff4444; }
+  /* .proto-delete styles moved to .proto-menu button.danger */
 
-  /* ── Pitch Deck button ───────────────────────────────────────────────────── */
-  .btn-pitch-deck {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background: var(--yellow);
-    color: var(--ink);
-    border: none;
-    border-radius: 999px;
-    padding: 8px 16px;
-    font-family: inherit;
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: .03em;
-    cursor: pointer;
-    transition: all .15s;
+
+  /* ── Prototype card overflow menu ───────────────────────────────────────────── */
+  .proto-actions {
+    position: relative;
+    display: inline-block;
     margin-top: 10px;
   }
-  .btn-pitch-deck:hover:not(:disabled) { background: #e6d000; transform: translateY(-1px); }
-  .btn-pitch-deck:disabled { opacity: .5; cursor: not-allowed; }
-
-  /* ── Clone in Claude button ────────────────────────────────────────────────── */
-  .btn-clone {
+  .btn-more {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 5px;
     background: none;
-    color: var(--ink-soft);
+    color: var(--ink-softer);
     border: 1.5px solid var(--line);
     border-radius: 999px;
-    padding: 7px 14px;
+    padding: 6px 14px;
     font-family: inherit;
     font-size: 12px;
     font-weight: 700;
-    letter-spacing: .03em;
+    letter-spacing: .04em;
     cursor: pointer;
     transition: all .15s;
-    margin-top: 10px;
   }
-  .btn-clone:hover { border-color: var(--ink); color: var(--ink); background: var(--paper); }
+  .btn-more:hover { border-color: var(--ink); color: var(--ink); background: var(--paper); }
+  .btn-more > span { font-size: 16px; letter-spacing: .02em; line-height: 1; }
+  .proto-menu {
+    display: none;
+    position: absolute;
+    bottom: calc(100% + 6px);
+    left: 0;
+    background: #fff;
+    border: 1.5px solid var(--line);
+    border-radius: 8px;
+    box-shadow: 0 8px 28px rgba(36,36,36,.12);
+    min-width: 200px;
+    z-index: 100;
+    overflow: hidden;
+  }
+  .proto-menu.open { display: block; }
+  .proto-menu button {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: none;
+    padding: 11px 16px;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+    cursor: pointer;
+    transition: background .12s;
+    border-bottom: 1px solid var(--line);
+  }
+  .proto-menu button:last-child { border-bottom: none; }
+  .proto-menu button:hover { background: var(--paper); }
+  .proto-menu button.danger { color: #c01a1a; }
+  .proto-menu button.danger:hover { background: #fde8e8; }
 
   /* ── Clone modal ────────────────────────────────────────────────────────────── */
   .clone-overlay {
@@ -966,10 +969,15 @@ async function loadPrototypes() {
             <span class="vote-quota" id="vq-${escapeAttr(p.id)}"></span>
           </div>
 
-          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
-            <button class="proto-delete" onclick="deletePrototype('${escapeAttr(p.id)}', this)">✕ Delete</button>
-            <button class="btn-pitch-deck" onclick="openDeckModal('${escapeAttr(p.id)}','${escapeAttr(p.title || '')}','${escapeAttr(p.summary || '')}','${escapeAttr(p.url || '')}')">✦ Generate Pitch Deck</button>
-            <button class="btn-clone" onclick="openCloneModal('${escapeAttr(p.id)}')">↗ Clone in Claude</button>
+          <div class="proto-actions" id="pa-${escapeAttr(p.id)}">
+            <button class="btn-more" onclick="toggleProtoMenu('${escapeAttr(p.id)}', this)" aria-label="More options">
+              <span>⋯</span> More
+            </button>
+            <div class="proto-menu" id="pm-${escapeAttr(p.id)}">
+              <button onclick="openCloneModal('${escapeAttr(p.id)}');toggleProtoMenu('${escapeAttr(p.id)}')">↗ Clone in Claude</button>
+              <button onclick="openDeckModal('${escapeAttr(p.id)}','${escapeAttr(p.title || '')}','${escapeAttr(p.summary || '')}','${escapeAttr(p.url || '')}');toggleProtoMenu('${escapeAttr(p.id)}')">✦ Generate Pitch Deck</button>
+              <button class="danger" onclick="deletePrototype('${escapeAttr(p.id)}', this.closest('.proto'))">✕ Delete prototype</button>
+            </div>
           </div>
 
           <div class="comments-section">
@@ -1182,18 +1190,16 @@ function escapeAttr(s) {
 loadPrototypes();
 
 // ── Delete prototype (no password) ───────────────────────────────────────────
-async function deletePrototype(id, btn) {
+async function deletePrototype(id, el) {
   if (!confirm('Delete this prototype? This cannot be undone.')) return;
-  btn.disabled = true;
-  btn.textContent = 'Deleting…';
+  // el can be a button or the .proto card — close any open menu
+  document.querySelectorAll('.proto-menu.open').forEach(m => m.classList.remove('open'));
   try {
     const res = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
     if (!res.ok) throw new Error(`Server error ${res.status}`);
     await loadPrototypes();
   } catch (e) {
     alert(`Failed to delete: ${e.message}`);
-    btn.disabled = false;
-    btn.textContent = '✕ Delete';
   }
 }
 
@@ -1612,6 +1618,23 @@ async function submitDeck() {
   statusEl.textContent = '';
   document.getElementById('deckModalForm').querySelector('input').disabled = false;
 }
+
+// ── Prototype overflow menu ───────────────────────────────────────────────────
+function toggleProtoMenu(protoId, btn) {
+  const menu = document.getElementById('pm-' + protoId);
+  if (!menu) return;
+  const isOpen = menu.classList.contains('open');
+  // Close all other open menus first
+  document.querySelectorAll('.proto-menu.open').forEach(m => m.classList.remove('open'));
+  if (!isOpen) menu.classList.add('open');
+}
+
+// Close menus when clicking outside
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.proto-actions')) {
+    document.querySelectorAll('.proto-menu.open').forEach(m => m.classList.remove('open'));
+  }
+});
 
 // ── Clone in Claude ────────────────────────────────────────────────────────────
 let _clonePromptText = '';
