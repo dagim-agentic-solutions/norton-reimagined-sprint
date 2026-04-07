@@ -243,7 +243,18 @@
   transition: all .15s;
 }
 .cap-item.checked .cap-check { background: var(--yellow); border-color: var(--yellow); color: var(--ink); }
-.featured-cap .cap-check { border-color: rgba(255,255,255,.3); color: transparent; transition: all .15s; }
+/* featured-cap .cap-check — uses base .cap-check (dark border on light bg) until checked */
+.featured-cap .cap-check { color: transparent; }
+/* When featured cap is selected (background set to var(--ink) via JS) */
+.featured-cap[style*="background:var(--ink)"] .cap-check,
+.featured-cap[style*="background: var(--ink)"] .cap-check {
+  background: var(--yellow); border-color: var(--yellow); color: var(--ink);
+}
+/* Description text inside featured caps should be softer on dark bg once selected */
+.featured-cap[style*="background:var(--ink)"] div[style*="color:var(--ink-soft)"],
+.featured-cap[style*="background: var(--ink)"] div[style*="color:var(--ink-soft)"] {
+  color: rgba(255,255,255,.6) !important;
+}
 
 /* Keep text visible on dark selected state */
 .regular-cap .cap-label { color: var(--ink); transition: color .15s; }
