@@ -1377,6 +1377,7 @@ function openDeckModal(id, title, summary, url) {
   document.getElementById('deckPassword').value = '';
   document.getElementById('deckErr').textContent = '';
   document.getElementById('deckStatus').textContent = '';
+  window._deckGammaUrl = null;
   document.getElementById('deckResult').classList.remove('show');
   document.getElementById('deckModalForm').style.display = 'block';
   document.getElementById('deckModalDesc').textContent =
@@ -1451,7 +1452,8 @@ async function submitDeck() {
       if (pollData.status === 'completed' && pollData.gammaUrl) {
         statusEl.textContent = '';
         document.getElementById('deckModalForm').style.display = 'none';
-        document.getElementById('deckLink').href = pollData.gammaUrl;
+        window._deckGammaUrl = pollData.gammaUrl;
+        document.getElementById('deckLink').textContent = 'Open Pitch Deck →';
         document.getElementById('deckResult').classList.add('show');
         return;
       }
@@ -1505,7 +1507,7 @@ function lauraClass(verdict) {
     <div class="deck-modal-status" id="deckStatus"></div>
     <div class="deck-modal-result" id="deckResult">
       <p>✓ Your pitch deck is ready!</p>
-      <a id="deckLink" href="#" target="_blank" rel="noopener" class="btn-deck-open">Open Pitch Deck →</a>
+      <button id="deckLink" onclick="if(window._deckGammaUrl){window.open(window._deckGammaUrl,'_blank')}" class="btn-deck-open" style="cursor:pointer;border:none;font-family:inherit;">Open Pitch Deck →</button>
     </div>
   </div>
 </div>
