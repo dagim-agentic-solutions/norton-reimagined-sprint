@@ -4,7 +4,7 @@
  * Single-purpose: evaluates a product concept against the Laura persona.
  * This is NOT general-purpose AI passthrough — it does exactly one thing.
  *
- * Request body:  { concept: "<user text>" }  (max 2000 chars)
+ * Request body:  { concept: "<user text>" }  (max 4000 chars)
  * Response body: JSON per RESPONSE_SCHEMA below
  *
  * No npm dependencies — built-in fetch only.
@@ -196,9 +196,9 @@ export async function onRequestPost({ request, env }) {
       { status: 400, headers }
     );
   }
-  if (concept.length > 2000) {
+  if (concept.length > 4000) {
     return new Response(
-      JSON.stringify({ error: "Concept exceeds 2000 characters. Please shorten and retry." }),
+      JSON.stringify({ error: "Concept exceeds 4000 characters. Please shorten and retry." }),
       { status: 400, headers }
     );
   }

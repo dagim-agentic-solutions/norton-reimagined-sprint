@@ -141,8 +141,8 @@ export async function onRequestPost({ request, env }) {
     if (!pitch || pitch.length < 20) {
       return new Response(JSON.stringify({ valid: false, feedback: "Your pitch is too short. Give Laura something to react to." }), { status: 200, headers });
     }
-    if (pitch.length > 600) {
-      return new Response(JSON.stringify({ valid: false, feedback: "Keep it to a genuine elevator pitch — under 600 characters." }), { status: 200, headers });
+    if (pitch.length > 4000) {
+      return new Response(JSON.stringify({ valid: false, feedback: "Keep it to a genuine elevator pitch — under 4000 characters." }), { status: 200, headers });
     }
 
     const validationPrompt = `You are a design sprint facilitator. A team member has typed the following text as an "elevator pitch" for a new Norton product concept.
