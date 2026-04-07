@@ -75,6 +75,16 @@ body { padding-top: 63px; }
   font-size: 13px;
   letter-spacing: 0;
 }
+.nav-logo {
+  height: 22px;
+  width: auto;
+  display: block;
+  /* mix-blend-mode: screen makes the dark background of the "Dark" logo variant
+     transparent against the dark nav, leaving only the white/yellow logo visible */
+  mix-blend-mode: screen;
+  /* slight brightness boost to ensure crisp white on the dark nav */
+  filter: brightness(1.05);
+}
 .nav-links {
   display: flex;
   gap: 6px;
