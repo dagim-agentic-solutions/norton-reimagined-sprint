@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Norton Reimagined Sprint · Idea Workshop</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    :root {
+      --ink: #242424;
+      --yellow: #FFE800;
+      --paper: #F8F8F7;
+      --card: #FFFFFF;
+      --line: #E6E6E4;
+      --ink-soft: #5a5a5a;
+      --ink-softer: #8a8a8a;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter Tight', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--paper);
+      color: var(--ink);
+      margin: 0;
+      min-height: 100vh;
+    }
+
+    .page {
+      padding: 32px 24px 80px;
+      max-width: 1160px;
+      margin: 0 auto;
+    }
+
+    @media (max-width: 768px) {
+      .page {
+        padding: 24px 20px 64px;
+      }
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-weight: 700;
+      border-radius: 999px;
+      background: var(--ink);
+      color: var(--yellow);
+      padding: 4px 12px;
+      margin-bottom: 16px;
+    }
+
+    .hero h1 {
+      font-size: clamp(40px, 7vw, 64px);
+      margin: 0;
+      line-height: 1.05;
+      font-weight: 700;
+    }
+
+    .hero h1 .mark {
+      background: linear-gradient(120deg, var(--yellow), #fff8b3);
+      display: inline-block;
+      padding: 0 8px;
+      border-radius: 6px;
+    }
+
+    .hero p {
+      font-size: 20px;
+      max-width: 680px;
+      color: var(--ink-soft);
+      margin: 18px 0 32px;
+      line-height: 1.5;
+    }
+
+    .workshop-shell {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: clamp(20px, 3vw, 32px);
+      box-shadow: 0 20px 48px rgba(0, 0, 0, 0.04);
+    }
+
+    .progress-head {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .progress-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 14px;
+      color: var(--ink-soft);
+      font-weight: 600;
+    }
+
+    .progress-track {
+      width: 100%;
+      height: 8px;
+      background: var(--line);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: var(--ink);
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    .stepper {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 8px;
+      margin-bottom: 28px;
+    }
+
+    .stepper button {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 10px 14px;
+      background: transparent;
+      color: var(--ink-soft);
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .stepper button.active {
+      background: var(--ink);
+      color: white;
+      border-color: var(--ink);
+    }
+
+    .stepper button.done {
+      background: rgba(36, 36, 36, 0.08);
+      color: var(--ink);
+    }
+
+    .stepper button span {
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .step-card {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: clamp(20px, 4vw, 32px);
+      background: var(--card);
+      display: none;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .step-card.active {
+      display: flex;
+    }
+
+    .step-label {
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 700;
+      color: var(--ink-soft);
+    }
+
+    .step-title {
+      font-size: 28px;
+      margin: 0;
+      line-height: 1.3;
+      font-weight: 700;
+    }
+
+    .step-hint {
+      color: var(--ink-softer);
+      font-size: 16px;
+      margin: 0;
+    }
+
+    .chip-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .chip {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 10px 16px;
+      font-size: 15px;
+      font-weight: 600;
+      background: white;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      color: var(--ink);
+    }
+
+    .chip.selected {
+      background: var(--ink);
+      color: white;
+      border-color: var(--ink);
+    }
+
+    .input-area textarea,
+    .input-area input {
+      width: 100%;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      padding: 16px;
+      font-size: 16px;
+      font-family: inherit;
+      resize: none;
+      background: #fff;
+    }
+
+    .input-area textarea:focus,
+    .input-area input:focus {
+      outline: 2px solid rgba(36, 36, 36, 0.15);
+      border-color: var(--ink);
+    }
+
+    .char-counter {
+      text-align: right;
+      font-size: 13px;
+      color: var(--ink-softer);
+      margin-top: 6px;
+    }
+
+    .template-hint {
+      font-size: 14px;
+      color: var(--ink-softer);
+      background: rgba(36, 36, 36, 0.04);
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-weight: 500;
+    }
+
+    .step-actions {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 28px;
+    }
+
+    .step-actions button {
+      border-radius: 999px;
+      padding: 14px 28px;
+      font-size: 16px;
+      font-weight: 600;
+      border: 1px solid var(--ink);
+      background: white;
+      color: var(--ink);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .step-actions button.primary {
+      background: var(--ink);
+      color: var(--yellow);
+    }
+
+    .step-actions button:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .output-card {
+      margin-top: 40px;
+      border-radius: 18px;
+      padding: 32px;
+      background: var(--ink);
+      color: white;
+      display: none;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .output-card h3 {
+      margin: 0;
+      font-size: 28px;
+    }
+
+    .output-section {
+      border-top: 1px solid rgba(255, 255, 255, 0.12);
+      padding-top: 16px;
+    }
+
+    .output-section h4 {
+      margin: 0 0 6px;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: rgba(255, 255, 255, 0.6);
+    }
+
+    .output-section p {
+      margin: 0;
+      font-size: 18px;
+      line-height: 1.5;
+    }
+
+    .output-ctas {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .output-ctas button,
+    .output-ctas a {
+      border-radius: 999px;
+      padding: 12px 20px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: transparent;
+      color: white;
+      font-weight: 600;
+      text-decoration: none;
+      font-size: 15px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .output-ctas button {
+      background: var(--yellow);
+      color: var(--ink);
+      border-color: var(--yellow);
+    }
+
+    .output-note {
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.7);
+      margin-top: 8px;
+    }
+
+    .form-feedback {
+      margin-top: 16px;
+      color: #a94632;
+      font-weight: 600;
+      display: none;
+    }
+
+    @media (max-width: 640px) {
+      .stepper button {
+        font-size: 13px;
+      }
+
+      .output-card {
+        padding: 24px;
+      }
+
+      .output-section p {
+        font-size: 16px;
+      }
+
+      .step-actions {
+        flex-direction: column;
+      }
+
+      .step-actions button {
+        width: 100%;
+      }
+
+      .output-ctas {
+        flex-direction: column;
+      }
+
+      .output-ctas button,
+      .output-ctas a {
+        width: 100%;
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-brand">
+        <img src="assets/norton-logo.png" alt="Norton" class="nav-logo">
+        <span class="nav-sprint-label">Design Sprint</span>
+      </a>
+      <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+      <ul class="nav-links" id="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="laura.html">Laura</a></li>
+        <li><a href="where-is-norton.html">Where is Norton</a></li>
+        <li><a href="prototypes.html">Prototypes</a></li>
+        <li><a href="resources.html">Resources</a></li>
+        <li class="nav-dropdown">
+          <button class="nav-dropdown-btn" id="sprintToolsBtn" aria-expanded="false" aria-haspopup="true">
+            Sprint Tools <span class="nav-beta-pill">✦</span>
+          </button>
+          <ul class="nav-dropdown-menu" id="sprintToolsMenu" role="menu">
+            <li><a href="concept-builder.html" role="menuitem">Prototype Builder</a></li>
+            <li><a href="competitive-analysis.html" role="menuitem">Competitive Analysis</a></li>
+            <li><a href="idea-workshop.html" role="menuitem" class="active">Idea Workshop</a></li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+  <main class="page">
+    <div class="hero">
+      <div class="eyebrow">Sprint Tool</div>
+      <h1>Idea <span class="mark">Workshop</span>.</h1>
+      <p>Struggling to start? Walk through this structured framework to develop a sprint concept — grounded in the right problem, the right persona, and Norton's real strengths. The output is ready to paste straight into the Laura validation tools.</p>
+    </div>
+
+    <section class="workshop-shell">
+      <div class="progress-head">
+        <div class="progress-meta">
+          <span id="stepLabel">Step 1 of 7</span>
+          <span id="stepTitleMeta">Problem Statement</span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-bar" id="progressBar"></div>
+        </div>
+      </div>
+
+      <div class="stepper" id="stepper">
+        <button type="button" data-step="1" class="active"><span>1</span>Problem</button>
+        <button type="button" data-step="2"><span>2</span>Persona</button>
+        <button type="button" data-step="3"><span>3</span>Capabilities</button>
+        <button type="button" data-step="4"><span>4</span>Core Idea</button>
+        <button type="button" data-step="5"><span>5</span>Why Norton</button>
+        <button type="button" data-step="6"><span>6</span>Magic Moment</button>
+        <button type="button" data-step="7"><span>7</span>Name & Tagline</button>
+      </div>
+
+      <div class="steps">
+        <div class="step-card active" data-step="1">
+          <div>
+            <div class="step-label">Step 1 — Problem Statement</div>
+            <h2 class="step-title">What problem are we solving?</h2>
+            <p class="step-hint">Ground your idea in a real, specific problem Laura faces.</p>
+          </div>
+          <div class="chip-grid" data-chip-group="problem" data-selection="single">
+            <button type="button" class="chip" data-value="Laura is the household IT person and she's burnt out — every device problem lands on her desk">Laura is the household IT person and she's burnt out — every device problem lands on her desk</button>
+            <button type="button" class="chip" data-value="Laura can't tell if a suspicious email, text, or call is a scam — she has to figure it out herself">Laura can't tell if a suspicious email, text, or call is a scam — she has to figure it out herself</button>
+            <button type="button" class="chip" data-value="Laura's parents are getting targeted by scammers and she has no way to protect them remotely">Laura's parents are getting targeted by scammers and she has no way to protect them remotely</button>
+            <button type="button" class="chip" data-value="Laura doesn't know which of her family's devices are protected and which aren't — it's a blind spot">Laura doesn't know which of her family's devices are protected and which aren't — it's a blind spot</button>
+            <button type="button" class="chip" data-value="Laura found out about a data breach affecting her family months after it happened">Laura found out about a data breach affecting her family months after it happened</button>
+          </div>
+          <div class="input-area">
+            <textarea id="problemCustom" maxlength="200" rows="3" placeholder="Write your own problem statement…"></textarea>
+            <div class="char-counter" data-counter="problemCustom">0 / 200</div>
+          </div>
+        </div>
+
+        <div class="step-card" data-step="2">
+          <div>
+            <div class="step-label">Step 2 — Persona Focus</div>
+            <h2 class="step-title">Which part of Laura's life does this touch?</h2>
+          </div>
+          <div class="chip-grid" data-chip-group="persona" data-selection="single">
+            <button type="button" class="chip" data-value="Family protection">👨‍👩‍👧 Family protection</button>
+            <button type="button" class="chip" data-value="Financial & identity safety">💳 Financial &amp; identity safety</button>
+            <button type="button" class="chip" data-value="Device management & security">📱 Device management &amp; security</button>
+            <button type="button" class="chip" data-value="Scam & threat detection">🛡️ Scam &amp; threat detection</button>
+            <button type="button" class="chip" data-value="Privacy & data control">🔒 Privacy &amp; data control</button>
+            <button type="button" class="chip" data-value="Home network & smart devices">🏠 Home network &amp; smart devices</button>
+          </div>
+        </div>
+
+        <div class="step-card" data-step="3">
+          <div>
+            <div class="step-label">Step 3 — Norton Capabilities</div>
+            <h2 class="step-title">What Norton capability powers this?</h2>
+            <p class="step-hint">Choose 1–3 anchors. Tie the idea to real strengths.</p>
+          </div>
+          <div class="chip-grid" data-chip-group="capabilities" data-selection="multi" data-max="3">
+            <button type="button" class="chip" data-value="Antivirus & Malware Protection">Antivirus &amp; Malware Protection</button>
+            <button type="button" class="chip" data-value="Secure VPN">Secure VPN</button>
+            <button type="button" class="chip" data-value="Dark Web Monitoring">Dark Web Monitoring</button>
+            <button type="button" class="chip" data-value="Safe Web & Safe Search">Safe Web &amp; Safe Search</button>
+            <button type="button" class="chip" data-value="Genie Scam Protection">Genie Scam Protection</button>
+            <button type="button" class="chip" data-value="Password Manager">Password Manager</button>
+            <button type="button" class="chip" data-value="Smart Scan">Smart Scan</button>
+            <button type="button" class="chip" data-value="Privacy Monitor">Privacy Monitor</button>
+            <button type="button" class="chip" data-value="Family & Parental Controls">Family &amp; Parental Controls</button>
+            <button type="button" class="chip" data-value="Cloud Backup">Cloud Backup</button>
+            <button type="button" class="chip" data-value="Norton Money">Norton Money</button>
+            <button type="button" class="chip" data-value="Threat Intelligence Engine">Threat Intelligence Engine</button>
+            <button type="button" class="chip" data-value="Device Management">Device Management</button>
+            <button type="button" class="chip" data-value="Credit Monitoring">Credit Monitoring</button>
+            <button type="button" class="chip" data-value="Financial Monitoring">Financial Monitoring</button>
+            <button type="button" class="chip" data-value="Content Feed">Content Feed</button>
+            <button type="button" class="chip" data-value="Daily Digest">Daily Digest</button>
+            <button type="button" class="chip" data-value="NeoClaw (agentic AI)">NeoClaw (agentic AI)</button>
+            <button type="button" class="chip" data-value="Norton Genie">Norton Genie</button>
+          </div>
+        </div>
+
+        <div class="step-card" data-step="4">
+          <div>
+            <div class="step-label">Step 4 — The Core Idea</div>
+            <h2 class="step-title">What does your concept do?</h2>
+            <p class="step-hint">Describe the experience, not the feature. How does Laura feel before vs. after?</p>
+          </div>
+          <div class="input-area">
+            <textarea id="coreIdea" maxlength="400" rows="5" placeholder="Describe the end-to-end experience…"></textarea>
+            <div class="char-counter" data-counter="coreIdea">0 / 400</div>
+          </div>
+          <div class="template-hint">Starter template: “When Laura [trigger], Norton [action], so she [outcome].”</div>
+        </div>
+
+        <div class="step-card" data-step="5">
+          <div>
+            <div class="step-label">Step 5 — Differentiation</div>
+            <h2 class="step-title">Why can only Norton do this?</h2>
+          </div>
+          <div class="input-area">
+            <textarea id="differentiation" maxlength="300" rows="4" placeholder="Explain the unfair advantage…"></textarea>
+            <div class="char-counter" data-counter="differentiation">0 / 300</div>
+          </div>
+          <div class="chip-grid" data-chip-group="differentiators" data-selection="multi">
+            <button type="button" class="chip" data-value="30 years of threat intelligence">30 years of threat intelligence</button>
+            <button type="button" class="chip" data-value="LifeLock identity layer built in">LifeLock identity layer built in</button>
+            <button type="button" class="chip" data-value="Cross-device household coverage">Cross-device household coverage</button>
+            <button type="button" class="chip" data-value="Trusted brand with existing relationship">Trusted brand with existing relationship</button>
+            <button type="button" class="chip" data-value="AI + human specialist combination">AI + human specialist combination</button>
+          </div>
+        </div>
+
+        <div class="step-card" data-step="6">
+          <div>
+            <div class="step-label">Step 6 — The Magic Moment</div>
+            <h2 class="step-title">What's the moment Laura “gets it”?</h2>
+          </div>
+          <div class="input-area">
+            <textarea id="magicMoment" maxlength="300" rows="4" placeholder="Paint the aha moment…"></textarea>
+            <div class="char-counter" data-counter="magicMoment">0 / 300</div>
+          </div>
+          <div class="template-hint">Example: “Laura gets a single morning notification: ‘Your family had a quiet week. All 8 devices clean.’ She closes the app. Done.”</div>
+        </div>
+
+        <div class="step-card" data-step="7">
+          <div>
+            <div class="step-label">Step 7 — Name & Tagline</div>
+            <h2 class="step-title">Give it a name and a snap tagline</h2>
+          </div>
+          <div class="input-area">
+            <input type="text" id="conceptName" maxlength="60" placeholder="Concept name" />
+            <div class="char-counter" data-counter="conceptName">0 / 60</div>
+          </div>
+          <div class="input-area">
+            <input type="text" id="tagline" maxlength="100" placeholder="Tagline" />
+            <div class="char-counter" data-counter="tagline">0 / 100</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="step-actions">
+        <button type="button" id="prevBtn">← Back</button>
+        <button type="button" class="primary" id="nextBtn">Next →</button>
+      </div>
+      <div class="form-feedback" id="formFeedback"></div>
+    </section>
+
+    <section class="output-card" id="outputCard">
+      <div>
+        <h3 id="outputConceptName"></h3>
+        <p id="outputTagline" style="margin: 4px 0 0; font-size: 18px; color: rgba(255,255,255,0.85);"></p>
+      </div>
+      <div class="output-section">
+        <h4>THE PROBLEM</h4>
+        <p id="outputProblem"></p>
+      </div>
+      <div class="output-section">
+        <h4>THE CONCEPT</h4>
+        <p id="outputConcept"></p>
+      </div>
+      <div class="output-section">
+        <h4>WHY NORTON</h4>
+        <p id="outputWhy"></p>
+      </div>
+      <div class="output-section">
+        <h4>THE MAGIC MOMENT</h4>
+        <p id="outputMagic"></p>
+      </div>
+      <div class="output-section">
+        <h4>PERSONA FOCUS</h4>
+        <p id="outputPersona"></p>
+      </div>
+      <div class="output-ctas">
+        <button type="button" id="copyBtn">Copy to Clipboard</button>
+        <a href="laura.html#concept-validation" target="_blank">→ Pressure-Test with Laura</a>
+        <a href="laura.html#elevator-pitch" target="_blank">→ Pitch to Laura</a>
+      </div>
+      <div class="output-note">Tip: paste your concept directly into the Concept Validation tool or Elevator Pitch tool on the Laura page.</div>
+    </section>
+  </main>
+
+  <script>
+    const steps = document.querySelectorAll('.step-card');
+    const stepperButtons = document.querySelectorAll('#stepper button');
+    const progressBar = document.getElementById('progressBar');
+    const stepLabel = document.getElementById('stepLabel');
+    const stepTitleMeta = document.getElementById('stepTitleMeta');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const formFeedback = document.getElementById('formFeedback');
+    const outputCard = document.getElementById('outputCard');
+    const copyBtn = document.getElementById('copyBtn');
+
+    const totalSteps = steps.length;
+    let currentStep = 1;
+
+    const state = {
+      problem: '',
+      persona: '',
+      capabilities: [],
+      coreIdea: '',
+      differentiation: '',
+      differentiators: [],
+      magicMoment: '',
+      conceptName: '',
+      tagline: ''
+    };
+
+    const stepTitles = {
+      1: 'Problem Statement',
+      2: 'Persona Focus',
+      3: 'Norton Capabilities',
+      4: 'The Core Idea',
+      5: 'Differentiation',
+      6: 'Magic Moment',
+      7: 'Name & Tagline'
+    };
+
+    function updateStep(newStep) {
+      if (newStep < 1 || newStep > totalSteps) return;
+      currentStep = newStep;
+      steps.forEach(step => step.classList.toggle('active', Number(step.dataset.step) === currentStep));
+      stepperButtons.forEach(button => {
+        const stepNum = Number(button.dataset.step);
+        button.classList.remove('active', 'done');
+        if (stepNum === currentStep) {
+          button.classList.add('active');
+        } else if (stepNum < currentStep) {
+          button.classList.add('done');
+        }
+        button.disabled = stepNum > currentStep;
+      });
+      const percentage = (currentStep - 1) / (totalSteps - 1) * 100;
+      progressBar.style.width = `${percentage}%`;
+      stepLabel.textContent = `Step ${currentStep} of ${totalSteps}`;
+      stepTitleMeta.textContent = stepTitles[currentStep];
+      prevBtn.disabled = currentStep === 1;
+      nextBtn.textContent = currentStep === totalSteps ? '✦ Generate My Concept' : 'Next →';
+      formFeedback.style.display = 'none';
+    }
+
+    prevBtn.addEventListener('click', () => updateStep(currentStep - 1));
+
+    nextBtn.addEventListener('click', () => {
+      if (currentStep === totalSteps) {
+        handleGenerate();
+      } else {
+        updateStep(currentStep + 1);
+      }
+    });
+
+    stepperButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        const target = Number(button.dataset.step);
+        if (target <= currentStep) {
+          updateStep(target);
+        }
+      });
+    });
+
+    function handleChips() {
+      document.querySelectorAll('[data-chip-group]').forEach(group => {
+        group.addEventListener('click', event => {
+          const chip = event.target.closest('.chip');
+          if (!chip) return;
+          const selectionType = group.dataset.selection || 'single';
+          const value = chip.dataset.value;
+
+          if (selectionType === 'single') {
+            group.querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
+            chip.classList.add('selected');
+            storeValue(group.dataset.chipGroup, value);
+            if (group.dataset.chipGroup === 'problem') {
+              document.getElementById('problemCustom').value = '';
+              updateCounter('problemCustom');
+            }
+          } else {
+            const max = Number(group.dataset.max) || Infinity;
+            const selected = group.querySelectorAll('.chip.selected');
+            if (!chip.classList.contains('selected') && selected.length >= max) {
+              chip.classList.remove('selected');
+              return;
+            }
+            chip.classList.toggle('selected');
+            storeValue(group.dataset.chipGroup, Array.from(group.querySelectorAll('.chip.selected')).map(c => c.dataset.value));
+          }
+        });
+      });
+    }
+
+    function storeValue(key, value) {
+      if (Array.isArray(value)) {
+        state[key] = value;
+      } else {
+        state[key] = value;
+      }
+    }
+
+    function handleTextInputs() {
+      const fields = [
+        { id: 'problemCustom', key: 'problem' },
+        { id: 'coreIdea', key: 'coreIdea' },
+        { id: 'differentiation', key: 'differentiation' },
+        { id: 'magicMoment', key: 'magicMoment' },
+        { id: 'conceptName', key: 'conceptName' },
+        { id: 'tagline', key: 'tagline' }
+      ];
+
+      fields.forEach(field => {
+        const el = document.getElementById(field.id);
+        if (!el) return;
+        el.addEventListener('input', () => {
+          state[field.key] = el.value.trim();
+          if (field.id === 'problemCustom' && el.value.trim()) {
+            document.querySelectorAll('[data-chip-group="problem"] .chip').forEach(chip => chip.classList.remove('selected'));
+          }
+          updateCounter(field.id);
+        });
+        updateCounter(field.id);
+      });
+    }
+
+    function updateCounter(id) {
+      const input = document.getElementById(id);
+      const counter = document.querySelector(`[data-counter="${id}"]`);
+      if (input && counter) {
+        const max = input.getAttribute('maxlength');
+        counter.textContent = `${input.value.length} / ${max}`;
+      }
+    }
+
+    function validateState() {
+      if (!state.problem) return 'Select or write a problem statement.';
+      if (!state.persona) return 'Choose a persona focus for Laura.';
+      if (!state.capabilities.length) return 'Select at least one Norton capability (max 3).';
+      if (!state.coreIdea) return 'Describe the core idea.';
+      if (!state.differentiation) return 'Explain why only Norton can do this.';
+      if (!state.magicMoment) return 'Describe the magic moment.';
+      if (!state.conceptName) return 'Add a concept name.';
+      if (!state.tagline) return 'Add a tagline.';
+      return null;
+    }
+
+    function handleGenerate() {
+      const error = validateState();
+      if (error) {
+        formFeedback.textContent = error;
+        formFeedback.style.display = 'block';
+        return;
+      }
+      formFeedback.style.display = 'none';
+
+      const diffParts = [];
+      if (state.capabilities.length) diffParts.push(state.capabilities.join(', '));
+      if (state.differentiators.length) diffParts.push(state.differentiators.join(', '));
+      const whyText = `${state.capabilities.join(', ') || '—'}${state.differentiators.length ? ' + ' + state.differentiators.join(', ') : ''}`;
+
+      document.getElementById('outputConceptName').textContent = state.conceptName;
+      document.getElementById('outputTagline').textContent = state.tagline;
+      document.getElementById('outputProblem').textContent = state.problem;
+      document.getElementById('outputConcept').textContent = state.coreIdea;
+      document.getElementById('outputWhy').textContent = whyText;
+      document.getElementById('outputMagic').textContent = state.magicMoment;
+      document.getElementById('outputPersona').textContent = state.persona;
+
+      outputCard.style.display = 'flex';
+      outputCard.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    copyBtn.addEventListener('click', async () => {
+      const text = `${state.conceptName}\n${state.tagline}\n\nTHE PROBLEM\n${state.problem}\n\nTHE CONCEPT\n${state.coreIdea}\n\nWHY NORTON\n${state.capabilities.join(', ')}${state.differentiators.length ? ' + ' + state.differentiators.join(', ') : ''}\n\nTHE MAGIC MOMENT\n${state.magicMoment}\n\nPERSONA FOCUS: ${state.persona}`;
+      try {
+        await navigator.clipboard.writeText(text);
+        copyBtn.textContent = 'Copied!';
+        setTimeout(() => (copyBtn.textContent = 'Copy to Clipboard'), 2000);
+      } catch (err) {
+        copyBtn.textContent = 'Copy failed';
+        setTimeout(() => (copyBtn.textContent = 'Copy to Clipboard'), 2000);
+      }
+    });
+
+    handleChips();
+    handleTextInputs();
+
+    updateStep(1);
+  </script>
+  <script src="nav.js"></script>
+</body>
+</html>
