@@ -990,15 +990,38 @@ function setScreen(btn, val) {
 // ── Norton capabilities ───────────────────────────────────────────────────────
 const CAPABILITIES = [
   'Antivirus & Malware Protection', 'Secure VPN', 'Dark Web Monitoring',
-  'LifeLock Identity Protection', 'Safe Web & Safe Search', 'Genie Scam Protection',
+  'Safe Web & Safe Search', 'Genie Scam Protection',
   'Password Manager', 'Smart Scan', 'Privacy Monitor', 'Family & Parental Controls',
-  'Cloud Backup', 'Norton 360 Dashboard', 'Norton Money (Financial Wellness)',
-  'Threat Intelligence Engine', 'Device Management', 'Credit & Financial Monitoring'
+  'Cloud Backup', 'Norton Money (Financial Wellness)',
+  'Threat Intelligence Engine', 'Device Management',
+  'Credit Monitoring', 'Financial Monitoring',
+  'Content Feed', 'Daily Digest'
 ];
+
+// Descriptions for all regular capabilities
+const CAP_DESCS = {
+  'Antivirus & Malware Protection': 'Real-time, multi-layer defense against viruses, ransomware, spyware, and zero-day threats across all devices.',
+  'Secure VPN':                     'Encrypts browsing and hides IP on public Wi-Fi — no activity logs kept.',
+  'Dark Web Monitoring':            'Continuously scans dark web markets and forums for Laura's emails, SSN, and personal data, alerting her the moment something surfaces.',
+  'Safe Web & Safe Search':         'Browser extension that blocks malicious sites, flags dangerous search results, and stops phishing links before they load.',
+  'Genie Scam Protection':          'AI-powered scam detector — analyzes suspicious texts, emails, and calls in real time and tells Laura in plain language if something is a scam.',
+  'Password Manager':               'Stores, generates, and autofills strong passwords so Laura never has to remember or reuse them.',
+  'Smart Scan':                     'One-tap scan that checks for malware, weak passwords, network vulnerabilities, and out-of-date software in under a minute.',
+  'Privacy Monitor':                'Finds and requests removal of Laura's personal info from data broker sites that sell it to anyone.',
+  'Family & Parental Controls':     'Screen time limits, content filters, location sharing, and app supervision across every family member's device.',
+  'Cloud Backup':                   'Automatically backs up important files to the cloud so nothing is lost to ransomware, theft, or a broken device.',
+  'Norton Money (Financial Wellness)': 'Tracks spending, flags unusual transactions, and surfaces financial health insights alongside identity protection.',
+  'Threat Intelligence Engine':     'The real-time global threat database behind all Norton detections — learns from 175M+ devices to block emerging threats faster.',
+  'Device Management':              'Single view of every protected device in the household — status, coverage gaps, and one-tap fixes.',
+  'Credit Monitoring':              'Monitors credit files across Equifax, Experian, and TransUnion and alerts Laura to new accounts, hard inquiries, or score changes that could signal fraud.',
+  'Financial Monitoring':           'Scans bank, credit card, and investment accounts for suspicious activity — unauthorized withdrawals, balance transfers, and account takeovers.',
+  'Content Feed':                   'A personalized, curated feed of security news, scam alerts, and family safety tips surfaced in-app — keeping Laura informed without overwhelming her.',
+  'Daily Digest':                   'A once-a-day summary pushed to Laura covering everything Norton detected, blocked, or monitored overnight — so she always knows her household is safe with a single glance.'
+};
 
 // Featured capabilities that require a role selector when checked
 const FEATURED_CAPS = {
-  'NeoClaw': 'Norton\'s security-first cloud AI agent platform — performs tasks autonomously on Laura\'s behalf with full privacy protection',
+  'NeoClaw (or Norton Agent / agentic workflows)': 'Norton\'s agentic AI platform — performs multi-step security tasks autonomously on Laura\'s behalf, from removing data broker listings to resolving identity alerts, with full privacy protection.',
   'Norton Genie': 'Norton\'s AI assistant — answers security questions, explains threats, and guides Laura through decisions in plain language'
 };
 
@@ -1059,10 +1082,14 @@ const ROLE_OPTIONS = [
     item.dataset.cap = cap;
     item.style.cssText = 'flex-direction:column;align-items:flex-start;gap:8px;cursor:pointer;';
 
+    const capDesc = CAP_DESCS[cap] || '';
     item.innerHTML = `
       <div style="display:flex;align-items:center;gap:10px;width:100%;" onclick="toggleRegularCap('${cap}')">
         <span class="cap-check" id="rcc-${key}">✓</span>
-        <span class="cap-label">${cap}</span>
+        <div style="flex:1;min-width:0;">
+          <span class="cap-label">${cap}</span>
+          ${capDesc ? `<div style="font-size:12px;color:var(--ink-soft);margin-top:2px;line-height:1.4;">${capDesc}</div>` : ''}
+        </div>
       </div>
       <div class="reg-role-picker" id="rrp-${key}" style="display:none;width:100%;padding-top:8px;border-top:1px solid rgba(255,255,255,.15);">
         <div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--yellow);margin-bottom:6px;">How does it show up?</div>
@@ -1126,7 +1153,7 @@ function updateRegRoleStyles(cap) {
 }
 
 // Track featured cap state
-const _featuredState = {}; // { 'NeoClaw': { checked: bool, role: 'primary'|'part'|'cross' } }
+const _featuredState = {}; // { 'NeoClaw (or Norton Agent / agentic workflows)': { checked: bool, role: 'primary'|'part'|'cross' } }
 
 function toggleFeaturedCap(cap) {
   const key = cap.replace(/\s+/g,'_');
@@ -1497,7 +1524,7 @@ function getIaTabs() {
 
 // Seed 3 default tabs
 addIaTab('My Shield', '');
-addIaTab('NeoClaw', '');
+addIaTab('NeoClaw (or Norton Agent / agentic workflows)', '');
 addIaTab('Coach', '');
 
 // ── Generate ──────────────────────────────────────────────────────────────────
@@ -1621,7 +1648,7 @@ ${voiceTone ? `\nVOICE & TONE (defined by the concept author):\n${voiceTone}` : 
 
   const tabNavLine = iaTabs.length
     ? iaTabs.map(t => t.home ? `${t.name || 'Home'} (home)` : (t.name || 'Tab')).join(' · ')
-    : 'Home · ✦ NeoClaw · Coach';
+    : 'Home · ✦ NeoClaw (or Norton Agent / agentic workflows) · Coach';
 
   let platformSection;
   if (isIOS) {
