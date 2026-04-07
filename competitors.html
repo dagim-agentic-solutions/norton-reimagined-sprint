@@ -1,0 +1,1303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Competitors — Norton Reimagined Sprint</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<style>
+  .mockup {
+    height: 200px;
+    border-radius: 8px 8px 0 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    position: relative;
+    font-family: 'Inter Tight', sans-serif;
+  }
+  .mockup-label {
+    position: absolute;
+    bottom: 8px;
+    left: 0; right: 0;
+    text-align: center;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .04em;
+    opacity: .6;
+  }
+  .stat-tiles {
+    display: flex;
+    gap: 8px;
+    margin: 14px 0 10px;
+    flex-wrap: wrap;
+  }
+  .stat-tile {
+    flex: 1;
+    min-width: 70px;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 8px 10px;
+    text-align: center;
+  }
+  .stat-tile .st-val {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1.2;
+  }
+  .stat-tile .st-key {
+    font-size: 10px;
+    color: var(--ink-softer);
+    margin-top: 2px;
+    font-weight: 500;
+  }
+  .trend-badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin-left: 8px;
+    vertical-align: middle;
+  }
+  .trend-up { background: #e8f5e8; color: #0a7a3d; }
+  .trend-down { background: #fef2f2; color: #b01818; }
+  .trend-stable { background: #fff8e8; color: #c07000; }
+  .feat-badge {
+    display: inline-block;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 500;
+    padding: 3px 8px;
+    margin: 2px 3px 2px 0;
+    color: var(--ink-soft);
+  }
+  .competitor-card {
+    overflow: hidden;
+    padding: 0;
+  }
+  .competitor-card .card-body {
+    padding: 20px 22px 18px;
+  }
+  .competitor-name {
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: -.02em;
+    display: inline;
+  }
+  .differentiator {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--ink);
+    margin: 10px 0 8px;
+  }
+  details summary {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--ink-soft);
+    cursor: pointer;
+    padding: 8px 0 4px;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    list-style: none;
+    outline: none;
+  }
+  details summary::-webkit-details-marker { display: none; }
+  details[open] summary { color: var(--ink); }
+  .deep-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--ink-softer);
+    margin: 10px 0 4px;
+  }
+  .deep-val {
+    font-size: 13px;
+    color: var(--ink-soft);
+    line-height: 1.55;
+    margin-bottom: 8px;
+  }
+  /* Feature matrix */
+  .feat-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  .feat-table th {
+    background: var(--paper);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .07em;
+    text-transform: uppercase;
+    padding: 10px 12px;
+    text-align: left;
+    border-bottom: 2px solid var(--line);
+    white-space: nowrap;
+  }
+  .feat-table th.norton-col {
+    border-left: 4px solid var(--yellow);
+    background: #fffde6;
+  }
+  .feat-table td {
+    padding: 9px 12px;
+    border-bottom: 1px solid var(--line);
+    vertical-align: middle;
+    line-height: 1.4;
+  }
+  .feat-table td.norton-col {
+    border-left: 4px solid var(--yellow);
+    background: #fffde6;
+  }
+  .feat-table tr:last-child td { border-bottom: none; }
+  .feat-table td.yes { background: #e8f5e8; }
+  .feat-table td.no { background: #fef2f2; }
+  .feat-table td:first-child { font-weight: 600; color: var(--ink); background: var(--paper) !important; }
+  /* Tab buttons */
+  .tab-bar {
+    margin-bottom: 24px;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .tab-btn {
+    font-family: 'Inter Tight', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 8px 16px;
+    border-radius: 6px;
+    border: 1.5px solid var(--line);
+    cursor: pointer;
+    transition: all .15s;
+    background: #fff;
+    color: var(--ink);
+  }
+  .cat-section { display: none; }
+  /* Laura tool */
+  .laura-tool {
+    border-left: 4px solid var(--yellow);
+  }
+  .laura-tool select, .laura-tool textarea {
+    font-family: 'Inter Tight', sans-serif;
+    font-size: 14px;
+    color: var(--ink);
+    border: 1.5px solid var(--line);
+    border-radius: 6px;
+    padding: 10px 12px;
+    width: 100%;
+    box-sizing: border-box;
+    background: var(--paper);
+    margin-bottom: 12px;
+    outline: none;
+    resize: vertical;
+  }
+  .laura-tool select:focus, .laura-tool textarea:focus {
+    border-color: #242424;
+  }
+  #testBtn {
+    font-family: 'Inter Tight', sans-serif;
+    font-size: 14px;
+    font-weight: 800;
+    background: var(--yellow);
+    color: var(--ink);
+    border: 2px solid var(--ink);
+    border-radius: 6px;
+    padding: 11px 24px;
+    cursor: pointer;
+    transition: opacity .15s;
+  }
+  #testBtn:disabled { opacity: .5; cursor: not-allowed; }
+  #lauraResult { display: none; margin-top: 20px; padding: 20px; background: var(--paper); border-radius: 8px; border: 1px solid var(--line); }
+  #featurePills { margin-bottom: 12px; min-height: 36px; }
+  .callout-box {
+    background: var(--paper);
+    border-left: 4px solid var(--yellow);
+    padding: 18px 22px;
+    border-radius: 0 6px 6px 0;
+    margin-top: 0;
+  }
+  .callout-box p { margin: 0; font-size: 14px; line-height: 1.6; color: var(--ink); }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-brand">
+      <span>Norton</span> Reimagined
+    </a>
+    <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-links" id="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="laura.html">Laura</a></li>
+      <li><a href="where-is-norton.html">Where is Norton</a></li>
+      <li><a href="prototypes.html">Prototypes</a></li>
+      <li><a href="resources.html">Resources</a></li>
+      <li><a href="concept-builder.html">Concept Builder <span style="background:var(--yellow);color:var(--ink);font-size:9px;font-weight:800;padding:1px 6px;border-radius:999px;vertical-align:middle;letter-spacing:.04em;">β</span></a></li>
+      <li><a href="competitors.html" class="active">Competitors</a></li>
+    </ul>
+  </div>
+</nav>
+
+<div class="page">
+
+  <!-- =================== HERO =================== -->
+  <div class="col-12">
+    <span class="eyebrow">Competitive Intelligence · Beta</span>
+    <h1 class="page-title">The competitive <span class="mark">landscape</span>.</h1>
+    <p class="lede">A deep-dive into every player in the consumer cybersecurity market — what they do, who they target, how their UX looks, and whether any of it actually matters to Laura.</p>
+  </div>
+
+  <!-- =================== TABS =================== -->
+  <div class="col-12">
+    <div class="tab-bar">
+      <button class="tab-btn" id="tab-traditional" onclick="showCategory('traditional')" style="background:#FFE800;color:#242424;border-color:#242424;">Traditional Specialists</button>
+      <button class="tab-btn" id="tab-bigtech" onclick="showCategory('bigtech')">Big Tech — Structural Threat</button>
+      <button class="tab-btn" id="tab-indirect" onclick="showCategory('indirect')">Indirect Challengers</button>
+    </div>
+  </div>
+
+  <!-- =================== TRADITIONAL =================== -->
+  <div class="cat-section" id="cat-traditional" style="display:block;">
+
+    <!-- McAfee -->
+    <div class="col-6">
+      <div class="card competitor-card">
+        <div class="mockup" style="background:#1a1a2e;">
+          <div style="width:90px;height:90px;border-radius:50%;border:4px solid #22c55e;display:flex;flex-direction:column;align-items:center;justify-content:center;margin-bottom:10px;">
+            <div style="font-size:26px;font-weight:800;color:#22c55e;line-height:1;">780</div>
+            <div style="font-size:9px;color:#22c55e;font-weight:600;letter-spacing:.04em;">PROTECTION SCORE</div>
+          </div>
+          <div style="display:flex;gap:6px;">
+            <span style="background:rgba(255,255,255,.12);color:#fff;font-size:10px;font-weight:600;padding:3px 8px;border-radius:4px;">Antivirus</span>
+            <span style="background:rgba(255,255,255,.12);color:#fff;font-size:10px;font-weight:600;padding:3px 8px;border-radius:4px;">VPN</span>
+            <span style="background:rgba(255,255,255,.12);color:#fff;font-size:10px;font-weight:600;padding:3px 8px;border-radius:4px;">Identity</span>
+          </div>
+          <div class="mockup-label" style="color:#9ca3af;">Gamified Protection Score</div>
+        </div>
+        <div class="card-body">
+          <span class="competitor-name">McAfee</span>
+          <span class="trend-badge trend-up">▲ Growing</span>
+          <div class="stat-tiles">
+            <div class="stat-tile"><div class="st-val">~$2.5B</div><div class="st-key">Revenue</div></div>
+            <div class="stat-tile"><div class="st-val">600M</div><div class="st-key">Devices</div></div>
+            <div class="stat-tile"><div class="st-val">17% AV</div><div class="st-key">Market</div></div>
+            <div class="stat-tile"><div class="st-val">~$14B</div><div class="st-key">Valuation</div></div>
+          </div>
+          <div class="differentiator">AI deepfake detection (industry first) + massive OEM pre-install funnel</div>
+          <details>
+            <summary>Deep dive ▼</summary>
+            <div class="deep-label">Who they target</div>
+            <div class="deep-val">Digital-native families (25-44), new PC buyers via OEM pre-install channel</div>
+            <div class="deep-label">Perception</div>
+            <div class="deep-val">Legacy brand reinventing via AI scam focus; love-hate relationship from pre-install bloatware history</div>
+            <div class="deep-label">Features</div>
+            <div style="margin-bottom:8px;">
+              <span class="feat-badge">Scam Detector (Deepfake AI)</span>
+              <span class="feat-badge">Protection Score</span>
+              <span class="feat-badge">Secure VPN</span>
+              <span class="feat-badge">Social Privacy Manager</span>
+              <span class="feat-badge">Identity Monitoring</span>
+              <span class="feat-badge">Safe Family</span>
+              <span class="feat-badge">Personal Data Cleanup</span>
+            </div>
+            <div class="deep-label">Evolution</div>
+            <div class="deep-val">Pure consumer pivot (2021) → AI scam detection → Deepfake detector (industry first) → Youth rebrand via Pat McAfee</div>
+          </details>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bitdefender -->
+    <div class="col-6">
+      <div class="card competitor-card">
+        <div class="mockup" style="background:#0d1117;">
+          <div style="width:100%;padding:0 8px;box-sizing:border-box;">
+            <div style="color:#DC2626;font-size:13px;font-weight:800;margin-bottom:8px;">Bitdefender</div>
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;">
+              <span style="width:8px;height:8px;background:#22c55e;border-radius:50%;display:inline-block;"></span>
+              <span style="color:#fff;font-size:12px;font-weight:600;">You are protected</span>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px;">
+              <div style="background:rgba(255,255,255,.08);border-radius:5px;padding:7px 10px;color:#d1d5db;font-size:11px;font-weight:600;">Quick Scan</div>
+              <div style="background:rgba(255,255,255,.08);border-radius:5px;padding:7px 10px;color:#d1d5db;font-size:11px;font-weight:600;">VPN</div>
+              <div style="background:rgba(255,255,255,.08);border-radius:5px;padding:7px 10px;color:#d1d5db;font-size:11px;font-weight:600;">SafePay</div>
+              <div style="background:rgba(255,255,255,.08);border-radius:5px;padding:7px 10px;color:#d1d5db;font-size:11px;font-weight:600;">Firewall</div>
+            </div>
+            <div style="background:rgba(139,92,246,.2);border-radius:5px;padding:7px 10px;color:#c4b5fd;font-size:11px;font-weight:600;">💬 Scamio AI on WhatsApp</div>
+          </div>
+          <div class="mockup-label" style="color:#6b7280;">Dark, minimal, status-first</div>
+        </div>
+        <div class="card-body">
+          <span class="competitor-name">Bitdefender</span>
+          <span class="trend-badge trend-up">▲ Growing</span>
+          <div class="stat-tiles">
+            <div class="stat-tile"><div class="st-val">~$380M</div><div class="st-key">Revenue</div></div>
+            <div class="stat-tile"><div class="st-val">500M</div><div class="st-key">Endpoints</div></div>
+            <div class="stat-tile"><div class="st-val">IDC Leader</div><div class="st-key">Market</div></div>
+            <div class="stat-tile"><div class="st-val">IPO-ready</div><div class="st-key">Valuation</div></div>
+          </div>
+          <div class="differentiator">Best-in-class detection (99.7%) + Scamio AI chatbot free on WhatsApp and Discord</div>
+          <details>
+            <summary>Deep dive ▼</summary>
+            <div class="deep-label">Who they target</div>
+            <div class="deep-val">Tech-savvy users who value independent lab test scores (73% male audience)</div>
+            <div class="deep-label">Perception</div>
+            <div class="deep-val">Expert's choice — tops every independent lab test. Ferrari F1 partnership adds performance prestige.</div>
+            <div class="deep-label">Features</div>
+            <div style="margin-bottom:8px;">
+              <span class="feat-badge">Scam Copilot / Scamio</span>
+              <span class="feat-badge">Advanced Threat Defense</span>
+              <span class="feat-badge">Ransomware Remediation</span>
+              <span class="feat-badge">Digital Identity Protection</span>
+              <span class="feat-badge">Anti-Tracker</span>
+              <span class="feat-badge">Webcam/Mic Protection</span>
+            </div>
+            <div class="deep-label">Evolution</div>
+            <div class="deep-val">AV roots → Dual enterprise/consumer → Scamio chatbot on WhatsApp → IDC Leader 2025 → Kaspersky ban beneficiary</div>
+          </details>
+        </div>
+      </div>
+    </div>
+
+    <!-- Malwarebytes -->
+    <div class="col-6">
+      <div class="card competitor-card">
+        <div class="mockup" style="background:#111827;">
+          <div style="text-align:center;">
+            <div style="width:72px;height:72px;border-radius:50%;border:3px solid #3b82f6;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;font-size:26px;color:#3b82f6;">✓</div>
+            <div style="color:#fff;font-size:13px;font-weight:700;margin-bottom:10px;">Protected</div>
+            <div style="background:#3b82f6;color:#fff;font-size:12px;font-weight:700;padding:7px 24px;border-radius:6px;display:inline-block;margin-bottom:10px;">Scan</div>
+            <div style="color:#9ca3af;font-size:11px;">Last scan: 2 hours ago</div>
+          </div>
+          <div class="mockup-label" style="color:#6b7280;">Ultra-minimal, anti-bloatware</div>
+        </div>
+        <div class="card-body">
+          <span class="competitor-name">Malwarebytes</span>
+          <span class="trend-badge trend-stable">▶ Stable</span>
+          <div class="stat-tiles">
+            <div class="stat-tile"><div class="st-val">~$300M</div><div class="st-key">Revenue</div></div>
+            <div class="stat-tile"><div class="st-val">~3M</div><div class="st-key">Customers</div></div>
+            <div class="stat-tile"><div class="st-val">~7%</div><div class="st-key">Market</div></div>
+            <div class="stat-tile"><div class="st-val">Private</div><div class="st-key">Valuation</div></div>
+          </div>
+          <div class="differentiator">Behavior-based 4-layer detection in the lightest-weight, cleanest UX in the category</div>
+          <details>
+            <summary>Deep dive ▼</summary>
+            <div class="deep-label">Who they target</div>
+            <div class="deep-val">Tech-savvy fixers, IT professionals, privacy-conscious users who distrust Big AV</div>
+            <div class="deep-label">Perception</div>
+            <div class="deep-val">Cult following as the tool IT pros recommend when PCs are already infected. CNET 2025 Best for Privacy.</div>
+            <div class="deep-label">Features</div>
+            <div style="margin-bottom:8px;">
+              <span class="feat-badge">4-Layer Behavioral Detection</span>
+              <span class="feat-badge">Scam Guard (AI mobile)</span>
+              <span class="feat-badge">Personal Data Remover</span>
+              <span class="feat-badge">Digital Footprint Portal</span>
+              <span class="feat-badge">Browser Guard</span>
+              <span class="feat-badge">System Tools</span>
+            </div>
+            <div class="deep-label">Evolution</div>
+            <div class="deep-val">Remediation tool → Proactive suite → Privacy/identity expansion → Free optimization tools (2025) → ChatGPT integration (2026)</div>
+          </details>
+        </div>
+      </div>
+    </div>
+
+    <!-- TotalAV -->
+    <div class="col-6">
+      <div class="card competitor-card">
+        <div class="mockup" style="background:#f8fafc;">
+          <div style="width:100%;padding:0 10px;box-sizing:border-box;">
+            <div style="color:#059669;font-size:14px;font-weight:800;margin-bottom:8px;">TotalAV</div>
+            <div style="background:#fff;border-radius:6px;padding:8px 12px;margin-bottom:8px;display:flex;align-items:center;gap:8px;">
+              <span style="color:#059669;font-size:16px;">✓</span>
+              <span style="font-size:12px;font-weight:700;color:#111;">System is Protected</span>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:5px;">
+              <div style="background:#fff;border-radius:5px;padding:6px;text-align:center;font-size:10px;color:#374151;font-weight:600;"><span style="color:#ef4444;font-size:14px;">●</span><br>Malware</div>
+              <div style="background:#fff;border-radius:5px;padding:6px;text-align:center;font-size:10px;color:#374151;font-weight:600;"><span style="color:#f59e0b;font-size:14px;">●</span><br>Junk</div>
+              <div style="background:#fff;border-radius:5px;padding:6px;text-align:center;font-size:10px;color:#374151;font-weight:600;"><span style="color:#3b82f6;font-size:14px;">●</span><br>Dupes</div>
+              <div style="background:#fff;border-radius:5px;padding:6px;text-align:center;font-size:10px;color:#374151;font-weight:600;"><span style="color:#8b5cf6;font-size:14px;">●</span><br>Startup</div>
+              <div style="background:#fff;border-radius:5px;padding:6px;text-align:center;font-size:10px;color:#374151;font-weight:600;"><span style="color:#059669;font-size:14px;">●</span><br>VPN</div>
+              <div style="background:#fff;border-radius:5px;padding:6px;text-align:center;font-size:10px;color:#374151;font-weight:600;"><span style="color:#ec4899;font-size:14px;">●</span><br>WebShield</div>
+            </div>
+          </div>
+          <div class="mockup-label" style="color:#6b7280;">Colorful, approachable, tune-up focus</div>
+        </div>
+        <div class="card-body">
+          <span class="competitor-name">TotalAV</span>
+          <span class="trend-badge trend-up">▲ Growing</span>
+          <div class="stat-tiles">
+            <div class="stat-tile"><div class="st-val">N/A</div><div class="st-key">Revenue</div></div>
+            <div class="stat-tile"><div class="st-val">30M+</div><div class="st-key">Users</div></div>
+            <div class="stat-tile"><div class="st-val">Growing</div><div class="st-key">Market</div></div>
+            <div class="stat-tile"><div class="st-val">Private</div><div class="st-key">Valuation</div></div>
+          </div>
+          <div class="differentiator">Lowest intro pricing ($19/yr) + modern UX that makes cybersecurity approachable for non-technical users</div>
+          <details>
+            <summary>Deep dive ▼</summary>
+            <div class="deep-label">Who they target</div>
+            <div class="deep-val">Budget-conscious first-time buyers (18-35) discovering via YouTube reviews and affiliate channels</div>
+            <div class="deep-label">Perception</div>
+            <div class="deep-val">Polarizing: fans love the value and clean UI; critics note the 200-300% price jump at renewal.</div>
+            <div class="deep-label">Features</div>
+            <div style="margin-bottom:8px;">
+              <span class="feat-badge">Real-time Scanning (Avira engine)</span>
+              <span class="feat-badge">WebShield</span>
+              <span class="feat-badge">Total VPN (bundled)</span>
+              <span class="feat-badge">System Tune-up Tools</span>
+              <span class="feat-badge">Ad Block Pro</span>
+              <span class="feat-badge">Password Vault</span>
+              <span class="feat-badge">Data Breach Check</span>
+            </div>
+            <div class="deep-label">Evolution</div>
+            <div class="deep-val">Affiliate growth hack → Improved AV-TEST scores → VPN bundling → Password management expansion</div>
+          </details>
+        </div>
+      </div>
+    </div>
+
+    <!-- Kaspersky - full width (odd) -->
+    <div class="col-12">
+      <div class="card competitor-card">
+        <div class="mockup" style="background:#f5f5f5;height:180px;">
+          <div style="width:100%;max-width:480px;padding:0 16px;box-sizing:border-box;">
+            <div style="background:#fff;border-radius:6px;padding:10px 14px;margin-bottom:8px;display:flex;align-items:center;gap:10px;box-shadow:0 1px 3px rgba(0,0,0,.08);">
+              <span style="color:#059669;font-size:18px;font-weight:700;">✓</span>
+              <span style="font-size:13px;font-weight:700;color:#111;">Protected</span>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:8px;">
+              <div style="background:#fff;border-radius:5px;padding:8px 6px;text-align:center;font-size:11px;font-weight:600;color:#374151;box-shadow:0 1px 2px rgba(0,0,0,.06);">Scan</div>
+              <div style="background:#fff;border-radius:5px;padding:8px 6px;text-align:center;font-size:11px;font-weight:600;color:#374151;box-shadow:0 1px 2px rgba(0,0,0,.06);">Safe Money</div>
+              <div style="background:#fff;border-radius:5px;padding:8px 6px;text-align:center;font-size:11px;font-weight:600;color:#374151;box-shadow:0 1px 2px rgba(0,0,0,.06);">VPN</div>
+              <div style="background:#fff;border-radius:5px;padding:8px 6px;text-align:center;font-size:11px;font-weight:600;color:#374151;box-shadow:0 1px 2px rgba(0,0,0,.06);">Safe Kids</div>
+            </div>
+            <div style="background:#b01818;border-radius:5px;padding:8px 14px;text-align:center;color:#fff;font-size:12px;font-weight:800;letter-spacing:.04em;">🚫 BANNED IN US (Sept 2024)</div>
+          </div>
+          <div class="mockup-label" style="color:#6b7280;">Status-forward, info-dense</div>
+        </div>
+        <div class="card-body">
+          <span class="competitor-name">Kaspersky</span>
+          <span class="trend-badge trend-down">▼ Declining</span>
+          <div class="stat-tiles">
+            <div class="stat-tile"><div class="st-val">~$822M</div><div class="st-key">Revenue</div></div>
+            <div class="stat-tile"><div class="st-val">400M</div><div class="st-key">Users</div></div>
+            <div class="stat-tile"><div class="st-val">Declining (US ban)</div><div class="st-key">Market</div></div>
+            <div class="stat-tile"><div class="st-val">Private</div><div class="st-key">Valuation</div></div>
+          </div>
+          <div class="differentiator">World-class threat research (GReAT team) + Transparency Centers. BANNED IN US Sept 2024 — pivoting to non-US markets.</div>
+          <details>
+            <summary>Deep dive ▼</summary>
+            <div class="deep-label">Who they target</div>
+            <div class="deep-val">Sophisticated global users — strong in Europe, CIS countries, Middle East</div>
+            <div class="deep-label">Perception</div>
+            <div class="deep-val">Technically excellent but brand fundamentally defined by the US government ban and Russian government ties.</div>
+            <div class="deep-label">Features</div>
+            <div style="margin-bottom:8px;">
+              <span class="feat-badge">Kaspersky Premium Suite</span>
+              <span class="feat-badge">Safe Money (secure browser)</span>
+              <span class="feat-badge">Safe Kids</span>
+              <span class="feat-badge">VPN</span>
+              <span class="feat-badge">Password Manager</span>
+              <span class="feat-badge">Privacy Protection</span>
+              <span class="feat-badge">Hard Drive Monitor</span>
+            </div>
+            <div class="deep-label">Evolution</div>
+            <div class="deep-val">Top-tier AV globally → US federal concerns (2017) → Full US ban (Sept 2024) → Auto-migration to UltraAV → Pivot to non-US markets</div>
+          </details>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end traditional -->
+
+  <!-- =================== BIG TECH =================== -->
+  <div class="cat-section" id="cat-bigtech">
+
+    <!-- Microsoft Defender -->
+    <div class="col-6">
+      <div class="card competitor-card">
+        <div class="mockup" style="background:#f0f0f0;">
+          <div style="width:100%;max-width:300px;padding:0 12px;box-sizing:border-box;">
+            <div style="display:flex;gap:4px;margin-bottom:10px;">
+              <div style="width:18px;height:18px;display:grid;grid-template-columns:1fr 1fr;gap:2px;">
+                <div style="background:#f25022;border-radius:1px;"></div>
+                <div style="background:#7fba00;border-radius:1px;"></div>
+                <div style="background:#00a4ef;border-radius:1px;"></div>
+                <div style="background:#ffb900;border-radius:1px;"></div>
+              </div>
+              <span style="font-size:12px;font-weight:700;color:#111;margin-left:4px;">Windows Security</span>
+            </div>
+            <div style="background:#fff;border-radius:6px;padding:10px 12px;margin-bottom:8px;display:flex;align-items:center;gap:8px;box-shadow:0 1px 2px rgba(0,0,0,.06);">
+              <span style="color:#059669;font-size:14px;">●</span>
+              <span style="font-size:12px;font-weight:700;color:#111;">Your device is protected</span>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:8px;">
+              <div style="background:#fff;border-radius:5px;padding:7px 9px;font-size:11px;font-weight:600;color:#374151;box-shadow:0 1px 2px rgba(0,0,0,.05);">🛡 Virus protection</div>
+              <div style="background:#fff;border-radius:5px;padding:7px 9px;font-size:11px;font-weight:600;color:#374151;box-shadow:0 1px 2px rgba(0,0,0,.05);">🔥 Firewall</div>
+              <div style="background:#fff;border-radius:5px;padding:7px 9px;font-size:11px;font-weight:600;color:#374151;box-shadow:0 1px 2px rgba(0,0,0,.05);">🔒 App control</div>
+              <div style="background:#fff;border-radius:5px;padding:7px 9px;font-size:11px;font-weight:600;color:#374151;box-shadow:0 1px 2px rgba(0,0,0,.05);">💻 Device security</div>
+            </div>
+            <div style="background:#059669;border-radius:5px;padding:7px 12px;text-align:center;color:#fff;font-size:11px;font-weight:700;">FREE · AV-TEST Top Product 2025</div>
+          </div>
+          <div class="mockup-label" style="color:#6b7280;">Invisible OS-level integration</div>
+        </div>
+        <div class="card-body">
+          <span class="competitor-name">Microsoft Defender</span>
+          <span class="trend-badge trend-up">▲ Growing</span>
+          <div class="stat-tiles">
+            <div class="stat-tile"><div class="st-val">Free</div><div class="st-key">Revenue</div></div>
+            <div class="stat-tile"><div class="st-val">1.4B+</div><div class="st-key">Windows Users</div></div>
+            <div class="stat-tile"><div class="st-val">100% Windows</div><div class="st-key">Market</div></div>
+            <div class="stat-tile"><div class="st-val">$3T+</div><div class="st-key">Company</div></div>
+          </div>
+          <div class="differentiator">Free, built-in, and now genuinely good — AV-TEST Top Product 2025 scoring 6/6 protection. The single most existential threat to Norton.</div>
+          <details>
+            <summary>Deep dive ▼</summary>
+            <div class="deep-label">Who they target</div>
+            <div class="deep-val">Every Windows user by default — no targeting, no opt-in required</div>
+            <div class="deep-label">Perception</div>
+            <div class="deep-val">Was a security joke for a decade. Now matches paid AV. The single most existential threat to Norton's core value proposition.</div>
+            <div class="deep-label">Features</div>
+            <div style="margin-bottom:8px;">
+              <span class="feat-badge">Windows Defender (real-time AV)</span>
+              <span class="feat-badge">Smart App Control (AI whitelisting)</span>
+              <span class="feat-badge">Edge Scareware Blocker (Gemini AI)</span>
+              <span class="feat-badge">Microsoft Defender app (M365)</span>
+              <span class="feat-badge">Firewall + exploit protection</span>
+              <span class="feat-badge">Cloud-delivered protection</span>
+            </div>
+            <div class="deep-label">Evolution</div>
+            <div class="deep-val">Security joke → Slow steady improvement → AV-TEST parity → Top Product 2025 → Smart App Control paradigm shift → AI agent security 2026</div>
+          </details>
+        </div>
+      </div>
+    </div>
+
+    <!-- Google -->
+    <div class="col-6">
+      <div class="card competitor-card">
+        <div class="mockup" style="background:#1a1a1a;">
+          <div style="width:100%;max-width:300px;padding:0 12px;box-sizing:border-box;">
+            <div style="background:#1a73e8;border-radius:6px 6px 0 0;padding:8px 12px;color:#fff;font-size:12px;font-weight:700;margin-bottom:0;">💬 Google Messages</div>
+            <div style="background:#2d2d2d;border-radius:0 0 6px 6px;padding:10px 12px;margin-bottom:8px;">
+              <div style="background:#3d3d3d;border-radius:6px;padding:8px 10px;margin-bottom:6px;color:#d1d5db;font-size:11px;">"Your package is on hold. Pay $3.99 to release: bit.ly/pkg-fee..."</div>
+              <div style="background:#b01818;border-radius:5px;padding:6px 10px;color:#fff;font-size:11px;font-weight:700;">⚠️ Suspected scam</div>
+            </div>
+            <div style="display:flex;gap:6px;">
+              <div style="flex:1;background:#b01818;border-radius:5px;padding:7px 8px;text-align:center;color:#fff;font-size:11px;font-weight:700;">Report &amp; Block</div>
+              <div style="flex:1;background:rgba(255,255,255,.1);border-radius:5px;padding:7px 8px;text-align:center;color:#9ca3af;font-size:11px;font-weight:600;">Not spam</div>
+            </div>
+          </div>
+          <div class="mockup-label" style="color:#6b7280;">Invisible, real-time, platform-embedded</div>
+        </div>
+        <div class="card-body">
+          <span class="competitor-name">Google (Android/Chrome)</span>
+          <span class="trend-badge trend-up">▲ Growing</span>
+          <div class="stat-tiles">
+            <div class="stat-tile"><div class="st-val">Free</div><div class="st-key">Revenue</div></div>
+            <div class="stat-tile"><div class="st-val">3B+</div><div class="st-key">Android Devices</div></div>
+            <div class="stat-tile"><div class="st-val">100% Android</div><div class="st-key">Market</div></div>
+            <div class="stat-tile"><div class="st-val">$2T+</div><div class="st-key">Company</div></div>
+          </div>
+          <div class="differentiator">AI scam detection at OS layer — 10 billion suspected malicious calls and messages processed monthly, free and invisible</div>
+          <details>
+            <summary>Deep dive ▼</summary>
+            <div class="deep-label">Who they target</div>
+            <div class="deep-val">Every Android user and Chrome browser user globally — 3+ billion devices</div>
+            <div class="deep-label">Perception</div>
+            <div class="deep-val">Not perceived as a security brand at all — which makes the protection even more invisible and effortless.</div>
+            <div class="deep-label">Features</div>
+            <div style="margin-bottom:8px;">
+              <span class="feat-badge">Messages Scam Detection (on-device AI)</span>
+              <span class="feat-badge">Phone Call Screen &amp; Spam AI</span>
+              <span class="feat-badge">Chrome AI Scam Blocker (Gemini Nano)</span>
+              <span class="feat-badge">Gmail phishing protection (99.9%)</span>
+              <span class="feat-badge">Google Play Protect</span>
+              <span class="feat-badge">Safe Browsing (5B+ devices)</span>
+              <span class="feat-badge">In-call financial protection (pilot)</span>
+            </div>
+            <div class="deep-label">Evolution</div>
+            <div class="deep-val">Safe Browsing → Play Protect → On-device AI scam detection → Gemini Nano in Chrome → In-call financial app protection pilot (2025)</div>
+          </details>
+        </div>
+      </div>
+    </div>
+
+    <!-- Apple - full width -->
+    <div class="col-12">
+      <div class="card competitor-card">
+        <div class="mockup" style="background:#000;height:180px;">
+          <div style="width:100%;max-width:480px;padding:0 16px;box-sizing:border-box;">
+            <div style="color:#aaa;font-size:11px;font-weight:500;margin-bottom:10px;">Settings › iCloud › Privacy &amp; Security</div>
+            <div style="background:#1c1c1e;border-radius:8px;overflow:hidden;">
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid #2c2c2e;">
+                <span style="color:#fff;font-size:12px;font-weight:600;">Private Relay</span>
+                <span style="background:#30d158;color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;">ON</span>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid #2c2c2e;">
+                <span style="color:#fff;font-size:12px;font-weight:600;">Hide My Email</span>
+                <span style="background:#30d158;color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;">ON</span>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid #2c2c2e;">
+                <span style="color:#fff;font-size:12px;font-weight:600;">Advanced Data Protection</span>
+                <span style="background:#30d158;color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;">ON</span>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;">
+                <span style="color:#fff;font-size:12px;font-weight:600;">Lockdown Mode</span>
+                <span style="color:#636366;font-size:12px;">›</span>
+              </div>
+            </div>
+          </div>
+          <div class="mockup-label" style="color:#6b7280;">Settings-level, always-on, ecosystem-native</div>
+        </div>
+        <div class="card-body">
+          <span class="competitor-name">Apple (iOS/macOS)</span>
+          <span class="trend-badge trend-up">▲ Growing</span>
+          <div class="stat-tiles">
+            <div class="stat-tile"><div class="st-val">Free (ecosystem)</div><div class="st-key">Revenue</div></div>
+            <div class="stat-tile"><div class="st-val">2.2B</div><div class="st-key">Active Devices</div></div>
+            <div class="stat-tile"><div class="st-val">50%+ US</div><div class="st-key">Smartphones</div></div>
+            <div class="stat-tile"><div class="st-val">$3T+</div><div class="st-key">Company</div></div>
+          </div>
+          <div class="differentiator">Privacy-by-design at hardware and OS level — no single party sees both who you are and what you do</div>
+          <details>
+            <summary>Deep dive ▼</summary>
+            <div class="deep-label">Who they target</div>
+            <div class="deep-val">All Apple ecosystem users — privacy protection is positioned as a premium benefit of the ecosystem</div>
+            <div class="deep-label">Perception</div>
+            <div class="deep-val">Deep ecosystem trust. Privacy is Apple's brand differentiator against Google. Users feel protected by choosing Apple.</div>
+            <div class="deep-label">Features</div>
+            <div style="margin-bottom:8px;">
+              <span class="feat-badge">iCloud Private Relay (dual-hop)</span>
+              <span class="feat-badge">App Tracking Transparency</span>
+              <span class="feat-badge">Hide My Email (aliases)</span>
+              <span class="feat-badge">Advanced Data Protection (E2E)</span>
+              <span class="feat-badge">Lockdown Mode</span>
+              <span class="feat-badge">Safety Check</span>
+              <span class="feat-badge">Stolen Device Protection</span>
+              <span class="feat-badge">Communication Safety (kids)</span>
+              <span class="feat-badge">Passkeys</span>
+            </div>
+            <div class="deep-label">Evolution</div>
+            <div class="deep-val">App Tracking Transparency (2021) → iCloud Private Relay → Advanced Data Protection → Stolen Device Protection → Expanding child safety features</div>
+          </details>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end bigtech -->
+
+  <!-- =================== INDIRECT =================== -->
+  <div class="cat-section" id="cat-indirect">
+
+    <!-- NordVPN -->
+    <div class="col-6">
+      <div class="card competitor-card">
+        <div class="mockup" style="background:#0f172a;">
+          <div style="width:100%;max-width:300px;padding:0 12px;box-sizing:border-box;">
+            <div style="color:#818cf8;font-size:13px;font-weight:800;margin-bottom:10px;">NordVPN</div>
+            <div style="display:flex;gap:8px;margin-bottom:10px;">
+              <div style="flex:1;background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.3);border-radius:6px;padding:8px 10px;">
+                <div style="font-size:16px;font-weight:800;color:#34d399;line-height:1.1;">2,847</div>
+                <div style="font-size:10px;color:#6b7280;margin-top:2px;">Threats blocked</div>
+              </div>
+              <div style="flex:1;background:rgba(59,130,246,.15);border:1px solid rgba(59,130,246,.3);border-radius:6px;padding:8px 10px;">
+                <div style="font-size:16px;font-weight:800;color:#60a5fa;line-height:1.1;">14.2K</div>
+                <div style="font-size:10px;color:#6b7280;margin-top:2px;">Trackers stopped</div>
+              </div>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:5px;">
+              <div style="background:rgba(255,255,255,.07);border-radius:5px;padding:6px 4px;text-align:center;color:#d1d5db;font-size:10px;font-weight:600;">Threat Pro</div>
+              <div style="background:rgba(255,255,255,.07);border-radius:5px;padding:6px 4px;text-align:center;color:#d1d5db;font-size:10px;font-weight:600;">Dark Web</div>
+              <div style="background:rgba(255,255,255,.07);border-radius:5px;padding:6px 4px;text-align:center;color:#d1d5db;font-size:10px;font-weight:600;">VPN</div>
+              <div style="background:rgba(255,255,255,.07);border-radius:5px;padding:6px 4px;text-align:center;color:#d1d5db;font-size:10px;font-weight:600;">NordPass</div>
+              <div style="background:rgba(255,255,255,.07);border-radius:5px;padding:6px 4px;text-align:center;color:#d1d5db;font-size:10px;font-weight:600;">NordProtect</div>
+              <div style="background:rgba(255,255,255,.07);border-radius:5px;padding:6px 4px;text-align:center;color:#d1d5db;font-size:10px;font-weight:600;">Scam Calls</div>
+            </div>
+          </div>
+          <div class="mockup-label" style="color:#6b7280;">Privacy-first, stats-driven</div>
+        </div>
+        <div class="card-body">
+          <span class="competitor-name">NordVPN / Nord Security</span>
+          <span class="trend-badge trend-up">▲ Growing</span>
+          <div class="stat-tiles">
+            <div class="stat-tile"><div class="st-val">$276M+</div><div class="st-key">Revenue</div></div>
+            <div class="stat-tile"><div class="st-val">15-20M</div><div class="st-key">Users</div></div>
+            <div class="stat-tile"><div class="st-val">#1 Consumer VPN</div><div class="st-key">Market</div></div>
+            <div class="stat-tile"><div class="st-val">$3B</div><div class="st-key">Valuation</div></div>
+          </div>
+          <div class="differentiator">Most aggressive VPN-to-cybersecurity platform expansion + post-quantum encryption (industry first, 2025)</div>
+          <details>
+            <summary>Deep dive ▼</summary>
+            <div class="deep-label">Who they target</div>
+            <div class="deep-val">Privacy-conscious millennials and Gen Z (25-44); streaming enthusiasts; privacy-first early adopters</div>
+            <div class="deep-label">Perception</div>
+            <div class="deep-val">Premium trustworthy VPN brand building a full security platform. Strong credibility from 6 independent no-logs audits.</div>
+            <div class="deep-label">Features</div>
+            <div style="margin-bottom:8px;">
+              <span class="feat-badge">VPN (9,017 servers, 130 countries)</span>
+              <span class="feat-badge">Threat Protection Pro (AV-certified)</span>
+              <span class="feat-badge">NordProtect ($1M ID theft insurance)</span>
+              <span class="feat-badge">Dark Web Monitor Pro</span>
+              <span class="feat-badge">Hijacked Session Alert (patented)</span>
+              <span class="feat-badge">Crypto Wallet Checker</span>
+              <span class="feat-badge">Scam Call Protection</span>
+              <span class="feat-badge">NordPass (password mgr)</span>
+            </div>
+            <div class="deep-label">Evolution</div>
+            <div class="deep-val">VPN only (2012) → Threat Protection anti-malware (certified) → NordProtect identity insurance → Post-quantum encryption (2025) → Full platform roadmap 2026</div>
+          </details>
+        </div>
+      </div>
+    </div>
+
+    <!-- Aura -->
+    <div class="col-6">
+      <div class="card competitor-card">
+        <div class="mockup" style="background:#faf5ff;">
+          <div style="width:100%;max-width:300px;padding:0 12px;box-sizing:border-box;">
+            <div style="color:#7C3AED;font-size:13px;font-weight:800;margin-bottom:8px;">Aura / Family Plan</div>
+            <div style="background:#fff;border-radius:6px;padding:10px 12px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 1px 3px rgba(0,0,0,.08);">
+              <div>
+                <div style="font-size:20px;font-weight:800;color:#0a7a3d;line-height:1.1;">742</div>
+                <div style="font-size:10px;color:#6b7280;">Credit Score</div>
+              </div>
+              <div style="text-align:right;">
+                <div style="font-size:10px;font-weight:700;color:#6b7280;margin-bottom:3px;">Credit Lock</div>
+                <span style="background:#0a7a3d;color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;">ON</span>
+              </div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+              <div style="background:#fff;border-radius:5px;padding:8px 10px;font-size:11px;font-weight:600;color:#374151;box-shadow:0 1px 2px rgba(0,0,0,.06);">🛡 Kids Safety</div>
+              <div style="background:#fff;border-radius:5px;padding:8px 10px;font-size:11px;font-weight:600;color:#374151;box-shadow:0 1px 2px rgba(0,0,0,.06);">🔍 Dark Web</div>
+              <div style="background:#fff;border-radius:5px;padding:8px 10px;font-size:11px;font-weight:600;color:#374151;box-shadow:0 1px 2px rgba(0,0,0,.06);">🗑 Data Brokers</div>
+              <div style="background:#fff;border-radius:5px;padding:8px 10px;font-size:11px;font-weight:600;color:#374151;box-shadow:0 1px 2px rgba(0,0,0,.06);">🔒 VPN+AV</div>
+            </div>
+          </div>
+          <div class="mockup-label" style="color:#6b7280;">Identity-first, family command center</div>
+        </div>
+        <div class="card-body">
+          <span class="competitor-name">Aura</span>
+          <span class="trend-badge trend-up">▲ Growing</span>
+          <div class="stat-tiles">
+            <div class="stat-tile"><div class="st-val">~$150M ARR</div><div class="st-key">Revenue</div></div>
+            <div class="stat-tile"><div class="st-val">Fast-growing</div><div class="st-key">Users</div></div>
+            <div class="stat-tile"><div class="st-val">Fastest-growing</div><div class="st-key">Market</div></div>
+            <div class="stat-tile"><div class="st-val">$1.6B</div><div class="st-key">Valuation</div></div>
+          </div>
+          <div class="differentiator">Only major platform built from scratch as a family digital safety product — not antivirus with family features bolted on</div>
+          <details>
+            <summary>Deep dive ▼</summary>
+            <div class="deep-label">Who they target</div>
+            <div class="deep-val">American families — parents (especially mothers) protecting kids and aging loved ones. Built for less technical users.</div>
+            <div class="deep-label">Perception</div>
+            <div class="deep-val">#2 identity protection (US News). Best User Experience accolade. Perceived as the all-in-one digital safety net for families.</div>
+            <div class="deep-label">Features</div>
+            <div style="margin-bottom:8px;">
+              <span class="feat-badge">3-Bureau Credit Monitoring (650x faster)</span>
+              <span class="feat-badge">$1M identity theft insurance</span>
+              <span class="feat-badge">One-click Credit Lock</span>
+              <span class="feat-badge">Data Broker Removal (automated)</span>
+              <span class="feat-badge">Parental Controls + Safe Gaming</span>
+              <span class="feat-badge">Cyberbullying &amp; Predator Alerts</span>
+              <span class="feat-badge">Online Balance Tracking (kids wellness)</span>
+              <span class="feat-badge">24/7 US-based Fraud Resolution Team</span>
+            </div>
+            <div class="deep-label">Evolution</div>
+            <div class="deep-val">ID protection startup → Pango separation (2024) → AI-powered Intelligence → Child digital wellness (2025) → Samsung Galaxy OEM partnership → AT&amp;T telco channel</div>
+          </details>
+        </div>
+      </div>
+    </div>
+
+    <!-- ExpressVPN - full width -->
+    <div class="col-12">
+      <div class="card competitor-card">
+        <div class="mockup" style="background:#1a1a1a;height:180px;">
+          <div style="text-align:center;width:100%;max-width:360px;">
+            <div style="color:#ef4444;font-size:14px;font-weight:800;margin-bottom:12px;">ExpressVPN</div>
+            <div style="width:80px;height:80px;border-radius:50%;border:3px solid #22c55e;box-shadow:0 0 20px rgba(34,197,94,.4);display:flex;align-items:center;justify-content:center;margin:0 auto 10px;font-size:28px;color:#22c55e;">⏻</div>
+            <div style="color:#22c55e;font-size:12px;font-weight:700;margin-bottom:4px;">Connected · New York, USA</div>
+            <div style="display:flex;gap:6px;justify-content:center;">
+              <span style="background:rgba(255,255,255,.1);color:#d1d5db;font-size:10px;font-weight:600;padding:4px 10px;border-radius:4px;">Keys</span>
+              <span style="background:rgba(255,255,255,.1);color:#d1d5db;font-size:10px;font-weight:600;padding:4px 10px;border-radius:4px;">Threat Mgr</span>
+              <span style="background:rgba(255,255,255,.1);color:#d1d5db;font-size:10px;font-weight:600;padding:4px 10px;border-radius:4px;">ID Defender</span>
+            </div>
+          </div>
+          <div class="mockup-label" style="color:#6b7280;">Clean, connection-focused, speed-first</div>
+        </div>
+        <div class="card-body">
+          <span class="competitor-name">ExpressVPN</span>
+          <span class="trend-badge trend-stable">▶ Stable</span>
+          <div class="stat-tiles">
+            <div class="stat-tile"><div class="st-val">~$38M/yr</div><div class="st-key">Revenue</div></div>
+            <div class="stat-tile"><div class="st-val">Millions</div><div class="st-key">Users</div></div>
+            <div class="stat-tile"><div class="st-val">Top 3 VPN</div><div class="st-key">Market</div></div>
+            <div class="stat-tile"><div class="st-val">~$936M</div><div class="st-key">Valuation</div></div>
+          </div>
+          <div class="differentiator">Speed and reliability benchmark via Lightway protocol and TrustedServer RAM-only infrastructure</div>
+          <details>
+            <summary>Deep dive ▼</summary>
+            <div class="deep-label">Who they target</div>
+            <div class="deep-val">Privacy-first consumers, frequent travelers, streaming enthusiasts — slightly older and more affluent than NordVPN's audience</div>
+            <div class="deep-label">Perception</div>
+            <div class="deep-val">Premium VPN for performance-focused users. Slower than NordVPN to build out a full security platform.</div>
+            <div class="deep-label">Features</div>
+            <div style="margin-bottom:8px;">
+              <span class="feat-badge">Lightway Protocol (proprietary, fastest)</span>
+              <span class="feat-badge">TrustedServer (RAM-only, wipes on reboot)</span>
+              <span class="feat-badge">Threat Manager (tracker/malware blocking)</span>
+              <span class="feat-badge">Keys (Password Manager)</span>
+              <span class="feat-badge">Identity Defender</span>
+              <span class="feat-badge">Network Lock (kill switch)</span>
+              <span class="feat-badge">Split Tunneling</span>
+              <span class="feat-badge">Router App</span>
+            </div>
+            <div class="deep-label">Evolution</div>
+            <div class="deep-val">Premium VPN → Kape Technologies acquisition (2021) → Threat Manager → Keys password manager → Identity Defender (gradual expansion)</div>
+          </details>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end indirect -->
+
+  <!-- =================== FEATURE MATRIX =================== -->
+  <div class="col-12">
+    <div class="section-title">
+      <div class="eyebrow-2">Competitive Matrix</div>
+      <h2>Feature matrix — who does what.</h2>
+    </div>
+  </div>
+
+  <div class="col-12">
+    <div class="card" style="overflow-x:auto;padding:0;">
+      <table class="feat-table">
+        <thead>
+          <tr>
+            <th>Feature</th>
+            <th class="norton-col">Norton</th>
+            <th>McAfee</th>
+            <th>Bitdefender</th>
+            <th>Malwarebytes</th>
+            <th>Aura</th>
+            <th>NordVPN</th>
+            <th>MS Defender</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Core AV</td>
+            <td class="norton-col yes">✅</td>
+            <td class="yes">✅</td>
+            <td class="yes">✅</td>
+            <td class="yes">✅</td>
+            <td class="yes">✅</td>
+            <td class="yes">✅ Threat Pro</td>
+            <td class="yes">✅ Free</td>
+          </tr>
+          <tr>
+            <td>VPN</td>
+            <td class="norton-col yes">✅</td>
+            <td class="yes">✅</td>
+            <td class="yes">✅ limited</td>
+            <td class="yes">✅</td>
+            <td class="yes">✅</td>
+            <td class="yes">✅ core</td>
+            <td class="no">❌</td>
+          </tr>
+          <tr>
+            <td>Password Manager</td>
+            <td class="norton-col yes">✅</td>
+            <td class="yes">✅</td>
+            <td class="yes">✅</td>
+            <td class="no">❌</td>
+            <td class="yes">✅</td>
+            <td class="yes">✅ NordPass</td>
+            <td class="no">❌</td>
+          </tr>
+          <tr>
+            <td>Identity Theft Protection</td>
+            <td class="norton-col yes">✅ LifeLock</td>
+            <td class="yes">✅</td>
+            <td class="yes">✅ US</td>
+            <td class="yes">✅ new</td>
+            <td class="yes">✅ core</td>
+            <td class="yes">✅ NordProtect</td>
+            <td class="no">❌</td>
+          </tr>
+          <tr>
+            <td>3-Bureau Credit Monitoring</td>
+            <td class="norton-col yes">✅</td>
+            <td class="yes">✅</td>
+            <td class="no">❌</td>
+            <td class="no">❌</td>
+            <td class="yes">✅</td>
+            <td class="no">❌</td>
+            <td class="no">❌</td>
+          </tr>
+          <tr>
+            <td>Dark Web Monitoring</td>
+            <td class="norton-col yes">✅</td>
+            <td class="yes">✅</td>
+            <td class="yes">✅</td>
+            <td class="no">❌</td>
+            <td class="yes">✅</td>
+            <td class="yes">✅</td>
+            <td class="no">❌</td>
+          </tr>
+          <tr>
+            <td>AI Scam Detection</td>
+            <td class="norton-col yes">✅</td>
+            <td class="yes">✅ deepfake</td>
+            <td class="yes">✅ Scamio</td>
+            <td class="yes">✅ mobile</td>
+            <td class="yes">✅</td>
+            <td class="yes">✅ email/web</td>
+            <td class="yes">✅ Edge</td>
+          </tr>
+          <tr>
+            <td>Parental Controls</td>
+            <td class="norton-col yes">✅</td>
+            <td class="yes">✅</td>
+            <td class="yes">✅</td>
+            <td class="no">❌</td>
+            <td class="yes">✅ deep</td>
+            <td class="no">❌</td>
+            <td class="no">❌</td>
+          </tr>
+          <tr>
+            <td>Data Broker Removal</td>
+            <td class="norton-col yes">✅</td>
+            <td class="yes">✅</td>
+            <td class="no">❌</td>
+            <td class="yes">✅</td>
+            <td class="yes">✅</td>
+            <td class="yes">✅ Incogni</td>
+            <td class="no">❌</td>
+          </tr>
+          <tr>
+            <td>Child Digital Wellness</td>
+            <td class="norton-col no">❌</td>
+            <td class="no">❌</td>
+            <td class="no">❌</td>
+            <td class="no">❌</td>
+            <td class="yes">✅ unique</td>
+            <td class="no">❌</td>
+            <td class="no">❌</td>
+          </tr>
+          <tr>
+            <td>Post-Quantum Encryption</td>
+            <td class="norton-col no">❌</td>
+            <td class="no">❌</td>
+            <td class="no">❌</td>
+            <td class="no">❌</td>
+            <td class="no">❌</td>
+            <td class="yes">✅ 2025</td>
+            <td class="no">❌</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- =================== STRATEGIC IMPLICATIONS =================== -->
+  <div class="col-12">
+    <div class="section-title">
+      <div class="eyebrow-2">Strategic Implications</div>
+      <h2>Where Norton wins. Where Norton loses.</h2>
+    </div>
+  </div>
+
+  <div class="col-6">
+    <div class="gap">
+      <div class="tag">Moat</div>
+      <h4>Where Norton's moat is strongest</h4>
+      <p>3-bureau credit monitoring + LifeLock insurance + dark web monitoring in a single subscription is unmatched. No competitor has both the credit infrastructure AND the identity recovery team at Norton's scale. The financial protection layer is genuinely differentiated — if it's surfaced properly.</p>
+    </div>
+  </div>
+  <div class="col-6">
+    <div class="gap">
+      <div class="tag">Vulnerability</div>
+      <h4>Where Norton is most vulnerable</h4>
+      <p>Core AV is commoditized — Microsoft Defender is free and matches Norton's detection rates. VPN is being commoditized by NordVPN and browser-native alternatives. Without LifeLock, Norton's differentiation evaporates. The product needs to lead with identity and family protection, not antivirus.</p>
+    </div>
+  </div>
+  <div class="col-6">
+    <div class="gap">
+      <div class="tag">Whitespace 01</div>
+      <h4>Whitespace: Digital wellness &amp; elder safety</h4>
+      <p>Aura has child digital wellness. Nobody has elder safety. Norton's customer base skews 45-65+ — the exact demo being targeted by grandparent scams, Medicare fraud, and romance fraud. A dedicated elder safety layer (with family oversight) is a whitespace no competitor is credibly in.</p>
+    </div>
+  </div>
+  <div class="col-6">
+    <div class="gap">
+      <div class="tag">Whitespace 02</div>
+      <h4>Whitespace: Financial wellness + cyber convergence</h4>
+      <p>No competitor connects credit health, fraud alerts, identity protection, and financial behavior in one flow. Norton has MoneyLion access and LifeLock data — the inputs exist. The product that turns those inputs into a proactive financial fiduciary doesn't yet exist anywhere in the market.</p>
+    </div>
+  </div>
+
+  <div class="col-12">
+    <div class="callout-box">
+      <p><strong>The strategic question:</strong> Norton has LifeLock, MoneyLion, and 77M subscribers. The reimagination needs to make those assets feel like one coherent Digital Fiduciary — not three separate products.</p>
+    </div>
+  </div>
+
+  <!-- =================== LAURA FILTER TOOL =================== -->
+  <div class="col-12">
+    <div class="section-title">
+      <div class="eyebrow-2">Interactive Tool</div>
+      <h2>Would Laura actually care?</h2>
+    </div>
+  </div>
+
+  <div class="col-12">
+    <div class="card laura-tool">
+      <h2 style="font-size:22px;font-weight:800;letter-spacing:-.02em;margin-bottom:6px;">Would Laura actually care?</h2>
+      <p style="font-size:14px;color:var(--ink-soft);margin-bottom:20px;line-height:1.55;">Pick a competitor feature and pressure-test it against Laura's JTBDs, anxieties, and behaviors.</p>
+
+      <label style="font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-softer);display:block;margin-bottom:6px;">1. Pick a competitor</label>
+      <select id="compSelect" onchange="onCompChange()">
+        <option value="">— Select a competitor —</option>
+        <optgroup label="Traditional Specialists">
+          <option value="mcafee">McAfee</option>
+          <option value="bitdefender">Bitdefender</option>
+          <option value="malwarebytes">Malwarebytes</option>
+          <option value="totalav">TotalAV</option>
+          <option value="kaspersky">Kaspersky</option>
+        </optgroup>
+        <optgroup label="Big Tech — Structural Threat">
+          <option value="microsoft">Microsoft Defender</option>
+          <option value="google">Google (Android/Chrome)</option>
+          <option value="apple">Apple (iOS/macOS)</option>
+        </optgroup>
+        <optgroup label="Indirect Challengers">
+          <option value="nordvpn">NordVPN / Nord Security</option>
+          <option value="aura">Aura</option>
+          <option value="expressvpn">ExpressVPN</option>
+        </optgroup>
+      </select>
+
+      <label style="font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-softer);display:block;margin-bottom:6px;">2. Pick a feature to test</label>
+      <div id="featurePills" style="margin-bottom:12px;min-height:36px;"></div>
+
+      <label style="font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-softer);display:block;margin-bottom:6px;">3. Edit or describe the concept</label>
+      <textarea id="conceptInput" maxlength="2000" rows="4" placeholder="Describe the competitor feature or concept you want to test against Laura's perspective…"></textarea>
+
+      <button id="testBtn" onclick="testLaura()">Test against Laura →</button>
+
+      <div id="lauraResult"></div>
+    </div>
+  </div>
+
+</div><!-- end .page -->
+
+<div class="footer">
+  <span class="brand">Norton Reimagined</span>
+  <span>Competitive Intelligence · Working Draft</span>
+</div>
+
+<script>
+const CATEGORIES = [
+  {
+    id: "traditional",
+    label: "Traditional Specialists",
+    players: [
+      { id: "mcafee", name: "McAfee",
+        lauraFeatures: [
+          { name: "AI Deepfake Detector", desc: "Automatically detects deepfake video scams on-device without sending data to the cloud. The industry's first on-device deepfake detection running locally on supported devices — warns Laura before she shares or acts on a fake video." },
+          { name: "Protection Score (gamified)", desc: "A gamified security health metric (0-1000) that shows Laura her overall protection level and gamifies improving it with streaks and achievements — asking her to take action to raise her score." },
+          { name: "Personal Data Cleanup", desc: "Automatically finds and requests removal of Laura's personal information from data broker sites that sell her address, phone number, and relatives to strangers and marketers." },
+          { name: "Social Privacy Manager", desc: "Automatically adjusts 100+ privacy settings across Laura's social media accounts to minimize what strangers can see about her and her family." }
+        ]
+      },
+      { id: "bitdefender", name: "Bitdefender",
+        lauraFeatures: [
+          { name: "Scamio AI on WhatsApp (free)", desc: "A free AI chatbot Laura can message directly on WhatsApp to check if a suspicious text, email, or link is a scam — no app download required, works in the chat app she already uses." },
+          { name: "Ransomware Remediation", desc: "If ransomware encrypts Laura's files, Bitdefender automatically restores them from a protected backup — no ransom needed, she gets her photos and documents back without doing anything." },
+          { name: "Webcam & Microphone Protection", desc: "Automatically blocks any app from accessing Laura's webcam or microphone without her explicit permission — no setup, no dashboard, just silent protection." }
+        ]
+      },
+      { id: "malwarebytes", name: "Malwarebytes",
+        lauraFeatures: [
+          { name: "Scam Guard (AI mobile)", desc: "AI-based smartphone tool that identifies and warns Laura about scam calls, texts, and messages in real-time before she responds — works on iOS and Android." },
+          { name: "Digital Footprint Portal (free)", desc: "A free tool that shows Laura exactly what personal information about her is exposed online — her addresses, phone numbers, relatives, financial data visible to strangers." },
+          { name: "Browser Guard (free extension)", desc: "A free browser extension that silently blocks ads, trackers, and scam sites as Laura browses — requires nothing from her after the one-time installation." }
+        ]
+      },
+      { id: "totalav", name: "TotalAV",
+        lauraFeatures: [
+          { name: "WebShield (auto-block scam sites)", desc: "Automatically blocks phishing, scam, and spoofed websites before Laura can accidentally click on them — runs in the background with nothing for her to manage." },
+          { name: "All-in-one bundle at $19/yr", desc: "Antivirus + VPN + system optimization + ad blocker all in one subscription at $19/year introductory price — bundling everything Laura might need in a single bill." },
+          { name: "System Tune-up (auto-cleanup)", desc: "Automatically cleans junk files, manages startup apps, and speeds up Laura's computer as part of the security subscription — no separate purchase or action needed." }
+        ]
+      },
+      { id: "kaspersky", name: "Kaspersky",
+        lauraFeatures: [
+          { name: "Safe Money (secure banking browser)", desc: "Automatically switches Laura into a hardened, isolated browser when she visits banking or payment sites — protecting her financial transactions from keyloggers and screen capture." }
+        ]
+      }
+    ]
+  },
+  {
+    id: "bigtech",
+    label: "Big Tech — Structural Threat",
+    players: [
+      { id: "microsoft", name: "Microsoft Defender",
+        lauraFeatures: [
+          { name: "Free built-in protection (no setup)", desc: "Windows Defender comes pre-installed on Laura's PC, requires zero setup, is completely free, and now scores 6/6 in protection — blocking 100% of real-world attacks in independent testing." },
+          { name: "Smart App Control (AI whitelisting)", desc: "AI-powered Windows 11 feature that only allows trusted, verified applications to run on Laura's PC — preventing malware before it can even install, with nothing for her to configure." },
+          { name: "Edge Scareware Blocker", desc: "Microsoft Edge uses AI to detect and block tech support scam pages that try to frighten Laura into calling a fake helpline — the exact scam her aging parents are most vulnerable to." }
+        ]
+      },
+      { id: "google", name: "Google (Android/Chrome)",
+        lauraFeatures: [
+          { name: "On-device SMS Scam Detection", desc: "Google Messages uses on-device AI to analyze Laura's text messages in real-time and warn her about package scams, financial fraud, and romance scams before she responds — processes 10B+ messages monthly." },
+          { name: "Call Screen (AI spam filter)", desc: "Google's AI automatically answers unknown calls, transcribes what the caller says, and identifies spam before Laura has to pick up — she sees a live transcript and decides whether to answer." },
+          { name: "Chrome Gemini Scam Blocker", desc: "Chrome browser uses an on-device Gemini AI model to detect and block tech support scam pages in real-time, without sending Laura's browsing data to Google's servers." }
+        ]
+      },
+      { id: "apple", name: "Apple (iOS/macOS)",
+        lauraFeatures: [
+          { name: "iCloud Private Relay", desc: "Automatically routes Laura's internet traffic through two separate servers so no single party — not even Apple — can see both who she is and what sites she visits. Included in iCloud+ at no extra charge." },
+          { name: "Communication Safety for Kids", desc: "On Laura's children's Apple devices, iOS automatically detects and blurs nudity or sensitive content in Messages, warning her child before they view or send it — and optionally alerting a parent." },
+          { name: "App Tracking Transparency", desc: "Every app must ask Laura's explicit permission before tracking her activity across other apps and websites. She can see exactly which apps are tracking her in Settings at any time." }
+        ]
+      }
+    ]
+  },
+  {
+    id: "indirect",
+    label: "Indirect Challengers",
+    players: [
+      { id: "nordvpn", name: "NordVPN / Nord Security",
+        lauraFeatures: [
+          { name: "NordProtect ($1M ID theft + scam loss recovery)", desc: "Identity theft insurance ($1M), cyber extortion coverage ($100K), and scam loss recovery — if Laura falls for a scam, Nord reimburses her financial losses. Available in US and UK." },
+          { name: "Hijacked Session Alert (patented)", desc: "Patented technology that warns Laura if her login session cookies for any of her accounts appear on the dark web — catching account takeovers before the attacker can use them." },
+          { name: "Scam Call Protection", desc: "Automatically identifies and blocks scam phone calls before they reach Laura's phone in the US, UK, and Canada — a direct counter to the grandparent scam targeting her parents." },
+          { name: "Threat Protection Pro (anti-malware in VPN)", desc: "Anti-malware, ad blocking, and tracker blocking embedded directly into the VPN — independently certified by AV-Comparatives and AV-TEST. No separate antivirus installation needed." }
+        ]
+      },
+      { id: "aura", name: "Aura",
+        lauraFeatures: [
+          { name: "3-Bureau Credit Alerts (650x faster)", desc: "Monitors all three credit bureaus and alerts Laura up to 650x faster than competitors — catching unauthorized credit applications within minutes of them appearing, not days." },
+          { name: "One-click Credit Lock", desc: "Laura can freeze and unfreeze her credit from all three bureaus instantly from the Aura app with a single tap — no need to contact Equifax, TransUnion, and Experian separately." },
+          { name: "Cyberbullying & Predator Alerts", desc: "Monitors Laura's children's online activity across apps and games and alerts her immediately if signs of cyberbullying, predatory behavior, or dangerous contact patterns appear." },
+          { name: "24/7 Fraud Resolution Team (human specialists)", desc: "If Laura's identity is stolen, a dedicated US-based human specialist handles the entire recovery process — makes calls to banks, files police reports, disputes fraudulent accounts, restores everything." },
+          { name: "Child Online Balance Tracking", desc: "Tracks how Laura's children's digital habits affect their mental health, physical activity, and sleep — giving Laura a wellness score for each child and flagging concerning patterns." }
+        ]
+      },
+      { id: "expressvpn", name: "ExpressVPN",
+        lauraFeatures: [
+          { name: "TrustedServer (RAM-only servers)", desc: "All ExpressVPN servers run entirely on RAM and completely wipe themselves every time they restart — making it technically impossible for any logs of Laura's internet activity to ever be stored." },
+          { name: "Identity Defender", desc: "Identity monitoring and credit breach alerts that warn Laura if her personal data — email, passwords, SSN — appears in data breaches or on the dark web." }
+        ]
+      }
+    ]
+  }
+];
+
+const ALL_PLAYERS = CATEGORIES.flatMap(c => c.players);
+
+function showCategory(id) {
+  document.querySelectorAll('.cat-section').forEach(el => el.style.display = 'none');
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.style.background = '#fff';
+    btn.style.color = '#242424';
+    btn.style.borderColor = '#E6E6E4';
+  });
+  document.getElementById('cat-' + id).style.display = 'block';
+  const activeBtn = document.getElementById('tab-' + id);
+  activeBtn.style.background = '#FFE800';
+  activeBtn.style.color = '#242424';
+  activeBtn.style.borderColor = '#242424';
+}
+
+async function testLaura() {
+  const concept = document.getElementById('conceptInput').value.trim();
+  if (!concept) return;
+  const btn = document.getElementById('testBtn');
+  const result = document.getElementById('lauraResult');
+  btn.textContent = 'Scoring against Laura…';
+  btn.disabled = true;
+  result.style.display = 'none';
+  try {
+    const res = await fetch('/api/pressure-test', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ concept })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'API error');
+    const scoreColor = data.score >= 90 ? '#0a7a3d' : data.score >= 75 ? '#4a8a00' : data.score >= 55 ? '#c07000' : data.score >= 35 ? '#c05000' : '#b01818';
+    result.innerHTML = `
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px;">
+        <div style="font-size:48px;font-weight:800;color:${scoreColor};line-height:1;">${data.score}</div>
+        <div>
+          <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:${scoreColor};">${data.verdict || ''}</div>
+          <div style="font-size:15px;font-weight:700;color:#242424;margin-top:2px;">${escHtml(data.headline || '')}</div>
+        </div>
+      </div>
+      <p style="font-size:14px;color:#5a5a5a;line-height:1.6;margin-bottom:16px;">${escHtml(data.summary || '')}</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+        <div>
+          <div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#0a7a3d;margin-bottom:6px;">What works for Laura</div>
+          <ul style="margin:0;padding-left:18px;">${(data.wins||[]).map(w=>`<li style="font-size:13px;color:#242424;line-height:1.5;margin-bottom:4px;">${escHtml(w)}</li>`).join('')}</ul>
+        </div>
+        <div>
+          <div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#b01818;margin-bottom:6px;">Laura's concerns</div>
+          <ul style="margin:0;padding-left:18px;">${(data.risks||[]).map(r=>`<li style="font-size:13px;color:#242424;line-height:1.5;margin-bottom:4px;">${escHtml(r)}</li>`).join('')}</ul>
+        </div>
+      </div>
+      ${data.recommendation ? `<div style="padding:14px 18px;background:var(--paper);border-left:4px solid var(--yellow);border-radius:0 5px 5px 0;"><p style="font-size:13.5px;color:#242424;margin:0;line-height:1.6;"><strong>Recommendation:</strong> ${escHtml(data.recommendation)}</p></div>` : ''}
+    `;
+    result.style.display = 'block';
+  } catch(err) {
+    result.innerHTML = `<p style="color:#b01818;font-size:13px;">${escHtml(err.message)}</p>`;
+    result.style.display = 'block';
+  } finally {
+    btn.textContent = 'Test against Laura →';
+    btn.disabled = false;
+  }
+}
+
+function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function onCompChange() {
+  const val = document.getElementById('compSelect').value;
+  const pillContainer = document.getElementById('featurePills');
+  pillContainer.innerHTML = '';
+  if (!val) return;
+  const comp = ALL_PLAYERS.find(p => p.id === val);
+  if (!comp || !comp.lauraFeatures) return;
+  comp.lauraFeatures.forEach(f => {
+    const btn = document.createElement('button');
+    btn.className = 'feature-pill';
+    btn.textContent = f.name;
+    btn.style.cssText = 'background:#f0f0ee;border:1px solid #E6E6E4;border-radius:4px;padding:6px 12px;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;color:#242424;margin:0 6px 6px 0;';
+    btn.onclick = () => {
+      document.querySelectorAll('.feature-pill').forEach(p => { p.style.background='#f0f0ee'; p.style.fontWeight='500'; });
+      btn.style.background = '#FFE800';
+      btn.style.fontWeight = '700';
+      document.getElementById('conceptInput').value = comp.name + ' — ' + f.name + ': ' + f.desc;
+    };
+    pillContainer.appendChild(btn);
+  });
+}
+</script>
+
+<script src="nav.js"></script>
+</body>
+</html>
