@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Competitive Analysis — Norton Reimagined Sprint</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<style>
+
+/* ── Competitor cards ──────────────────────────────────────────────────────── */
+.comp-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 18px;
+  margin-top: 28px;
+}
+.comp-card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.comp-card-head {
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+.comp-logo {
+  width: 42px; height: 42px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+  background: var(--paper);
+  border: 1px solid var(--line);
+}
+.comp-card-head-text { flex: 1; }
+.comp-name {
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  margin-bottom: 2px;
+}
+.comp-tagline {
+  font-size: 12px;
+  color: var(--ink-soft);
+  line-height: 1.4;
+}
+.threat-badge {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.threat-high   { background: #ffe5e5; color: #b01818; }
+.threat-med    { background: #fff4e0; color: #c07000; }
+.threat-low    { background: #e6f7ee; color: #0a7a3d; }
+.threat-struct { background: var(--ink); color: var(--yellow); }
+
+.comp-body { padding: 18px 24px; }
+.comp-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--line);
+  gap: 12px;
+}
+.comp-row:last-child { border-bottom: none; }
+.comp-row-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--ink-softer);
+  flex-shrink: 0;
+}
+.comp-row-val {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink);
+  text-align: right;
+}
+.comp-steal {
+  margin-top: 14px;
+  padding: 12px 14px;
+  background: var(--paper);
+  border-radius: 6px;
+  border-left: 3px solid var(--yellow);
+}
+.comp-steal .steal-label {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--ink-softer);
+  margin-bottom: 4px;
+}
+.comp-steal p {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--ink);
+}
+.comp-weakness {
+  margin-top: 10px;
+  padding: 12px 14px;
+  background: #fff5f5;
+  border-radius: 6px;
+  border-left: 3px solid #ffb3b3;
+}
+.comp-weakness .weak-label {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: #b01818;
+  margin-bottom: 4px;
+}
+.comp-weakness p {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--ink);
+}
+
+/* ── Feature matrix ────────────────────────────────────────────────────────── */
+.matrix-wrap {
+  overflow-x: auto;
+  margin-top: 28px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+}
+.matrix-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 700px;
+  font-size: 13px;
+}
+.matrix-table th {
+  background: var(--ink);
+  color: #fff;
+  padding: 12px 16px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.matrix-table th:first-child { min-width: 200px; }
+.matrix-table th.norton-col { background: var(--yellow); color: var(--ink); }
+.matrix-table td {
+  padding: 11px 16px;
+  border-bottom: 1px solid var(--line);
+  vertical-align: middle;
+  color: var(--ink);
+}
+.matrix-table tr:last-child td { border-bottom: none; }
+.matrix-table tr:nth-child(even) td { background: var(--paper); }
+.matrix-table .feat-name { font-weight: 600; font-size: 13px; }
+.check  { color: #0a7a3d; font-size: 16px; font-weight: 700; }
+.cross  { color: #b01818; font-size: 16px; }
+.partial { color: #c07000; font-size: 14px; font-weight: 600; }
+.norton-col-cell { background: #fffce6 !important; font-weight: 600; }
+
+/* ── Positioning map ───────────────────────────────────────────────────────── */
+.pos-map {
+  position: relative;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  margin-top: 28px;
+  padding: 40px;
+  min-height: 380px;
+}
+.pos-axis-x {
+  position: absolute;
+  bottom: 40px; left: 40px; right: 40px;
+  height: 1px;
+  background: var(--line);
+}
+.pos-axis-y {
+  position: absolute;
+  top: 40px; bottom: 40px; left: 50%;
+  width: 1px;
+  background: var(--line);
+  transform: translateX(-50%);
+}
+.pos-axis-label {
+  position: absolute;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--ink-softer);
+}
+.pos-dot {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  transform: translate(-50%, -50%);
+}
+.pos-dot-circle {
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,.2);
+}
+.pos-dot-label {
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+  background: rgba(255,255,255,.9);
+  padding: 1px 6px;
+  border-radius: 3px;
+}
+
+/* ── Laura fit scores ──────────────────────────────────────────────────────── */
+.laura-fit-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 12px;
+  margin-top: 24px;
+}
+.laura-fit-card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 16px 18px;
+  text-align: center;
+}
+.laura-fit-score {
+  font-size: 36px;
+  font-weight: 800;
+  letter-spacing: -.03em;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+.laura-fit-name { font-size: 13px; font-weight: 700; margin-bottom: 2px; }
+.laura-fit-verdict { font-size: 11px; color: var(--ink-soft); }
+.score-red  { color: #b01818; }
+.score-amber { color: #c07000; }
+.score-green { color: #0a7a3d; }
+
+/* ── Sprint insight callout ────────────────────────────────────────────────── */
+.insight-box {
+  background: var(--ink);
+  color: #fff;
+  border-radius: 10px;
+  padding: 28px 32px;
+  margin-top: 28px;
+}
+.insight-box .eyebrow { background: var(--yellow); color: var(--ink); margin-bottom: 14px; }
+.insight-box h3 { font-size: 24px; font-weight: 800; letter-spacing: -.02em; margin-bottom: 10px; }
+.insight-box p { font-size: 14px; color: rgba(255,255,255,.75); line-height: 1.6; }
+.insight-box p + p { margin-top: 10px; }
+.insight-box strong { color: #fff; }
+
+@media (max-width: 860px) {
+  .comp-grid { grid-template-columns: 1fr; }
+  .laura-fit-grid { grid-template-columns: repeat(3, 1fr); }
+  .pos-map { min-height: 280px; padding: 24px; }
+}
+@media (max-width: 480px) {
+  .laura-fit-grid { grid-template-columns: repeat(2, 1fr); }
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-brand">
+      <span class="dot"></span>
+      Norton Reimagined <span class="sub">· Design Sprint</span>
+    </a>
+    <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-links" id="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="laura.html">Laura</a></li>
+      <li><a href="where-is-norton.html">Where is Norton</a></li>
+      <li><a href="prototypes.html">Prototypes</a></li>
+      <li><a href="resources.html">Resources</a></li>
+      <li><a href="concept-builder.html">Concept Builder <span style="background:var(--yellow);color:var(--ink);font-size:9px;font-weight:800;padding:1px 6px;border-radius:999px;vertical-align:middle;letter-spacing:.04em;">β</span></a></li>
+      <li><a href="competitive-analysis.html" class="active">Competitive</a></li>
+          <li><a href="competitive-analysis.html">Competitive</a></li>
+    </ul>
+  </div>
+</nav>
+
+<div class="page">
+
+  <span class="eyebrow">Sprint Context</span>
+  <h1 class="page-title">Competitive <span class="mark">landscape</span>.</h1>
+  <p class="lede">Four threat vectors, nine competitors, and one honest question: what can Norton do that none of them can copy? This is the context the sprint is designing against.</p>
+
+  <!-- ══════════════════════════════════════════════════════════════ -->
+  <!-- SECTION 1: Laura fit scores                                  -->
+  <!-- ══════════════════════════════════════════════════════════════ -->
+  <div class="section-break" style="margin-top:48px;">
+    <div class="eyebrow-2">Laura Lens</div>
+    <h2>How well does each competitor <em>serve Laura</em>?</h2>
+  </div>
+  <p style="margin-top:10px;font-size:14px;color:var(--ink-soft);max-width:780px;">Scored 0–100 on how well each product fits Laura's mindset — passive protection, household framing, zero jargon, no mental load. Not a security feature score. A Laura score.</p>
+
+  <div class="laura-fit-grid">
+    <div class="laura-fit-card">
+      <div class="laura-fit-score score-amber">61</div>
+      <div class="laura-fit-name">Norton Today</div>
+      <div class="laura-fit-verdict">Powerful but asks too much</div>
+    </div>
+    <div class="laura-fit-card" style="border-color:var(--yellow);background:#fffce6;">
+      <div class="laura-fit-score score-green">88</div>
+      <div class="laura-fit-name">Norton Reimagined</div>
+      <div class="laura-fit-verdict">Sprint target — designed for her</div>
+    </div>
+    <div class="laura-fit-card">
+      <div class="laura-fit-score score-red">22</div>
+      <div class="laura-fit-name">Microsoft Defender</div>
+      <div class="laura-fit-verdict">OS-native but invisible to her</div>
+    </div>
+    <div class="laura-fit-card">
+      <div class="laura-fit-score score-red">18</div>
+      <div class="laura-fit-name">Google / Apple</div>
+      <div class="laura-fit-verdict">Siloed to one ecosystem</div>
+    </div>
+    <div class="laura-fit-card">
+      <div class="laura-fit-score score-amber">55</div>
+      <div class="laura-fit-name">McAfee+</div>
+      <div class="laura-fit-verdict">Household framing but clunky UX</div>
+    </div>
+    <div class="laura-fit-card">
+      <div class="laura-fit-score score-amber">48</div>
+      <div class="laura-fit-name">NordVPN</div>
+      <div class="laura-fit-verdict">Great product, wrong JTBD for her</div>
+    </div>
+    <div class="laura-fit-card">
+      <div class="laura-fit-score score-red">31</div>
+      <div class="laura-fit-name">Bitdefender</div>
+      <div class="laura-fit-verdict">Expert-first, Laura-last</div>
+    </div>
+    <div class="laura-fit-card">
+      <div class="laura-fit-score score-amber">58</div>
+      <div class="laura-fit-name">Aura</div>
+      <div class="laura-fit-verdict">Identity-first, all-in-one attempt</div>
+    </div>
+    <div class="laura-fit-card">
+      <div class="laura-fit-score score-red">29</div>
+      <div class="laura-fit-name">Malwarebytes</div>
+      <div class="laura-fit-verdict">Reactive, technical, no household lens</div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════════ -->
+  <!-- SECTION 2: Competitor deep-dives                             -->
+  <!-- ══════════════════════════════════════════════════════════════ -->
+  <div class="section-break" style="margin-top:56px;">
+    <div class="eyebrow-2">Threat Map</div>
+    <h2>The <em>four competitive lanes</em>.</h2>
+  </div>
+  <p style="margin-top:10px;font-size:14px;color:var(--ink-soft);max-width:780px;">Norton has historically owned one lane — traditional specialists. The sprint must answer all four simultaneously, or cede ground to players who are moving faster on the others.</p>
+
+  <!-- ── Lane 1: Big Tech ─── -->
+  <div class="section-break" style="margin-top:36px;">
+    <div class="eyebrow-2" style="color:var(--red);">Lane 1 — Structural Threat</div>
+    <h2 style="font-size:28px;">Big Tech is <em>absorbing</em> the category.</h2>
+  </div>
+
+  <div class="comp-grid">
+
+    <div class="comp-card">
+      <div class="comp-card-head">
+        <div class="comp-logo">🪟</div>
+        <div class="comp-card-head-text">
+          <div class="comp-name">Microsoft Defender</div>
+          <div class="comp-tagline">Built into Windows. Increasingly capable. Zero cost. 1.4B active devices.</div>
+        </div>
+        <span class="threat-badge threat-struct">Structural</span>
+      </div>
+      <div class="comp-body">
+        <div class="comp-row"><span class="comp-row-label">Price</span><span class="comp-row-val">Free (bundled)</span></div>
+        <div class="comp-row"><span class="comp-row-label">Reach</span><span class="comp-row-val">1.4B Windows devices</span></div>
+        <div class="comp-row"><span class="comp-row-label">NPS trend</span><span class="comp-row-val" style="color:var(--green);">▲ Rising fast</span></div>
+        <div class="comp-row"><span class="comp-row-label">BHI</span><span class="comp-row-val">164 (+5) — 1pt behind Norton</span></div>
+        <div class="comp-row"><span class="comp-row-label">AI play</span><span class="comp-row-val">Copilot + scam detection in Edge</span></div>
+        <div class="comp-steal"><div class="steal-label">What to borrow</div><p>Zero-friction activation — no setup, no subscription prompt. The benchmark for "it just works."</p></div>
+        <div class="comp-weakness"><div class="weak-label">Their blind spot</div><p>Windows-only. No cross-device household coverage. No identity layer. No iOS. Laura has an iPhone.</p></div>
+      </div>
+    </div>
+
+    <div class="comp-card">
+      <div class="comp-card-head">
+        <div class="comp-logo">🍎</div>
+        <div class="comp-card-head-text">
+          <div class="comp-name">Apple (iOS + macOS)</div>
+          <div class="comp-tagline">Privacy as brand value. Lockdown Mode, Stolen Device Protection, Passkeys, App Tracking Transparency.</div>
+        </div>
+        <span class="threat-badge threat-struct">Structural</span>
+      </div>
+      <div class="comp-body">
+        <div class="comp-row"><span class="comp-row-label">Price</span><span class="comp-row-val">Free (platform-native)</span></div>
+        <div class="comp-row"><span class="comp-row-label">BHI</span><span class="comp-row-val">125 (+4)</span></div>
+        <div class="comp-row"><span class="comp-row-label">Key features</span><span class="comp-row-val">Lockdown, Passkeys, ATT</span></div>
+        <div class="comp-row"><span class="comp-row-label">AI play</span><span class="comp-row-val">Apple Intelligence, on-device ML</span></div>
+        <div class="comp-steal"><div class="steal-label">What to borrow</div><p>Privacy as a brand posture, not a feature. "Private by design" is something Apple owns emotionally — and Norton should own operationally.</p></div>
+        <div class="comp-weakness"><div class="weak-label">Their blind spot</div><p>Apple-only. A family with mixed devices (Android kids, Windows PC, iPhone mom) falls through completely. No identity protection. No cross-platform household brief.</p></div>
+      </div>
+    </div>
+
+    <div class="comp-card">
+      <div class="comp-card-head">
+        <div class="comp-logo">🔵</div>
+        <div class="comp-card-head-text">
+          <div class="comp-name">Google (Android + Chrome)</div>
+          <div class="comp-tagline">Enhanced Safe Browsing, Play Protect, scam detection in Phone app, Gmail phishing AI.</div>
+        </div>
+        <span class="threat-badge threat-struct">Structural</span>
+      </div>
+      <div class="comp-body">
+        <div class="comp-row"><span class="comp-row-label">Price</span><span class="comp-row-val">Free (platform-native)</span></div>
+        <div class="comp-row"><span class="comp-row-label">BHI</span><span class="comp-row-val">152 (+4)</span></div>
+        <div class="comp-row"><span class="comp-row-label">Key features</span><span class="comp-row-val">Play Protect, scam call detection</span></div>
+        <div class="comp-row"><span class="comp-row-label">AI play</span><span class="comp-row-val">Real-time call scam detection (Gemini)</span></div>
+        <div class="comp-steal"><div class="steal-label">What to borrow</div><p>Real-time AI scam flagging in native apps — especially the phone call interception UX. The bar for "AI-native protection" is here.</p></div>
+        <div class="comp-weakness"><div class="weak-label">Their blind spot</div><p>Android-only scam features. No identity protection. No household management. Privacy posture is complex and trust is fragile (data collection concerns).</p></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── Lane 2: Traditional ─── -->
+  <div class="section-break" style="margin-top:40px;">
+    <div class="eyebrow-2">Lane 2 — Traditional Specialists</div>
+    <h2 style="font-size:28px;">Same category, <em>different positioning</em>.</h2>
+  </div>
+
+  <div class="comp-grid">
+
+    <div class="comp-card">
+      <div class="comp-card-head">
+        <div class="comp-logo">🛡</div>
+        <div class="comp-card-head-text">
+          <div class="comp-name">McAfee+</div>
+          <div class="comp-tagline">Pivoted to "privacy & identity for your whole family." Direct Norton overlap. Underdog story.</div>
+        </div>
+        <span class="threat-badge threat-high">High</span>
+      </div>
+      <div class="comp-body">
+        <div class="comp-row"><span class="comp-row-label">Price</span><span class="comp-row-val">$39.99–$199.99/yr</span></div>
+        <div class="comp-row"><span class="comp-row-label">NPS</span><span class="comp-row-val">Trailing Norton</span></div>
+        <div class="comp-row"><span class="comp-row-label">BHI</span><span class="comp-row-val">158 (−1)</span></div>
+        <div class="comp-row"><span class="comp-row-label">Key angle</span><span class="comp-row-val">Household framing, identity first</span></div>
+        <div class="comp-row"><span class="comp-row-label">AI play</span><span class="comp-row-val">AI-powered scam protection (limited)</span></div>
+        <div class="comp-steal"><div class="steal-label">What to borrow</div><p>"Your whole family" messaging done simply. McAfee lands household framing more cleanly than Norton does today — without the complexity.</p></div>
+        <div class="comp-weakness"><div class="weak-label">Their blind spot</div><p>No LifeLock equivalent. Identity monitoring is weaker. Brand trust recovery still ongoing post-founder controversy. No agentic AI layer.</p></div>
+      </div>
+    </div>
+
+    <div class="comp-card">
+      <div class="comp-card-head">
+        <div class="comp-logo">🧠</div>
+        <div class="comp-card-head-text">
+          <div class="comp-name">Bitdefender</div>
+          <div class="comp-tagline">Technical excellence. Top AV-TEST scores. Expert-first positioning that Laura will never seek out.</div>
+        </div>
+        <span class="threat-badge threat-med">Medium</span>
+      </div>
+      <div class="comp-body">
+        <div class="comp-row"><span class="comp-row-label">Price</span><span class="comp-row-val">$29.99–$159.99/yr</span></div>
+        <div class="comp-row"><span class="comp-row-label">Strength</span><span class="comp-row-val">Detection rates, performance</span></div>
+        <div class="comp-row"><span class="comp-row-label">Laura fit</span><span class="comp-row-val" style="color:var(--red);">31/100 — expert-first</span></div>
+        <div class="comp-row"><span class="comp-row-label">AI play</span><span class="comp-row-val">Scam Copilot (beta, browser ext)</span></div>
+        <div class="comp-steal"><div class="steal-label">What to borrow</div><p>Detection accuracy narrative — "blocked before it reached you" is a story Bitdefender tells well at the technical level. Translate it for Laura.</p></div>
+        <div class="comp-weakness"><div class="weak-label">Their blind spot</div><p>Zero household framing. No identity layer. Scam Copilot is reactive, not proactive. UI designed for IT professionals, not parents.</p></div>
+      </div>
+    </div>
+
+    <div class="comp-card">
+      <div class="comp-card-head">
+        <div class="comp-logo">🔴</div>
+        <div class="comp-card-head-text">
+          <div class="comp-name">Malwarebytes</div>
+          <div class="comp-tagline">Reactive remediation leader. Strong brand among technically-aware users. Not Laura's product.</div>
+        </div>
+        <span class="threat-badge threat-low">Low (for Laura)</span>
+      </div>
+      <div class="comp-body">
+        <div class="comp-row"><span class="comp-row-label">Price</span><span class="comp-row-val">$44.99–$119.97/yr</span></div>
+        <div class="comp-row"><span class="comp-row-label">Laura fit</span><span class="comp-row-val" style="color:var(--red);">29/100</span></div>
+        <div class="comp-row"><span class="comp-row-label">Core use</span><span class="comp-row-val">Remediation, not prevention</span></div>
+        <div class="comp-steal"><div class="steal-label">What to borrow</div><p>Nothing directly useful for Laura's design. Their "clean up the mess" framing is the exact opposite of the quiet guardian Norton Reimagined should be.</p></div>
+        <div class="comp-weakness"><div class="weak-label">Their blind spot</div><p>Reactive by design. No household tools. No identity layer. No AI-proactive play. Laura would never find them.</p></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── Lane 3: Identity + Emerging ─── -->
+  <div class="section-break" style="margin-top:40px;">
+    <div class="eyebrow-2">Lane 3 — Identity &amp; Emerging Challengers</div>
+    <h2 style="font-size:28px;">Gaining fast on the <em>metrics that matter</em>.</h2>
+  </div>
+
+  <div class="comp-grid">
+
+    <div class="comp-card">
+      <div class="comp-card-head">
+        <div class="comp-logo">🌐</div>
+        <div class="comp-card-head-text">
+          <div class="comp-name">NordVPN / Nord Security</div>
+          <div class="comp-tagline">NPS leader. 13 of 14 product attributes rated best-in-class. Winning on experience even with less market share.</div>
+        </div>
+        <span class="threat-badge threat-high">High</span>
+      </div>
+      <div class="comp-body">
+        <div class="comp-row"><span class="comp-row-label">Price</span><span class="comp-row-val">$59.88–$179.88/yr</span></div>
+        <div class="comp-row"><span class="comp-row-label">NPS rank</span><span class="comp-row-val" style="color:var(--green);">1st globally</span></div>
+        <div class="comp-row"><span class="comp-row-label">BHI</span><span class="comp-row-val">114 (−2) — but NPS dominates</span></div>
+        <div class="comp-row"><span class="comp-row-label">Top rated</span><span class="comp-row-val">13 of 14 product attributes</span></div>
+        <div class="comp-row"><span class="comp-row-label">Expansion</span><span class="comp-row-val">NordPass, NordLocker, Threat Protection</span></div>
+        <div class="comp-steal"><div class="steal-label">What to borrow</div><p>Experience obsession — NordVPN proves you can win on product quality even without brand heritage. Every flow is frictionless. The bar for delightful security UX.</p></div>
+        <div class="comp-weakness"><div class="weak-label">Their blind spot</div><p>No identity protection equivalent. No family/household management. Technical user base — Laura doesn't know VPN. No proactive AI guardian play.</p></div>
+      </div>
+    </div>
+
+    <div class="comp-card">
+      <div class="comp-card-head">
+        <div class="comp-logo">💎</div>
+        <div class="comp-card-head-text">
+          <div class="comp-name">Aura</div>
+          <div class="comp-tagline">The most direct challenger for Norton Reimagined territory. All-in-one digital safety, identity, family, financial.</div>
+        </div>
+        <span class="threat-badge threat-high">High — Watch Closely</span>
+      </div>
+      <div class="comp-body">
+        <div class="comp-row"><span class="comp-row-label">Price</span><span class="comp-row-val">$144–$264/yr (family)</span></div>
+        <div class="comp-row"><span class="comp-row-label">Laura fit</span><span class="comp-row-val" style="color:var(--amber);">58/100</span></div>
+        <div class="comp-row"><span class="comp-row-label">Positioning</span><span class="comp-row-val">All-in-one, family-first</span></div>
+        <div class="comp-row"><span class="comp-row-label">Key features</span><span class="comp-row-val">Identity, VPN, antivirus, parental, financial</span></div>
+        <div class="comp-row"><span class="comp-row-label">AI play</span><span class="comp-row-val">AI spam/scam call protection</span></div>
+        <div class="comp-steal"><div class="steal-label">What to borrow</div><p>All-in-one household narrative — single dashboard, one price, every family member. This is the positioning Norton Reimagined must own and out-execute.</p></div>
+        <div class="comp-weakness"><div class="weak-label">Their blind spot</div><p>30 years less brand equity than Norton. LifeLock identity depth is stronger. NeoClaw AI agents are a structural advantage Aura can't replicate quickly. No 87M partner channel.</p></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── Lane 4: B2B2C ─── -->
+  <div class="section-break" style="margin-top:40px;">
+    <div class="eyebrow-2">Lane 4 — B2B2C / Embedded</div>
+    <h2 style="font-size:28px;">Cybersafety without <em>brand recognition</em>.</h2>
+  </div>
+
+  <div class="insight-box" style="margin-top:0;">
+    <span class="eyebrow">Sprint Awareness</span>
+    <h3>The channel threat Norton can't outspend.</h3>
+    <p>McAfee is pre-installed on HP and Dell laptops. Bitdefender is embedded in Netgear routers. F-Secure runs inside AT&T's network protection product. Array Networks lives inside Bank of America. These products reach Laura without her ever choosing them — no brand consideration, no app store, no subscription decision.</p>
+    <p>The sprint doesn't need to solve this — but every concept we build should work <strong>in addition to</strong> or <strong>in replacement of</strong> these invisible embedded tools, not alongside them as yet another product to manage.</p>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════════ -->
+  <!-- SECTION 3: Feature matrix                                    -->
+  <!-- ══════════════════════════════════════════════════════════════ -->
+  <div class="section-break" style="margin-top:56px;">
+    <div class="eyebrow-2">Feature Comparison</div>
+    <h2>What each player <em>actually covers</em>.</h2>
+  </div>
+  <p style="margin-top:10px;font-size:14px;color:var(--ink-soft);max-width:780px;">Mapped against the capabilities Laura actually needs. Yellow = Norton. Green = has it. Partial = limited or add-on required.</p>
+
+  <div class="matrix-wrap">
+    <table class="matrix-table">
+      <thead>
+        <tr>
+          <th>Capability</th>
+          <th class="norton-col">Norton (Today)</th>
+          <th>McAfee+</th>
+          <th>Bitdefender</th>
+          <th>NordVPN</th>
+          <th>Aura</th>
+          <th>Microsoft</th>
+          <th>Apple/Google</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="feat-name">Antivirus / malware</td>
+          <td class="norton-col-cell"><span class="check">✓</span></td>
+          <td><span class="check">✓</span></td>
+          <td><span class="check">✓</span></td>
+          <td><span class="partial">~</span></td>
+          <td><span class="check">✓</span></td>
+          <td><span class="check">✓</span></td>
+          <td><span class="partial">~</span></td>
+        </tr>
+        <tr>
+          <td class="feat-name">VPN</td>
+          <td class="norton-col-cell"><span class="check">✓</span></td>
+          <td><span class="check">✓</span></td>
+          <td><span class="check">✓</span></td>
+          <td><span class="check">✓</span> Best-in-class</td>
+          <td><span class="check">✓</span></td>
+          <td><span class="cross">✗</span></td>
+          <td><span class="cross">✗</span></td>
+        </tr>
+        <tr>
+          <td class="feat-name">Identity theft protection</td>
+          <td class="norton-col-cell"><span class="check">✓</span> LifeLock</td>
+          <td><span class="partial">~</span> Limited</td>
+          <td><span class="cross">✗</span></td>
+          <td><span class="cross">✗</span></td>
+          <td><span class="check">✓</span></td>
+          <td><span class="cross">✗</span></td>
+          <td><span class="cross">✗</span></td>
+        </tr>
+        <tr>
+          <td class="feat-name">Dark web monitoring</td>
+          <td class="norton-col-cell"><span class="check">✓</span></td>
+          <td><span class="check">✓</span></td>
+          <td><span class="partial">~</span></td>
+          <td><span class="cross">✗</span></td>
+          <td><span class="check">✓</span></td>
+          <td><span class="cross">✗</span></td>
+          <td><span class="cross">✗</span></td>
+        </tr>
+        <tr>
+          <td class="feat-name">Parental / family controls</td>
+          <td class="norton-col-cell"><span class="check">✓</span> Norton Family</td>
+          <td><span class="check">✓</span></td>
+          <td><span class="partial">~</span></td>
+          <td><span class="cross">✗</span></td>
+          <td><span class="check">✓</span></td>
+          <td><span class="partial">~</span> Family Safety</td>
+          <td><span class="check">✓</span> Screen Time</td>
+        </tr>
+        <tr>
+          <td class="feat-name">AI scam detection</td>
+          <td class="norton-col-cell"><span class="check">✓</span> Genie</td>
+          <td><span class="partial">~</span> Limited</td>
+          <td><span class="partial">~</span> Scam Copilot</td>
+          <td><span class="partial">~</span> Threat Protection</td>
+          <td><span class="check">✓</span></td>
+          <td><span class="partial">~</span> Edge only</td>
+          <td><span class="check">✓</span> Native (calls)</td>
+        </tr>
+        <tr>
+          <td class="feat-name">Cross-device household</td>
+          <td class="norton-col-cell"><span class="check">✓</span> Up to 10</td>
+          <td><span class="check">✓</span></td>
+          <td><span class="partial">~</span> Limited</td>
+          <td><span class="partial">~</span> 6 devices</td>
+          <td><span class="check">✓</span></td>
+          <td><span class="cross">✗</span> Windows only</td>
+          <td><span class="cross">✗</span> Platform only</td>
+        </tr>
+        <tr>
+          <td class="feat-name">Financial monitoring</td>
+          <td class="norton-col-cell"><span class="check">✓</span> Norton Money</td>
+          <td><span class="partial">~</span></td>
+          <td><span class="cross">✗</span></td>
+          <td><span class="cross">✗</span></td>
+          <td><span class="check">✓</span></td>
+          <td><span class="cross">✗</span></td>
+          <td><span class="cross">✗</span></td>
+        </tr>
+        <tr>
+          <td class="feat-name">Agentic AI (autonomous tasks)</td>
+          <td class="norton-col-cell"><span class="check">✓</span> NeoClaw</td>
+          <td><span class="cross">✗</span></td>
+          <td><span class="cross">✗</span></td>
+          <td><span class="cross">✗</span></td>
+          <td><span class="cross">✗</span></td>
+          <td><span class="partial">~</span> Copilot (limited)</td>
+          <td><span class="partial">~</span> Apple Intelligence</td>
+        </tr>
+        <tr>
+          <td class="feat-name">Proactive household brief</td>
+          <td class="norton-col-cell" style="color:var(--red);font-weight:700;">✗ Not yet</td>
+          <td><span class="cross">✗</span></td>
+          <td><span class="cross">✗</span></td>
+          <td><span class="cross">✗</span></td>
+          <td><span class="cross">✗</span></td>
+          <td><span class="cross">✗</span></td>
+          <td><span class="cross">✗</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════════ -->
+  <!-- SECTION 4: The Norton advantage                              -->
+  <!-- ══════════════════════════════════════════════════════════════ -->
+  <div class="section-break" style="margin-top:56px;">
+    <div class="eyebrow-2">Sprint Framing</div>
+    <h2>What only <em>Norton can do</em>.</h2>
+  </div>
+
+  <div class="insight-box">
+    <span class="eyebrow">The Unfair Advantage</span>
+    <h3>Five things no competitor can replicate in 12 months.</h3>
+    <p><strong>1. LifeLock + Norton 360 under one roof.</strong> The only player that has both best-in-class antivirus and best-in-class identity protection. Aura is trying to build this. Nobody else is close.</p>
+    <p><strong>2. NeoClaw.</strong> A security-first agentic AI platform that can act autonomously on Laura's behalf. No competitor has this. Google and Apple have AI but it's platform-native and siloed. This is the infrastructure for a genuinely new category: AI-fiduciary security.</p>
+    <p><strong>3. 30 years of threat intelligence.</strong> The training data advantage is structural. NeoClaw agents trained on three decades of real threat data, across 500M+ devices, can detect and respond to threats that newer models haven't seen.</p>
+    <p><strong>4. Cross-platform household coverage at scale.</strong> iOS + Android + Windows + Mac, up to 10 devices, all family members. No Big Tech player can do this across ecosystems. NordVPN is capped at 6. Aura is trying. Norton already has it.</p>
+    <p><strong>5. 87M partner channel.</strong> Bank partnerships, OEM deals, telco embed — distribution at a scale that a startup challenger cannot buy. Every concept we build should assume this reach.</p>
+  </div>
+
+  <div style="margin-top:24px;padding:20px 24px;background:var(--paper);border-left:4px solid var(--yellow);border-radius:0 6px 6px 0;">
+    <p style="font-size:14px;"><strong>The sprint design brief, in one sentence:</strong> Build concepts that combine LifeLock + NeoClaw + household framing into experiences Laura would adopt passively — making the most defensible competitive moat also the most visible product story.</p>
+  </div>
+
+</div>
+
+<div class="footer">
+  <span class="brand">Norton Reimagined</span>
+  <span>Competitive Analysis · Sprint Reference</span>
+</div>
+
+<script src="nav.js"></script>
+</body>
+</html>
