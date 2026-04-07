@@ -90,6 +90,29 @@
     border-left: 1px solid rgba(255,255,255,0.15);
     margin-left: 2px;
   }
+  /* Sprint Tools dropdown — must be defined here since laura.html overrides styles.css */
+  .nav-dropdown { position: relative; }
+  .nav-dropdown-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 14px; font-size: 13px; font-weight: 500;
+    color: #c9c9c9; border-radius: 999px;
+    background: none; border: none; cursor: pointer;
+    font-family: 'Inter Tight', sans-serif; transition: all 0.15s; white-space: nowrap;
+  }
+  .nav-dropdown-btn:hover, .nav-dropdown-btn[aria-expanded="true"] { color: #fff; background: rgba(255,255,255,0.08); }
+  .nav-dropdown-btn.active { color: var(--ink); background: var(--yellow); font-weight: 700; }
+  .nav-beta-pill { font-size: 11px; font-weight: 800; color: var(--yellow); }
+  .nav-dropdown-btn.active .nav-beta-pill { color: var(--ink); }
+  .nav-dropdown-menu {
+    display: none; position: absolute; top: calc(100% + 8px); right: 0;
+    min-width: 200px; background: #fff; border: 1.5px solid var(--line);
+    border-radius: 10px; box-shadow: 0 12px 40px rgba(36,36,36,.14);
+    list-style: none; padding: 6px; z-index: 1100; overflow: hidden;
+  }
+  .nav-dropdown-menu.open { display: block; }
+  .nav-dropdown-menu li a { display: block; padding: 10px 14px; font-size: 13px; font-weight: 500; color: var(--ink); border-radius: 6px; transition: background 0.12s; }
+  .nav-dropdown-menu li a:hover { background: var(--paper); }
+  .nav-dropdown-menu li a.active { background: var(--yellow); color: var(--ink); font-weight: 700; }
   .nav-links {
     display: flex;
     gap: 6px;
