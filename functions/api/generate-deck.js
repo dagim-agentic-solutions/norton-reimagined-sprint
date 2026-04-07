@@ -90,10 +90,26 @@ How this concept positions Norton vs. McAfee+, Aura, Bitdefender, Google Scam De
 **Slide 8 — Norton's Unfair Advantage**
 The LifeLock identity layer + 30 years of threat intelligence + cross-device household coverage + trusted brand = a moat competitors can't cross. This concept activates those advantages.
 
-**Slide 9 — The Business Case**
+**Slide 9 — Feature Deep-Dive: What Makes This Different**
+Break down the 3–5 core features or capabilities inside this prototype. For each one:
+- Name the feature in plain language (no jargon)
+- Explain exactly what it does for Laura — the job it completes, the anxiety it removes
+- Explain why this is differentiated: what competitors miss, what Norton's unique position enables, and why this feature couldn't be replicated easily by Apple, Google, McAfee, or Aura
+- Flag which feature is the "hero" — the one thing that would make Laura say "no other product does this"
+Make this slide feel like a product teardown, not a feature list.
+
+**Slide 10 — Brand Vision & Go-to-Market Campaign**
+How does Norton take this concept to market and pitch this shift to the millions of existing Norton customers and the broader consumer base?
+- Campaign concept: Give this product a campaign name, a hero tagline, and a one-line manifesto that captures what Norton is becoming (not just what it does)
+- Primary message: What single truth does this campaign communicate to Laura? What emotion does it create?
+- Channel strategy: Where does Norton reach Laura? (TV, YouTube pre-roll, social, email to existing base, retail partners, co-marketing with device OEMs)
+- Key visual idea: Describe the hero creative — what does the campaign look and feel like? What's the contrast between the "before" (Laura overwhelmed, the family IT person) and the "after" (Laura free, Norton quietly handling everything)
+- Retention angle: How does this campaign speak to existing Norton subscribers in a way that makes them feel they're upgrading into something better — not being sold a new product?
+
+**Slide 11 — The Business Case**
 Why this wins for Norton: retention uplift, ARPU expansion, entry-tier to premium upgrade path, LifeLock attach opportunity, churn reduction. Connect to the FY25 context.
 
-**Slide 10 — What We're Asking**
+**Slide 12 — What We're Asking**
 Clear ask from the sprint team: validation, feedback, go/no-go signal, or next steps. One CTA per slide.
 
 ---
@@ -186,7 +202,7 @@ export async function onRequestPost({ request, env }) {
         inputText: pitchText,
         textMode: "preserve",
         format: "presentation",
-        numCards: 10,
+        numCards: 12,
         cardOptions: { dimensions: "16x9" },
         textOptions: {
           amount: "medium",
