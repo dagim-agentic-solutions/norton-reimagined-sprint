@@ -1532,6 +1532,16 @@
             </button>
           </div>
           <div class="ep-error" id="epError"></div>
+      <div style="margin-top:8px;font-size:12px;color:var(--ink-softer);font-weight:600;" id="epUsageCounter"></div>
+      <!-- Bypass block (hidden until limit hit) -->
+      <div id="epBypassWrap" style="display:none;margin-top:12px;padding:14px 16px;background:var(--paper);border:1.5px solid var(--line);border-radius:8px;">
+        <div style="font-size:12px;font-weight:700;color:var(--ink-soft);margin-bottom:8px;">Enter password to continue</div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <input type="password" id="epBypassInput" placeholder="Password…" maxlength="40" style="flex:1;padding:9px 12px;border:1.5px solid var(--line);border-radius:6px;font-family:inherit;font-size:14px;outline:none;background:#fff;" onkeydown="if(event.key==='Enter')epTryBypass()">
+          <button onclick="epTryBypass()" style="background:var(--ink);color:#fff;border:none;border-radius:6px;padding:9px 18px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;">Unlock</button>
+        </div>
+        <div id="epBypassErr" style="font-size:12px;color:#c01a1a;margin-top:6px;min-height:14px;"></div>
+      </div>
         </div>
 
         <!-- Step 2: conversation -->
@@ -1715,20 +1725,79 @@ document.getElementById('concept').addEventListener('keydown', (e) => {
 
 // ===== Elevator Pitch Tool =====
 const EP_API = '/api/elevator-pitch';
+const EP_LIMIT = 10;
+const EP_LIMIT_KEY = 'ep_pitch_count';
+const EP_BYPASS_KEY = 'ep_bypass';
+const EP_BYPASS_PASS = 'norton';
+
 let epPitchText = '';
 let epHistory = [];  // [{role:'user'|'assistant', content:'...'}]
 let epTurn = 0;      // Laura's turns (max 5)
 let epBusy = false;
 
+function epGetCount() {
+  return parseInt(localStorage.getItem(EP_LIMIT_KEY) || '0', 10);
+}
+function epIncrCount() {
+  localStorage.setItem(EP_LIMIT_KEY, String(epGetCount() + 1));
+}
+function epIsBypassed() {
+  return localStorage.getItem(EP_BYPASS_KEY) === '1';
+}
+function epIsLimited() {
+  return !epIsBypassed() && epGetCount() >= EP_LIMIT;
+}
+function epRemainingLabel() {
+  if (epIsBypassed()) return '';
+  const left = EP_LIMIT - epGetCount();
+  return left > 0 ? left + ' pitch' + (left === 1 ? '' : 'es') + ' remaining' : '0 remaining';
+}
+
 document.getElementById('epPitch').addEventListener('input', function() {
   document.getElementById('epCharCount').textContent = this.value.length;
 });
+
+// Show usage counter on load
+(function epInitCounter() {
+  const counter = document.getElementById('epUsageCounter');
+  if (!counter) return;
+  if (epIsBypassed()) { counter.style.display = 'none'; return; }
+  const left = EP_LIMIT - epGetCount();
+  if (left <= 0) {
+    counter.textContent = 'Limit reached (10/10) — enter password below to continue';
+    counter.style.color = '#c01a1a';
+    document.getElementById('epBypassWrap').style.display = 'block';
+  } else {
+    counter.textContent = epRemainingLabel();
+  }
+})();
+
+function epTryBypass() {
+  const input = document.getElementById('epBypassInput');
+  const errEl = document.getElementById('epBypassErr');
+  errEl.textContent = '';
+  if ((input.value || '').trim() === EP_BYPASS_PASS) {
+    localStorage.setItem(EP_BYPASS_KEY, '1');
+    document.getElementById('epBypassWrap').style.display = 'none';
+    document.getElementById('epUsageCounter').style.display = 'none';
+    document.getElementById('epStartBtn').disabled = false;
+    document.getElementById('epError').textContent = '';
+  } else {
+    errEl.textContent = 'Incorrect password.';
+  }
+}
 
 async function epStart() {
   if (epBusy) return;
   const pitch = document.getElementById('epPitch').value.trim();
   const errorEl = document.getElementById('epError');
   errorEl.textContent = '';
+
+  if (epIsLimited()) {
+    errorEl.textContent = 'You’ve reached the 10-pitch limit. Enter the password below to continue.';
+    document.getElementById('epBypassWrap').style.display = 'block';
+    return;
+  }
 
   if (!pitch) { errorEl.textContent = 'Write your elevator pitch first.'; return; }
   if (pitch.length < 20) { errorEl.textContent = 'Give Laura more to work with — describe what your idea actually is.'; return; }
@@ -1768,6 +1837,21 @@ async function epStart() {
   epPitchText = pitch;
   epHistory = [];
   epTurn = 0;
+
+  // Increment usage counter
+  epIncrCount();
+  // Update counter label
+  (function() {
+    const counter = document.getElementById('epUsageCounter');
+    if (!counter || epIsBypassed()) return;
+    const left = EP_LIMIT - epGetCount();
+    if (left <= 0) {
+      counter.textContent = 'Limit reached (10/10) — enter password below to continue';
+      counter.style.color = '#c01a1a';
+    } else {
+      counter.textContent = epRemainingLabel();
+    }
+  })();
 
   // Show conversation view
   document.getElementById('epStep1').style.display = 'none';
