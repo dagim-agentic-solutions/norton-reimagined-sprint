@@ -137,6 +137,9 @@ export async function onRequestGet({ request, env }) {
   const headers = { "Content-Type": "application/json", ...corsHeaders() };
   const url = new URL(request.url);
   const id = url.searchParams.get("id");
+  const protoId = url.searchParams.get("protoId") || null;
+  const title   = url.searchParams.get("title")   || "";
+
   if (!id) {
     return new Response(JSON.stringify({ error: "Missing id param." }), { status: 400, headers });
   }
@@ -152,6 +155,10 @@ export async function onRequestGet({ request, env }) {
       return new Response(JSON.stringify({ status: "pending" }), { status: 200, headers });
     }
     const data = await res.json();
+    // When generation completes, save a system note to the prototype's comments
+    if (data.status === "completed" && data.gammaUrl && protoId && env.PROTOTYPES_KV) {
+      await saveSystemNote(env.PROTOTYPES_KV, protoId, data.gammaUrl, title);
+    }
     return new Response(JSON.stringify({
       status: data.status || "pending",
       gammaUrl: data.gammaUrl || null,
@@ -222,4 +229,27 @@ export async function onRequestPost({ request, env }) {
   } catch (err) {
     return new Response(JSON.stringify({ error: `Network error starting generation: ${err.message}` }), { status: 502, headers });
   }
+}
+
+// ── Internal helper: save a system note to the prototype's comments ───────────
+async function saveSystemNote(kv, protoId, gammaUrl, title) {
+  if (!kv || !protoId) return;
+  const kvKey = `comments::${protoId}`;
+  try {
+    const raw = await kv.get(kvKey);
+    const comments = raw ? JSON.parse(raw) : [];
+    const now = new Date().toLocaleString('en-US', {
+      month: 'short', day: 'numeric', year: 'numeric',
+      hour: 'numeric', minute: '2-digit', timeZoneName: 'short',
+    });
+    comments.push({
+      id: crypto.randomUUID(),
+      protoId,
+      author: '✦ Pitch Deck',
+      text: `Deck generated on ${now}: ${gammaUrl}`,
+      createdAt: Date.now(),
+      system: true,
+    });
+    await kv.put(kvKey, JSON.stringify(comments));
+  } catch { /* non-blocking — don't fail the poll response if note fails */ }
 }

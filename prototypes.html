@@ -1120,6 +1120,28 @@ function renderCommentItem(c, protoId) {
   const time = c.createdAt
     ? new Date(c.createdAt).toLocaleDateString('en-US', { month:'short', day:'numeric', hour:'numeric', minute:'2-digit' })
     : '';
+
+  // System notes (pitch deck links) get distinct styling with a clickable link
+  if (c.system) {
+    const urlMatch = c.text.match(/https?:\/\/[^\s]+/);
+    const url = urlMatch ? urlMatch[0] : null;
+    const label = c.text.replace(url || '', '').trim().replace(/:$/, '');
+    return `<li class="comment-item" style="background:#fffbe6;border-radius:6px;padding:8px 12px;border:1px solid #e6d800;">
+      <div class="comment-avatar" style="background:var(--yellow);color:var(--ink);font-size:10px;">✦</div>
+      <div class="comment-content">
+        <div class="comment-meta">
+          <span class="comment-author" style="color:#8a6a00;">${escapeHtml(c.author)}</span>
+          <span class="comment-time">${escapeHtml(time)}</span>
+        </div>
+        <div class="comment-text" style="font-size:12px;">
+          ${escapeHtml(label)}
+          ${url ? `<br><a href="${escapeAttr(url)}" target="_blank" rel="noopener" style="color:#0a7a3d;font-weight:600;text-decoration:underline;word-break:break-all;">View Pitch Deck →</a>` : ''}
+        </div>
+      </div>
+      <button class="comment-delete" onclick="deleteComment('${escapeAttr(c.id)}','${escapeAttr(protoId)}')" title="Remove">✕</button>
+    </li>`;
+  }
+
   return `<li class="comment-item">
     <div class="comment-avatar">${escapeHtml(initials)}</div>
     <div class="comment-content">
@@ -1447,7 +1469,10 @@ async function submitDeck() {
     dots = (dots % 3) + 1;
     statusEl.textContent = '⏳ Building your deck' + '.'.repeat(dots) + ' (~60s total)';
     try {
-      const pollRes = await fetch('/api/generate-deck?id=' + encodeURIComponent(generationId));
+      const pollUrl = '/api/generate-deck?id=' + encodeURIComponent(generationId) +
+        '&protoId=' + encodeURIComponent(_deckProto.id) +
+        '&title=' + encodeURIComponent(_deckProto.title);
+      const pollRes = await fetch(pollUrl);
       const pollData = await pollRes.json();
       if (pollData.status === 'completed' && pollData.gammaUrl) {
         statusEl.textContent = '';
