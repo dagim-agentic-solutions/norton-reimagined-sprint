@@ -959,7 +959,7 @@ async function loadPrototypes() {
       return `
         <div class="proto">
           <div class="proto-meta">
-            <span class="proto-author">${escapeHtml(p.author || 'Anonymous')}</span>
+            <span class="proto-author">${escapeHtml(p.author || p.name || 'Anonymous')}</span>
             <span class="proto-date">${escapeHtml(date)}</span>
           </div>
           <h3>${escapeHtml(p.title || 'Untitled')}</h3>
