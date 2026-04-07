@@ -1274,13 +1274,11 @@
   }
   .ep-tool-main-locked .tool-locked-overlay {
     border-radius: 0;
-    /* Stretch fully including past any padding */
     inset: 0;
-    margin: -40px -40px -40px -40px; /* counteract .ep-tool-main padding */
     padding: 18px 20px;
-    background: rgba(255,255,255,0.78);
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
+    background: rgba(248,248,247,0.72);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
   }
 </style>
   <link rel="icon" type="image/svg+xml" href="assets/norton-checkmark.svg">
@@ -1749,6 +1747,27 @@
 </div>
 
 <script>
+// ── Tool availability flags ───────────────────────────────────────────────
+// Set TOOLS_LOCKED = false to lift the "Coming Soon" restrictions on both tools.
+const TOOLS_LOCKED = true;
+
+if (!TOOLS_LOCKED) {
+  // Remove all locked overlays
+  document.querySelectorAll('.tool-locked-overlay').forEach(el => el.remove());
+  // Re-enable pointer events on locked containers
+  document.querySelectorAll('.ep-tool-main-locked > *').forEach(el => {
+    el.style.pointerEvents = '';
+    el.style.userSelect = '';
+  });
+  document.querySelector('.ep-tool-main-locked')?.classList.remove('ep-tool-main-locked');
+  document.querySelectorAll('.tool-locked-wrap').forEach(wrap => {
+    // Unwrap — move children out of wrapper div
+    const parent = wrap.parentNode;
+    while (wrap.firstChild) parent.insertBefore(wrap.firstChild, wrap);
+    wrap.remove();
+  });
+}
+
 // ===== Pressure-test: thin client that calls the backend Pages Function =====
 // The Laura persona context lives server-side in functions/api/pressure-test.js
 // so it can't be tampered with from the browser and the prompt is consistent
