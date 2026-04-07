@@ -1002,13 +1002,13 @@ const CAPABILITIES = [
 const CAP_DESCS = {
   'Antivirus & Malware Protection': 'Real-time, multi-layer defense against viruses, ransomware, spyware, and zero-day threats across all devices.',
   'Secure VPN':                     'Encrypts browsing and hides IP on public Wi-Fi — no activity logs kept.',
-  'Dark Web Monitoring':            'Continuously scans dark web markets and forums for Laura's emails, SSN, and personal data, alerting her the moment something surfaces.',
+  'Dark Web Monitoring':            'Continuously scans dark web markets and forums for Laura’s emails, SSN, and personal data, alerting her the moment something surfaces.',
   'Safe Web & Safe Search':         'Browser extension that blocks malicious sites, flags dangerous search results, and stops phishing links before they load.',
   'Genie Scam Protection':          'AI-powered scam detector — analyzes suspicious texts, emails, and calls in real time and tells Laura in plain language if something is a scam.',
   'Password Manager':               'Stores, generates, and autofills strong passwords so Laura never has to remember or reuse them.',
   'Smart Scan':                     'One-tap scan that checks for malware, weak passwords, network vulnerabilities, and out-of-date software in under a minute.',
-  'Privacy Monitor':                'Finds and requests removal of Laura's personal info from data broker sites that sell it to anyone.',
-  'Family & Parental Controls':     'Screen time limits, content filters, location sharing, and app supervision across every family member's device.',
+  'Privacy Monitor':                'Finds and requests removal of Laura’s personal info from data broker sites that sell it to anyone.',
+  'Family & Parental Controls':     'Screen time limits, content filters, location sharing, and app supervision across every family member’s device.',
   'Cloud Backup':                   'Automatically backs up important files to the cloud so nothing is lost to ransomware, theft, or a broken device.',
   'Norton Money (Financial Wellness)': 'Tracks spending, flags unusual transactions, and surfaces financial health insights alongside identity protection.',
   'Threat Intelligence Engine':     'The real-time global threat database behind all Norton detections — learns from 175M+ devices to block emerging threats faster.',
@@ -1022,7 +1022,7 @@ const CAP_DESCS = {
 // Featured capabilities that require a role selector when checked
 const FEATURED_CAPS = {
   'NeoClaw (or Norton Agent / agentic workflows)': 'Norton\'s agentic AI platform — performs multi-step security tasks autonomously on Laura\'s behalf, from removing data broker listings to resolving identity alerts, with full privacy protection.',
-  'Norton Genie': 'Norton\'s AI assistant — answers security questions, explains threats, and guides Laura through decisions in plain language'
+  'Norton Genie': 'Norton’s AI assistant — answers security questions, explains threats, and guides Laura through decisions in plain language'
 };
 
 const ROLE_OPTIONS = [
@@ -1083,12 +1083,13 @@ const ROLE_OPTIONS = [
     item.style.cssText = 'flex-direction:column;align-items:flex-start;gap:8px;cursor:pointer;';
 
     const capDesc = CAP_DESCS[cap] || '';
+    const capDescHtml = capDesc ? '<div style="font-size:12px;color:var(--ink-soft);margin-top:2px;line-height:1.4;">' + capDesc + '</div>' : '';
     item.innerHTML = `
       <div style="display:flex;align-items:center;gap:10px;width:100%;" onclick="toggleRegularCap('${cap}')">
         <span class="cap-check" id="rcc-${key}">✓</span>
         <div style="flex:1;min-width:0;">
           <span class="cap-label">${cap}</span>
-          ${capDesc ? `<div style="font-size:12px;color:var(--ink-soft);margin-top:2px;line-height:1.4;">${capDesc}</div>` : ''}
+          ${capDescHtml}
         </div>
       </div>
       <div class="reg-role-picker" id="rrp-${key}" style="display:none;width:100%;padding-top:8px;border-top:1px solid rgba(255,255,255,.15);">
