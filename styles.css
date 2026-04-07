@@ -100,6 +100,24 @@ body { padding-top: 63px; }
   background: var(--yellow);
   font-weight: 700;
 }
+.nav-search-btn {
+  background: none;
+  border: 1px solid rgba(255,255,255,0.35);
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-family: 'Inter Tight', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: #fff;
+  cursor: pointer;
+  transition: all .15s;
+}
+.nav-search-btn:hover {
+  border-color: #fff;
+  color: var(--yellow);
+}
 
 /* ==========================================================================
    Page layout
