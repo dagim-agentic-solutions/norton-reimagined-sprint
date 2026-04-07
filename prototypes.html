@@ -284,6 +284,121 @@
   }
   .proto-delete:hover { color: #ff4444; }
 
+  /* ── Pitch Deck button ───────────────────────────────────────────────────── */
+  .btn-pitch-deck {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--yellow);
+    color: var(--ink);
+    border: none;
+    border-radius: 999px;
+    padding: 8px 16px;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .03em;
+    cursor: pointer;
+    transition: all .15s;
+    margin-top: 10px;
+  }
+  .btn-pitch-deck:hover:not(:disabled) { background: #e6d000; transform: translateY(-1px); }
+  .btn-pitch-deck:disabled { opacity: .5; cursor: not-allowed; }
+
+  /* ── Pitch Deck modal ────────────────────────────────────────────────────── */
+  .deck-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.6);
+    z-index: 2100;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .deck-overlay.open { display: flex; }
+  .deck-modal {
+    background: #fff;
+    border-radius: 12px;
+    padding: 36px 40px 32px;
+    width: 100%;
+    max-width: 460px;
+    box-shadow: 0 24px 64px rgba(0,0,0,.25);
+    font-family: 'Inter Tight', sans-serif;
+  }
+  .deck-modal h3 { font-size: 20px; font-weight: 800; letter-spacing: -.02em; margin-bottom: 6px; }
+  .deck-modal p { font-size: 13px; color: var(--ink-soft); line-height: 1.5; margin-bottom: 20px; }
+  .deck-modal label { display: block; font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-softer); margin-bottom: 6px; }
+  .deck-modal input[type="password"] {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1.5px solid var(--line);
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 15px;
+    outline: none;
+    transition: border-color .15s;
+    box-sizing: border-box;
+    margin-bottom: 14px;
+  }
+  .deck-modal input:focus { border-color: var(--ink); }
+  .deck-modal-actions { display: flex; gap: 10px; }
+  .btn-deck-submit {
+    flex: 1;
+    background: var(--ink);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 13px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background .15s;
+  }
+  .btn-deck-submit:hover:not(:disabled) { background: #1a1a1a; }
+  .btn-deck-submit:disabled { opacity: .5; cursor: not-allowed; }
+  .btn-deck-cancel {
+    background: none;
+    border: 1.5px solid var(--line);
+    border-radius: 6px;
+    padding: 12px 18px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ink-soft);
+    cursor: pointer;
+    transition: border-color .15s;
+  }
+  .btn-deck-cancel:hover { border-color: var(--ink); color: var(--ink); }
+  .deck-modal-err { font-size: 12px; color: #c01a1a; margin-top: 10px; min-height: 16px; }
+  .deck-modal-status { font-size: 13px; color: var(--ink-soft); margin-top: 12px; min-height: 18px; text-align: center; }
+  .deck-modal-result {
+    display: none;
+    margin-top: 18px;
+    padding: 16px 18px;
+    background: #f0fff4;
+    border: 1.5px solid #0a7a3d;
+    border-radius: 8px;
+  }
+  .deck-modal-result.show { display: block; }
+  .deck-modal-result p { color: #0a7a3d; font-weight: 600; margin-bottom: 10px; font-size: 13px; }
+  .btn-deck-open {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #0a7a3d;
+    color: #fff;
+    border-radius: 999px;
+    padding: 10px 20px;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: background .15s;
+  }
+  .btn-deck-open:hover { background: #085f30; }
+
   /* ── Comments ─────────────────────────────────────────────────────────── */
   .comments-section {
     margin-top: 16px;
@@ -741,7 +856,10 @@ async function loadPrototypes() {
             <span class="vote-quota" id="vq-${escapeAttr(p.id)}"></span>
           </div>
 
-          <button class="proto-delete" onclick="deletePrototype('${escapeAttr(p.id)}', this)">✕ Delete</button>
+          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+            <button class="proto-delete" onclick="deletePrototype('${escapeAttr(p.id)}', this)">✕ Delete</button>
+            <button class="btn-pitch-deck" onclick="openDeckModal('${escapeAttr(p.id)}','${escapeAttr(p.title || '')}','${escapeAttr(p.summary || '')}','${escapeAttr(p.url || '')}')">✦ Generate Pitch Deck</button>
+          </div>
 
           <div class="comments-section">
             <button class="comments-toggle" onclick="toggleComments('${escapeAttr(p.id)}', this)">
@@ -1251,6 +1369,77 @@ function closeResults() {
   document.getElementById('resultsModal').classList.remove('open');
 }
 
+// ── Pitch Deck Generator ─────────────────────────────────────────────────────
+let _deckProto = { id: '', title: '', summary: '', url: '' };
+
+function openDeckModal(id, title, summary, url) {
+  _deckProto = { id, title, summary, url };
+  document.getElementById('deckPassword').value = '';
+  document.getElementById('deckErr').textContent = '';
+  document.getElementById('deckStatus').textContent = '';
+  document.getElementById('deckResult').classList.remove('show');
+  document.getElementById('deckModalForm').style.display = 'block';
+  document.getElementById('deckModalDesc').textContent =
+    'Enter the sprint password to generate a Gamma pitch deck for "' + title + '". The deck will be publicly shareable once created.';
+  document.getElementById('deckSubmitBtn').disabled = false;
+  document.getElementById('deckSubmitBtn').textContent = 'Generate Deck';
+  document.getElementById('deckModal').classList.add('open');
+  setTimeout(() => document.getElementById('deckPassword').focus(), 100);
+}
+
+function closeDeckModal() {
+  document.getElementById('deckModal').classList.remove('open');
+}
+
+async function submitDeck() {
+  const password = document.getElementById('deckPassword').value.trim();
+  const errEl    = document.getElementById('deckErr');
+  const statusEl = document.getElementById('deckStatus');
+  const submitBtn = document.getElementById('deckSubmitBtn');
+
+  errEl.textContent = '';
+  if (!password) { errEl.textContent = 'Password required.'; return; }
+
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Generating…';
+  statusEl.textContent = '⏳ Building your pitch deck — this takes about 60 seconds…';
+  document.getElementById('deckModalForm').querySelector('input').disabled = true;
+
+  try {
+    const res = await fetch('/api/generate-deck', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        password,
+        protoId: _deckProto.id,
+        title:   _deckProto.title,
+        summary: _deckProto.summary,
+        url:     _deckProto.url,
+      }),
+    });
+    const data = await res.json();
+    if (!res.ok || data.error) {
+      errEl.textContent = data.error || 'Generation failed. Try again.';
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Generate Deck';
+      statusEl.textContent = '';
+      document.getElementById('deckModalForm').querySelector('input').disabled = false;
+      return;
+    }
+    statusEl.textContent = '';
+    document.getElementById('deckModalForm').style.display = 'none';
+    const resultEl = document.getElementById('deckResult');
+    document.getElementById('deckLink').href = data.gammaUrl;
+    resultEl.classList.add('show');
+  } catch (e) {
+    errEl.textContent = 'Network error — try again.';
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Generate Deck';
+    statusEl.textContent = '';
+    document.getElementById('deckModalForm').querySelector('input').disabled = false;
+  }
+}
+
 function lauraClass(verdict) {
   if (!verdict) return '';
   const v = verdict.toLowerCase();
@@ -1264,6 +1453,28 @@ function lauraClass(verdict) {
 
 </script>
 
+
+<!-- Pitch Deck modal -->
+<div class="deck-overlay" id="deckModal" onclick="if(event.target===this)closeDeckModal()">
+  <div class="deck-modal">
+    <h3>✦ Generate Pitch Deck</h3>
+    <p id="deckModalDesc">Enter the sprint password to generate a Gamma pitch deck for this prototype. The deck will be publicly shareable once created.</p>
+    <div id="deckModalForm">
+      <label for="deckPassword">Sprint Password</label>
+      <input type="password" id="deckPassword" placeholder="Enter password…" onkeydown="if(event.key==='Enter')submitDeck()">
+      <div class="deck-modal-actions">
+        <button class="btn-deck-submit" id="deckSubmitBtn" onclick="submitDeck()">Generate Deck</button>
+        <button class="btn-deck-cancel" onclick="closeDeckModal()">Cancel</button>
+      </div>
+    </div>
+    <div class="deck-modal-err" id="deckErr"></div>
+    <div class="deck-modal-status" id="deckStatus"></div>
+    <div class="deck-modal-result" id="deckResult">
+      <p>✓ Your pitch deck is ready!</p>
+      <a id="deckLink" href="#" target="_blank" rel="noopener" class="btn-deck-open">Open Pitch Deck →</a>
+    </div>
+  </div>
+</div>
 
 <!-- Results modal -->
 <div class="results-overlay" id="resultsModal" onclick="if(event.target===this)closeResults()">
