@@ -1264,9 +1264,23 @@
   /* EP tool: only lock the main column, leave sidebar interactive */
   .ep-tool-main-locked {
     position: relative;
+    overflow: hidden;
+  }
+  /* Disable all interaction inside the locked main column */
+  .ep-tool-main-locked > *:not(.tool-locked-overlay) {
+    pointer-events: none;
+    user-select: none;
+    -webkit-user-select: none;
   }
   .ep-tool-main-locked .tool-locked-overlay {
     border-radius: 0;
+    /* Stretch fully including past any padding */
+    inset: 0;
+    margin: -40px -40px -40px -40px; /* counteract .ep-tool-main padding */
+    padding: 18px 20px;
+    background: rgba(255,255,255,0.78);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
   }
 </style>
   <link rel="icon" type="image/svg+xml" href="assets/norton-checkmark.svg">
