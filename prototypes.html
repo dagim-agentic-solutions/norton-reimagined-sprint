@@ -305,6 +305,115 @@
   .btn-pitch-deck:hover:not(:disabled) { background: #e6d000; transform: translateY(-1px); }
   .btn-pitch-deck:disabled { opacity: .5; cursor: not-allowed; }
 
+  /* ── Clone in Claude button ────────────────────────────────────────────────── */
+  .btn-clone {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: none;
+    color: var(--ink-soft);
+    border: 1.5px solid var(--line);
+    border-radius: 999px;
+    padding: 7px 14px;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .03em;
+    cursor: pointer;
+    transition: all .15s;
+    margin-top: 10px;
+  }
+  .btn-clone:hover { border-color: var(--ink); color: var(--ink); background: var(--paper); }
+
+  /* ── Clone modal ────────────────────────────────────────────────────────────── */
+  .clone-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.6);
+    z-index: 2200;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .clone-overlay.open { display: flex; }
+  .clone-modal {
+    background: var(--ink);
+    color: #fff;
+    border-radius: 12px;
+    padding: 32px 36px 28px;
+    width: 100%;
+    max-width: 680px;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 24px 64px rgba(0,0,0,.4);
+    font-family: 'Inter Tight', sans-serif;
+  }
+  .clone-modal-header { margin-bottom: 16px; flex-shrink: 0; }
+  .clone-modal-header h3 { font-size: 18px; font-weight: 800; letter-spacing: -.02em; margin-bottom: 4px; }
+  .clone-modal-header p { font-size: 13px; color: rgba(255,255,255,.55); line-height: 1.4; }
+  .clone-prompt-box {
+    flex: 1;
+    overflow-y: auto;
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 8px;
+    padding: 16px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 11.5px;
+    line-height: 1.6;
+    color: #d8d8d6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    min-height: 200px;
+    margin-bottom: 16px;
+  }
+  .clone-modal-actions { display: flex; gap: 10px; flex-shrink: 0; flex-wrap: wrap; }
+  .btn-clone-copy {
+    flex: 1;
+    background: var(--yellow);
+    color: var(--ink);
+    border: none;
+    border-radius: 6px;
+    padding: 12px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: background .15s;
+    min-width: 140px;
+  }
+  .btn-clone-copy:hover { background: #e6d000; }
+  .btn-clone-copy.copied { background: #0a7a3d; color: #fff; }
+  .btn-clone-dl {
+    background: none;
+    border: 1.5px solid rgba(255,255,255,.2);
+    border-radius: 6px;
+    padding: 11px 18px;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(255,255,255,.7);
+    cursor: pointer;
+    transition: border-color .15s;
+    white-space: nowrap;
+  }
+  .btn-clone-dl:hover { border-color: rgba(255,255,255,.5); color: #fff; }
+  .btn-clone-close {
+    background: none;
+    border: 1.5px solid rgba(255,255,255,.12);
+    border-radius: 6px;
+    padding: 11px 18px;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(255,255,255,.4);
+    cursor: pointer;
+    transition: all .15s;
+  }
+  .btn-clone-close:hover { border-color: rgba(255,255,255,.3); color: rgba(255,255,255,.7); }
+
   /* ── Pitch Deck modal ────────────────────────────────────────────────────── */
   .deck-overlay {
     display: none;
@@ -821,6 +930,7 @@ async function loadPrototypes() {
     // Newest first
     list.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
 
+    _protoList = list; // cache for clone prompt
     const protoIds = list.map(p => p.id);
     container.innerHTML = '<div class="proto-grid">' + list.map(p => {
 
@@ -859,6 +969,7 @@ async function loadPrototypes() {
           <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
             <button class="proto-delete" onclick="deletePrototype('${escapeAttr(p.id)}', this)">✕ Delete</button>
             <button class="btn-pitch-deck" onclick="openDeckModal('${escapeAttr(p.id)}','${escapeAttr(p.title || '')}','${escapeAttr(p.summary || '')}','${escapeAttr(p.url || '')}')">✦ Generate Pitch Deck</button>
+            <button class="btn-clone" onclick="openCloneModal('${escapeAttr(p.id)}')">↗ Clone in Claude</button>
           </div>
 
           <div class="comments-section">
@@ -1253,6 +1364,7 @@ function saveSessionVotes(arr) {
 }
 
 let _globalVotes = {}; // { protoId: count }
+let _protoList   = []; // cached prototype list for clone prompt generation
 
 async function loadVotes(protoIds) {
   try {
@@ -1501,6 +1613,188 @@ async function submitDeck() {
   document.getElementById('deckModalForm').querySelector('input').disabled = false;
 }
 
+// ── Clone in Claude ────────────────────────────────────────────────────────────
+let _clonePromptText = '';
+let _cloneProtoTitle = '';
+
+const NORTON_DESIGN_SYSTEM = `
+## Norton Reimagined — Design System (apply exactly)
+
+### Typography
+- Font: **Inter Tight** only (import via Google Fonts)
+- Weights: 400, 500, 600, 700, 800
+- Hero headlines: weight 800, tracking −0.03em
+- Body: weight 400–500, line-height 1.45–1.5
+- Labels: weight 700, letter-spacing 0.10–0.14em, UPPERCASE
+
+### Color Palette (CSS variables)
+\`\`\`css
+--ink:       #242424;   /* primary text, dark surfaces */
+--yellow:    #FFE800;   /* accent, CTA, highlights */
+--paper:     #F8F8F7;   /* page background */
+--card:      #FFFFFF;   /* elevated surfaces */
+--line:      #E6E6E4;   /* borders, dividers */
+--ink-soft:  #5a5a5a;   /* secondary text */
+--ink-softer:#8a8a8a;   /* tertiary */
+\`\`\`
+
+### Border Radius
+- 999px → pill buttons, tags, badges
+- 8px   → cards, inputs, standard containers
+- 6px   → small elements, code blocks
+
+### Component Patterns
+- Nav: dark (#242424) background, sticky/fixed
+- Primary CTA: yellow pill, ink text, weight 700–800
+- Eyebrow labels: ink bg, yellow text, pill, 11px uppercase
+- Cards: white bg, 1px #E6E6E4 border, 8px radius
+- Padding: 26–28px card internal, 56px desktop page
+
+### QA Checklist (apply before outputting)
+- All screens fully scrollable — no overflow:hidden trapping content
+- No text clipped or touching container edges
+- All interactive elements have visible hover/tap states
+- Color contrast WCAG AA minimum
+- Realistic placeholder data — no Lorem ipsum
+`;
+
+const LAURA_PERSONA_BRIEF = `
+## Laura, the Outsourcer — Target Persona
+
+Laura is the guardian of her household's digital life — but she doesn't want the job. She wants a trusted expert to quietly handle it in the background, the way insurance or utilities do.
+
+**Who she is:** 35–55, working parent, 5–10 devices across family, burnt out being the family IT person.
+
+**Her 4 Jobs To Be Done:**
+1. Protect the whole household with as little admin as possible
+2. Block threats before anyone clicks
+3. Keep her kids safe online with simple controls
+4. Tell her what to do in plain language when something goes wrong
+
+**Designs FOR her:** Outcomes not mechanics. "You're protected" status. Calm, assured tone. Single clear CTAs.
+
+**She rejects:** Dashboards of toggles, jargon, gamification, anything that adds to her mental load.
+`;
+
+function buildClonePrompt(proto) {
+  const lauraContext = proto.lauraScore != null ? `
+## Laura's Verdict on This Prototype
+- **Score:** ${proto.lauraScore}/100 — ${proto.lauraVerdict || 'N/A'}
+- **Recommendation:** ${proto.lauraRecommendation || 'N/A'}
+` : '';
+
+  const urlContext = proto.url ? `
+## Live Prototype URL
+${proto.url}
+
+**Important:** Open this URL and read the full HTML source carefully before reproducing it. Your reproduction must match the original to the smallest detail — every section, copy line, interaction, color, layout, and component.
+` : '';
+
+  return `# Clone + Extend: "${proto.title}"
+> Sprint: Norton Reimagined Design Sprint — Tiger Team
+> Original author: ${proto.author || 'Anonymous'}
+> Task: Reproduce this prototype faithfully, then extend it based on my instructions.
+
+---
+
+## Your Task
+
+You are a Senior Product Designer and Frontend Developer specialising in consumer security and privacy products. I want to clone an existing prototype and extend it with new ideas.
+
+**Step 1:** Reproduce the prototype at the URL below with complete fidelity — every section, every line of copy, every interaction, every visual detail. Output a single self-contained HTML file (inline CSS + JS, no external dependencies except Google Fonts).
+
+**Step 2:** Once you've reproduced it, stop and ask me: *"I've reproduced '${proto.title}' faithfully. What would you like to add, change, or extend?"*
+
+**Step 3:** Implement my requested changes on top of the reproduction.
+
+---
+
+## Prototype Details
+
+**Title:** ${proto.title}
+**Summary:** ${proto.summary || '(no summary provided)'}
+${urlContext}${lauraContext}
+
+---
+
+${LAURA_PERSONA_BRIEF}
+
+---
+
+${NORTON_DESIGN_SYSTEM}
+
+---
+
+## Technical Requirements
+
+- Single self-contained HTML file
+- Responsive (mobile-first, breakpoints at 640px and 1024px)  
+- No external JavaScript dependencies
+- Inline CSS and JS only
+- Use Inter Tight via Google Fonts link
+- Fully accessible (semantic HTML, alt text, focus states)
+- Apply the Norton Reimagined design system exactly as specified above
+
+---
+
+## What Makes a Good Clone
+
+A faithful clone means:
+- Every section reproduced in order
+- All copy and microcopy matches exactly
+- Color palette, typography, spacing all match the design system
+- Interactive elements (tabs, accordions, modals, CTAs) all work
+- No placeholder content — same realistic data as the original
+- The user should not be able to tell it's a reproduction
+
+---
+
+Begin by opening the URL above and reproducing it now. Do not ask clarifying questions first — just build it, then ask what to extend.`;
+}
+
+function openCloneModal(protoId) {
+  const proto = _protoList.find(p => p.id === protoId);
+  if (!proto) { alert('Prototype data not loaded yet — try again in a moment.'); return; }
+
+  _cloneProtoTitle = proto.title || 'prototype';
+  _clonePromptText = buildClonePrompt(proto);
+
+  const box = document.getElementById('clonePromptBox');
+  box.textContent = _clonePromptText;
+
+  const btn = document.getElementById('cloneCopyBtn');
+  btn.textContent = 'Copy Prompt';
+  btn.className = 'btn-clone-copy';
+
+  document.getElementById('cloneModal').classList.add('open');
+}
+
+function closeCloneModal() {
+  document.getElementById('cloneModal').classList.remove('open');
+}
+
+function copyClonePrompt() {
+  navigator.clipboard.writeText(_clonePromptText).then(() => {
+    const btn = document.getElementById('cloneCopyBtn');
+    btn.textContent = '✓ Copied!';
+    btn.className = 'btn-clone-copy copied';
+    setTimeout(() => {
+      btn.textContent = 'Copy Prompt';
+      btn.className = 'btn-clone-copy';
+    }, 2500);
+  });
+}
+
+function downloadClonePrompt() {
+  const slug = (_cloneProtoTitle || 'prototype').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+  const blob = new Blob([_clonePromptText], { type: 'text/markdown;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `clone-${slug}.md`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
 function lauraClass(verdict) {
   if (!verdict) return '';
   const v = verdict.toLowerCase();
@@ -1533,6 +1827,22 @@ function lauraClass(verdict) {
     <div class="deck-modal-result" id="deckResult">
       <p>✓ Your pitch deck is ready!</p>
       <button id="deckLink" onclick="if(window._deckGammaUrl){window.open(window._deckGammaUrl,'_blank')}" class="btn-deck-open" style="cursor:pointer;border:none;font-family:inherit;">Open Pitch Deck →</button>
+    </div>
+  </div>
+</div>
+
+<!-- Clone in Claude modal -->
+<div class="clone-overlay" id="cloneModal" onclick="if(event.target===this)closeCloneModal()">
+  <div class="clone-modal">
+    <div class="clone-modal-header">
+      <h3>↗ Clone in Claude</h3>
+      <p>Copy this prompt and paste it into Claude Desktop or Claude.ai. Claude will reproduce the prototype exactly, then wait for your instructions on what to extend or change.</p>
+    </div>
+    <div class="clone-prompt-box" id="clonePromptBox"></div>
+    <div class="clone-modal-actions">
+      <button class="btn-clone-copy" id="cloneCopyBtn" onclick="copyClonePrompt()">Copy Prompt</button>
+      <button class="btn-clone-dl" onclick="downloadClonePrompt()">↓ Download .md</button>
+      <button class="btn-clone-close" onclick="closeCloneModal()">Close</button>
     </div>
   </div>
 </div>
