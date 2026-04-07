@@ -825,8 +825,15 @@
       <li><a href="where-is-norton.html">Where is Norton</a></li>
       <li><a href="prototypes.html" class="active">Prototypes</a></li>
       <li><a href="resources.html">Resources</a></li>
-      <li><a href="concept-builder.html">Concept Builder <span style="background:var(--yellow);color:var(--ink);font-size:9px;font-weight:800;padding:1px 6px;border-radius:999px;vertical-align:middle;letter-spacing:.04em;">β</span></a></li>
-      <li><a href="competitive-analysis.html">Competitive <span style="background:var(--yellow);color:var(--ink);font-size:9px;font-weight:800;padding:1px 6px;border-radius:999px;vertical-align:middle;letter-spacing:.04em;">β</span></a></li>
+      <li class="nav-dropdown">
+        <button class="nav-dropdown-btn" id="sprintToolsBtn" aria-expanded="false" aria-haspopup="true">
+          Sprint Tools <span class="nav-beta-pill">✦</span>
+        </button>
+        <ul class="nav-dropdown-menu" id="sprintToolsMenu" role="menu">
+          <li><a href="concept-builder.html" role="menuitem">Concept Builder</a></li>
+          <li><a href="competitive-analysis.html" role="menuitem">Competitive Analysis</a></li>
+        </ul>
+      </li>
     </ul>
   </div>
 </nav>
