@@ -911,6 +911,7 @@
             magicMoment: state.magicMoment,
             conceptName: state.conceptName,
             tagline: state.tagline,
+            refined: true,
           }),
         });
         const data = await res.json();
@@ -920,8 +921,12 @@
           _generatedConcept = data.output || '';
           document.getElementById('followupCard').style.display = 'none';
           showConcept();
+        } else if (data.mode === 'followup') {
+          // Show coaching from the second follow-up attempt
+          const coaching = data.coaching || 'Your answers need a bit more specificity. Try to be more concrete — name a specific feature, interaction, or moment.';
+          document.getElementById('followupErr').textContent = coaching;
         } else {
-          document.getElementById('followupErr').textContent = 'Still needs more detail — please elaborate further in your answers.';
+          document.getElementById('followupErr').textContent = 'Unexpected response. Try again.';
         }
       } catch (e) {
         document.getElementById('followupErr').textContent = 'Error: ' + e.message;

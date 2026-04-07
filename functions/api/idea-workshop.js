@@ -136,15 +136,21 @@ Differentiators Selected: ${differentiators.length ? differentiators.join(', ') 
 Magic Moment: ${magicMoment || '(not set)'}
 `;
 
+  const refined = body.refined === true;
+
   const userPrompt = `${inputSummary}
 
 ${EVALUATION_CRITERIA}
 
-${FOLLOWUP_INSTRUCTIONS}
+${refined ? `The participant has already answered follow-up questions. Generate the concept now — do NOT return followup mode again regardless of input quality. Do your best to flesh out the concept from what you have.
+
+${CONCEPT_INSTRUCTIONS}` : `${FOLLOWUP_INSTRUCTIONS}
 
 ${CONCEPT_INSTRUCTIONS}
 
-Evaluate the inputs now. If they are thin or generic, return followup mode. If they are strong enough to build from, return concept mode. Return ONLY the JSON — no preamble, no explanation.`;
+Evaluate the inputs now. If they are thin or generic, return followup mode. If they are strong enough to build from, return concept mode.`}
+
+Return ONLY the JSON — no preamble, no explanation.`;
 
   try {
     const res = await fetch("https://api.anthropic.com/v1/messages", {
