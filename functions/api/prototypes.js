@@ -180,12 +180,36 @@ export async function onRequestPost({ request, env }) {
           return json({ error: "ZIP file appears to be empty or unreadable." }, 400);
         }
         vercelFiles = filesToVercelPayload(rawFiles);
+        // Inject Norton favicon into any index.html inside the zip
+        const iconTags = '<link rel="icon" type="image/svg+xml" href="https://norton-reimagined-sprint.pages.dev/assets/norton-checkmark.svg"><link rel="apple-touch-icon" sizes="180x180" href="https://norton-reimagined-sprint.pages.dev/assets/icon-180.png">';
+        vercelFiles = vercelFiles.map(f => {
+          if ((f.file === "index.html" || f.file === "public/index.html") && f.encoding !== "base64") {
+            let d = f.data;
+            if (d.includes("</head>")) {
+              d = d.replace("</head>", iconTags + "</head>");
+            } else if (d.includes("<head>")) {
+              d = d.replace("<head>", "<head>" + iconTags);
+            }
+            return { ...f, data: d };
+          }
+          return f;
+        });
       } else {
         // Single HTML or JS file — always serve at root as index.html
         const ext = fileName.trim().split(".").pop().toLowerCase();
+        let deployContent = fileContent;
+        // Inject Norton favicon into HTML files
+        if (ext === "html" && encoding !== "base64") {
+          const iconTags = '<link rel="icon" type="image/svg+xml" href="https://norton-reimagined-sprint.pages.dev/assets/norton-checkmark.svg"><link rel="apple-touch-icon" sizes="180x180" href="https://norton-reimagined-sprint.pages.dev/assets/icon-180.png">';
+          if (deployContent.includes("</head>")) {
+            deployContent = deployContent.replace("</head>", iconTags + "</head>");
+          } else if (deployContent.includes("<head>")) {
+            deployContent = deployContent.replace("<head>", "<head>" + iconTags);
+          }
+        }
         vercelFiles = [{
           file: ext === "js" ? "index.js" : "index.html",
-          data: fileContent,
+          data: deployContent,
           encoding: encoding === "base64" ? "base64" : "utf-8",
         }];
       }
