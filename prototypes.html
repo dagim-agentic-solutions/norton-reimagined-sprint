@@ -586,10 +586,6 @@
 <nav class="nav">
   <div class="nav-inner">
     <a href="index.html" class="nav-brand">
-    <button class="nav-search-btn" type="button" aria-label="Open search">
-      <span class="nav-search-icon" aria-hidden="true">🔍</span>
-      <span class="sr-only">Open search</span>
-    </button>
       <span class="dot"></span>
       Norton Reimagined <span class="sub">· Design Sprint</span>
     </a>
@@ -752,8 +748,7 @@ async function loadPrototypes() {
               💬 Notes <span class="ct-count" id="cc-${escapeAttr(p.id)}">...</span>
             </button>
             <div class="comments-body" id="cb-${escapeAttr(p.id)}">
-              <ul class="comment-list" id="cl-${escapeAttr(p.id)}">      <li><a href="competitive-analysis.html">Competitive <span style="background:var(--yellow);color:var(--ink);font-size:9px;font-weight:800;padding:1px 6px;border-radius:999px;vertical-align:middle;letter-spacing:.04em;">β</span></a></li>
-    </ul>
+              <ul class="comment-list" id="cl-${escapeAttr(p.id)}"></ul>
               <div class="comment-form">
                 <input type="text" placeholder="Your name" id="cn-${escapeAttr(p.id)}" maxlength="80">
                 <div class="comment-form-row">
