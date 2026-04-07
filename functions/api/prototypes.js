@@ -20,7 +20,7 @@
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 const MAX_FILE_BYTES   = 5 * 1024 * 1024; // 5 MB raw (before base64)
-const ALLOWED_EXTS     = ["html", "js", "zip"];
+const ALLOWED_EXTS     = ["html", "js", "ts", "tsx", "jsx", "zip"];
 const TEXT_EXTS        = new Set(["html","htm","css","js","ts","jsx","tsx","json","txt","md","svg","xml","yaml","yml","toml"]);
 
 const CORS = {
