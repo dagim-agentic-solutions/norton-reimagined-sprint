@@ -52,8 +52,7 @@ body { padding-top: 63px; }
   padding: 18px 56px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 24px;
+  gap: 16px;
 }
 .nav-brand {
   display: flex;
@@ -81,6 +80,7 @@ body { padding-top: 63px; }
   gap: 6px;
   list-style: none;
   flex-wrap: wrap;
+  margin-left: auto;
 }
 .nav-links a {
   display: inline-block;

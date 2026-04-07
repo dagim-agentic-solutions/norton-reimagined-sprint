@@ -105,28 +105,8 @@
     resultsWrap.innerHTML = '';
   }
 
-  function initNavButton() {
-    const navList = document.getElementById('nav-links');
-    if (navList) {
-      navList.querySelectorAll('.nav-search-btn').forEach(btn => btn.remove());
-    }
-    const navInner = document.querySelector('.nav-inner');
-    const toggle = document.getElementById('nav-toggle');
-    if (!navInner || navInner.querySelector('.nav-search-btn')) return;
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'nav-search-btn';
-    btn.innerHTML = '<span class="nav-search-icon" aria-hidden="true">🔍</span><span class="sr-only">Open search</span>';
-    btn.addEventListener('click', openSearch);
-    if (toggle) {
-      navInner.insertBefore(btn, toggle);
-    } else {
-      navInner.appendChild(btn);
-    }
-  }
-
   document.addEventListener('DOMContentLoaded', () => {
-    initNavButton();
+    document.querySelectorAll('.nav-search-btn').forEach(btn => btn.addEventListener('click', openSearch));
     ensureElements();
     renderResults('');
   });
