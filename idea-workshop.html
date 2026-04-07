@@ -468,13 +468,17 @@
             <div class="step-label">Step 2 — Persona Focus</div>
             <h2 class="step-title">Which part of Laura's life does this touch?</h2>
           </div>
-          <div class="chip-grid" data-chip-group="persona" data-selection="single">
+          <div class="chip-grid" data-chip-group="persona" data-selection="single" id="personaChips">
             <button type="button" class="chip" data-value="Family protection">👨‍👩‍👧 Family protection</button>
             <button type="button" class="chip" data-value="Financial & identity safety">💳 Financial &amp; identity safety</button>
             <button type="button" class="chip" data-value="Device management & security">📱 Device management &amp; security</button>
             <button type="button" class="chip" data-value="Scam & threat detection">🛡️ Scam &amp; threat detection</button>
             <button type="button" class="chip" data-value="Privacy & data control">🔒 Privacy &amp; data control</button>
             <button type="button" class="chip" data-value="Home network & smart devices">🏠 Home network &amp; smart devices</button>
+          </div>
+          <div class="custom-add-row" style="margin-top:12px;display:flex;gap:8px;align-items:center;">
+            <input type="text" id="personaCustomInput" maxlength="60" placeholder="Add your own focus area…" style="flex:1;padding:9px 12px;border:1.5px solid var(--line);border-radius:6px;font-family:inherit;font-size:13px;background:var(--paper);outline:none;transition:border-color .15s;" onfocus="this.style.borderColor='var(--ink)'" onblur="this.style.borderColor='var(--line)'" onkeydown="if(event.key==='Enter'){event.preventDefault();addCustomPersona();}">
+            <button type="button" onclick="addCustomPersona()" style="background:var(--ink);color:#fff;border:none;border-radius:6px;padding:9px 16px;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;">+ Add</button>
           </div>
         </div>
 
@@ -504,6 +508,10 @@
             <button type="button" class="chip" data-value="Daily Digest">Daily Digest</button>
             <button type="button" class="chip" data-value="NeoClaw (agentic AI)">NeoClaw (agentic AI)</button>
             <button type="button" class="chip" data-value="Norton Genie">Norton Genie</button>
+          </div>
+          <div class="custom-add-row" style="margin-top:12px;display:flex;gap:8px;align-items:center;">
+            <input type="text" id="capabilityCustomInput" maxlength="60" placeholder="Add a custom capability…" style="flex:1;padding:9px 12px;border:1.5px solid var(--line);border-radius:6px;font-family:inherit;font-size:13px;background:var(--paper);outline:none;transition:border-color .15s;" onfocus="this.style.borderColor='var(--ink)'" onblur="this.style.borderColor='var(--line)'" onkeydown="if(event.key==='Enter'){event.preventDefault();addCustomCapability();}">
+            <button type="button" onclick="addCustomCapability()" style="background:var(--ink);color:#fff;border:none;border-radius:6px;padding:9px 16px;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;">+ Add</button>
           </div>
         </div>
 
@@ -573,37 +581,31 @@
       <div class="form-feedback" id="formFeedback"></div>
     </section>
 
-    <section class="output-card" id="outputCard">
-      <div>
-        <h3 id="outputConceptName"></h3>
-        <p id="outputTagline" style="margin: 4px 0 0; font-size: 18px; color: rgba(255,255,255,0.85);"></p>
+    <!-- Follow-up questions panel -->
+    <section id="followupCard" style="display:none;background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:36px 40px;margin-top:32px;">
+      <span class="eyebrow" style="margin-bottom:14px;display:inline-block;">One more round</span>
+      <h3 style="font-size:22px;font-weight:800;letter-spacing:-.02em;margin-bottom:8px;">Let's sharpen this idea.</h3>
+      <p id="followupCoaching" style="font-size:14px;color:var(--ink-soft);line-height:1.55;margin-bottom:24px;"></p>
+      <div id="followupQAs" style="display:flex;flex-direction:column;gap:20px;"></div>
+      <button type="button" id="followupSubmitBtn" onclick="submitFollowup()" style="margin-top:24px;background:var(--ink);color:#fff;border:none;border-radius:999px;padding:14px 32px;font-family:inherit;font-size:15px;font-weight:800;cursor:pointer;transition:background .15s;display:inline-flex;align-items:center;gap:8px;">Refine My Concept →</button>
+      <div id="followupErr" style="font-size:12px;color:#c01a1a;margin-top:8px;min-height:16px;"></div>
+    </section>
+
+    <!-- Final concept output -->
+    <section class="output-card" id="outputCard" style="display:none;">
+      <div style="margin-bottom:20px;">
+        <div class="eyebrow" style="background:var(--yellow);color:var(--ink);display:inline-flex;padding:4px 12px;border-radius:999px;font-size:11px;font-weight:700;letter-spacing:.06em;margin-bottom:12px;border:none;">Your Concept</div>
+        <h3 id="outputConceptName" style="font-size:26px;font-weight:800;letter-spacing:-.025em;margin-bottom:4px;"></h3>
+        <p id="outputTagline" style="font-size:17px;color:rgba(255,255,255,0.7);font-style:italic;margin:0;"></p>
       </div>
-      <div class="output-section">
-        <h4>THE PROBLEM</h4>
-        <p id="outputProblem"></p>
-      </div>
-      <div class="output-section">
-        <h4>THE CONCEPT</h4>
-        <p id="outputConcept"></p>
-      </div>
-      <div class="output-section">
-        <h4>WHY NORTON</h4>
-        <p id="outputWhy"></p>
-      </div>
-      <div class="output-section">
-        <h4>THE MAGIC MOMENT</h4>
-        <p id="outputMagic"></p>
-      </div>
-      <div class="output-section">
-        <h4>PERSONA FOCUS</h4>
-        <p id="outputPersona"></p>
-      </div>
-      <div class="output-ctas">
+      <div id="outputProse" style="font-size:15px;line-height:1.75;color:rgba(255,255,255,.88);white-space:pre-wrap;"></div>
+      <div class="output-ctas" style="margin-top:28px;">
         <button type="button" id="copyBtn">Copy to Clipboard</button>
-        <a href="laura.html#concept-validation" target="_blank">→ Pressure-Test with Laura</a>
-        <a href="laura.html#elevator-pitch" target="_blank">→ Pitch to Laura</a>
+        <a href="laura.html" target="_blank">→ Pressure-Test with Laura</a>
+        <a href="laura.html" target="_blank">→ Pitch to Laura</a>
+        <button type="button" onclick="resetWorkshop()" style="background:none;border:1.5px solid rgba(255,255,255,.2);border-radius:999px;padding:12px 20px;font-family:inherit;font-size:13px;font-weight:600;color:rgba(255,255,255,.5);cursor:pointer;transition:all .15s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,.5)'">↺ Start over</button>
       </div>
-      <div class="output-note">Tip: paste your concept directly into the Concept Validation tool or Elevator Pitch tool on the Laura page.</div>
+      <div class="output-note">Tip: copy your concept and paste it into the Concept Validation or Elevator Pitch tool on the Laura page.</div>
     </section>
   </main>
 
@@ -617,8 +619,6 @@
     const nextBtn = document.getElementById('nextBtn');
     const formFeedback = document.getElementById('formFeedback');
     const outputCard = document.getElementById('outputCard');
-    const copyBtn = document.getElementById('copyBtn');
-
     const totalSteps = steps.length;
     let currentStep = 1;
 
@@ -769,7 +769,52 @@
       return null;
     }
 
-    function handleGenerate() {
+    // ── Custom persona/capability add ────────────────────────────────────────
+    function addCustomPersona() {
+      const input = document.getElementById('personaCustomInput');
+      const val = input.value.trim();
+      if (!val) return;
+      const grid = document.getElementById('personaChips');
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'chip selected';
+      btn.dataset.value = val;
+      btn.textContent = val;
+      // Deselect others first
+      grid.querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
+      btn.classList.add('selected');
+      grid.appendChild(btn);
+      state.persona = val;
+      input.value = '';
+    }
+
+    function addCustomCapability() {
+      const input = document.getElementById('capabilityCustomInput');
+      const val = input.value.trim();
+      if (!val) return;
+      const grid = document.querySelector('[data-chip-group="capabilities"]');
+      // Check max 3 already selected
+      const selected = grid.querySelectorAll('.chip.selected');
+      if (selected.length >= 3) {
+        input.placeholder = 'Max 3 selected — deselect one first';
+        setTimeout(() => { input.placeholder = 'Add a custom capability…'; }, 2500);
+        return;
+      }
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'chip selected';
+      btn.dataset.value = val;
+      btn.textContent = val;
+      grid.appendChild(btn);
+      state.capabilities = [...state.capabilities, val];
+      input.value = '';
+    }
+
+    // ── AI-powered generate ───────────────────────────────────────────────────
+    let _generatedConcept = '';
+    let _followupQuestions = [];
+
+    async function handleGenerate() {
       const error = validateState();
       if (error) {
         formFeedback.textContent = error;
@@ -778,32 +823,143 @@
       }
       formFeedback.style.display = 'none';
 
-      const diffParts = [];
-      if (state.capabilities.length) diffParts.push(state.capabilities.join(', '));
-      if (state.differentiators.length) diffParts.push(state.differentiators.join(', '));
-      const whyText = `${state.capabilities.join(', ') || '—'}${state.differentiators.length ? ' + ' + state.differentiators.join(', ') : ''}`;
+      const btn = document.getElementById('nextBtn');
+      btn.disabled = true;
+      btn.textContent = '✦ Thinking…';
 
-      document.getElementById('outputConceptName').textContent = state.conceptName;
-      document.getElementById('outputTagline').textContent = state.tagline;
-      document.getElementById('outputProblem').textContent = state.problem;
-      document.getElementById('outputConcept').textContent = state.coreIdea;
-      document.getElementById('outputWhy').textContent = whyText;
-      document.getElementById('outputMagic').textContent = state.magicMoment;
-      document.getElementById('outputPersona').textContent = state.persona;
+      try {
+        const res = await fetch('/api/idea-workshop', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            problem: state.problem,
+            persona: state.persona,
+            capabilities: state.capabilities,
+            coreIdea: state.coreIdea,
+            differentiation: state.differentiation,
+            differentiators: state.differentiators,
+            magicMoment: state.magicMoment,
+            conceptName: state.conceptName,
+            tagline: state.tagline,
+          }),
+        });
+        const data = await res.json();
+        if (data.error) throw new Error(data.error);
 
-      outputCard.style.display = 'flex';
-      outputCard.scrollIntoView({ behavior: 'smooth' });
+        if (data.mode === 'followup') {
+          _followupQuestions = data.questions || [];
+          showFollowup(data.coaching || '', _followupQuestions);
+        } else if (data.mode === 'concept') {
+          _generatedConcept = data.output || '';
+          showConcept();
+        } else {
+          throw new Error('Unexpected response from API');
+        }
+      } catch (e) {
+        formFeedback.textContent = 'Something went wrong: ' + e.message + '. Try again.';
+        formFeedback.style.display = 'block';
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '✦ Generate My Concept';
+      }
     }
 
-    copyBtn.addEventListener('click', async () => {
-      const text = `${state.conceptName}\n${state.tagline}\n\nTHE PROBLEM\n${state.problem}\n\nTHE CONCEPT\n${state.coreIdea}\n\nWHY NORTON\n${state.capabilities.join(', ')}${state.differentiators.length ? ' + ' + state.differentiators.join(', ') : ''}\n\nTHE MAGIC MOMENT\n${state.magicMoment}\n\nPERSONA FOCUS: ${state.persona}`;
+    function showFollowup(coaching, questions) {
+      document.getElementById('followupCoaching').textContent = coaching;
+      const qasEl = document.getElementById('followupQAs');
+      qasEl.innerHTML = '';
+      questions.forEach((q, i) => {
+        const wrap = document.createElement('div');
+        wrap.innerHTML = '<label style="display:block;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-softer);margin-bottom:6px;">Q' + (i+1) + '</label>' +
+          '<p style="font-size:14px;font-weight:600;color:var(--ink);margin-bottom:8px;line-height:1.4;">' + escHtml(q) + '</p>' +
+          '<textarea id="fq' + i + '" rows="3" maxlength="300" placeholder="Your answer…" style="width:100%;padding:10px 12px;border:1.5px solid var(--line);border-radius:6px;font-family:inherit;font-size:14px;background:var(--paper);outline:none;resize:vertical;box-sizing:border-box;transition:border-color .15s;" onfocus="this.style.borderColor=\'var(--ink)\'" onblur="this.style.borderColor=\'var(--line)\'"></textarea>';
+        qasEl.appendChild(wrap);
+      });
+      document.getElementById('followupCard').style.display = 'block';
+      document.getElementById('followupCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    async function submitFollowup() {
+      const errEl = document.getElementById('followupErr');
+      errEl.textContent = '';
+      const answers = _followupQuestions.map((q, i) => {
+        const el = document.getElementById('fq' + i);
+        return el ? el.value.trim() : '';
+      });
+      if (answers.some(a => !a)) {
+        errEl.textContent = 'Please answer all questions before continuing.';
+        return;
+      }
+      const btn = document.getElementById('followupSubmitBtn');
+      btn.disabled = true; btn.textContent = '✦ Refining…';
+
+      // Merge answers back into state for richer context
+      const enrichedCoreIdea = state.coreIdea + '\n\nAdditional context:\n' +
+        _followupQuestions.map((q, i) => '- ' + q + '\n  → ' + answers[i]).join('\n');
+
       try {
-        await navigator.clipboard.writeText(text);
-        copyBtn.textContent = 'Copied!';
-        setTimeout(() => (copyBtn.textContent = 'Copy to Clipboard'), 2000);
+        const res = await fetch('/api/idea-workshop', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            problem: state.problem,
+            persona: state.persona,
+            capabilities: state.capabilities,
+            coreIdea: enrichedCoreIdea,
+            differentiation: state.differentiation,
+            differentiators: state.differentiators,
+            magicMoment: state.magicMoment,
+            conceptName: state.conceptName,
+            tagline: state.tagline,
+          }),
+        });
+        const data = await res.json();
+        if (data.error) throw new Error(data.error);
+
+        if (data.mode === 'concept') {
+          _generatedConcept = data.output || '';
+          document.getElementById('followupCard').style.display = 'none';
+          showConcept();
+        } else {
+          document.getElementById('followupErr').textContent = 'Still needs more detail — please elaborate further in your answers.';
+        }
+      } catch (e) {
+        document.getElementById('followupErr').textContent = 'Error: ' + e.message;
+      } finally {
+        btn.disabled = false; btn.textContent = 'Refine My Concept →';
+      }
+    }
+
+    function showConcept() {
+      document.getElementById('outputConceptName').textContent = state.conceptName;
+      document.getElementById('outputTagline').textContent = state.tagline;
+      document.getElementById('outputProse').textContent = _generatedConcept;
+      const card = document.getElementById('outputCard');
+      card.style.display = 'flex';
+      card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function resetWorkshop() {
+      document.getElementById('outputCard').style.display = 'none';
+      document.getElementById('followupCard').style.display = 'none';
+      updateStep(1);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function escHtml(s) {
+      return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    document.getElementById('copyBtn').addEventListener('click', async function() {
+      const fullText = state.conceptName + '\n' + state.tagline + '\n\n' + _generatedConcept;
+      const btn = this;
+      try {
+        await navigator.clipboard.writeText(fullText);
+        btn.textContent = '✓ Copied!';
+        setTimeout(() => (btn.textContent = 'Copy to Clipboard'), 2500);
       } catch (err) {
-        copyBtn.textContent = 'Copy failed';
-        setTimeout(() => (copyBtn.textContent = 'Copy to Clipboard'), 2000);
+        btn.textContent = 'Copy failed';
+        setTimeout(() => (btn.textContent = 'Copy to Clipboard'), 2000);
       }
     });
 
