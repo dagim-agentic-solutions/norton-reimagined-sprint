@@ -314,37 +314,37 @@
   <p style="margin-top:6px;font-size:12px;color:var(--ink-softer);">Tap any competitor to see what, if anything, it actually solves for Laura.</p>
 
   <div class="laura-fit-grid">
-    <div class="laura-fit-card">
+    <div class="laura-fit-card" role="button" tabindex="0">
       <div class="laura-fit-score score-red">22</div>
       <div class="laura-fit-name">Microsoft Defender</div>
       <div class="laura-fit-verdict">OS-native but invisible to her</div>
     </div>
-    <div class="laura-fit-card">
+    <div class="laura-fit-card" role="button" tabindex="0">
       <div class="laura-fit-score score-red">18</div>
       <div class="laura-fit-name">Google / Apple</div>
       <div class="laura-fit-verdict">Siloed to one ecosystem</div>
     </div>
-    <div class="laura-fit-card">
+    <div class="laura-fit-card" role="button" tabindex="0">
       <div class="laura-fit-score score-amber">55</div>
       <div class="laura-fit-name">McAfee+</div>
       <div class="laura-fit-verdict">Household framing but clunky UX</div>
     </div>
-    <div class="laura-fit-card">
+    <div class="laura-fit-card" role="button" tabindex="0">
       <div class="laura-fit-score score-amber">48</div>
       <div class="laura-fit-name">NordVPN</div>
       <div class="laura-fit-verdict">Great product, wrong JTBD for her</div>
     </div>
-    <div class="laura-fit-card">
+    <div class="laura-fit-card" role="button" tabindex="0">
       <div class="laura-fit-score score-red">31</div>
       <div class="laura-fit-name">Bitdefender</div>
       <div class="laura-fit-verdict">Expert-first, Laura-last</div>
     </div>
-    <div class="laura-fit-card">
+    <div class="laura-fit-card" role="button" tabindex="0">
       <div class="laura-fit-score score-amber">58</div>
       <div class="laura-fit-name">Aura</div>
       <div class="laura-fit-verdict">Identity-first, all-in-one attempt</div>
     </div>
-    <div class="laura-fit-card">
+    <div class="laura-fit-card" role="button" tabindex="0">
       <div class="laura-fit-score score-red">29</div>
       <div class="laura-fit-name">Malwarebytes</div>
       <div class="laura-fit-verdict">Reactive, technical, no household lens</div>
@@ -726,12 +726,19 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
   document.querySelectorAll('.laura-fit-card').forEach(function(card) {
-    card.addEventListener('click', function() {
+    function toggle() {
       if (card.classList.contains('open')) {
         card.classList.remove('open');
       } else {
         document.querySelectorAll('.laura-fit-card.open').forEach(function(openCard) { openCard.classList.remove('open'); });
         card.classList.add('open');
+      }
+    }
+    card.addEventListener('click', toggle);
+    card.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        toggle();
       }
     });
   });
