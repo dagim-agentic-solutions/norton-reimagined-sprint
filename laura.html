@@ -1255,7 +1255,7 @@
         <ul class="nav-dropdown-menu" id="sprintToolsMenu" role="menu">
           <li><a href="concept-builder.html" role="menuitem">Prototype Builder</a></li>
           <li><a href="competitive-analysis.html" role="menuitem">Competitive Analysis</a></li>
-          <li><a href="idea-workshop.html" role="menuitem">Idea Workshop</a></li>
+          <li><a href="idea-workshop.html" role="menuitem">Ideation Wizard</a></li>
         </ul>
       </li>
     </ul>
@@ -1843,7 +1843,7 @@ document.getElementById('concept').addEventListener('keydown', (e) => {
   }
 });
 
-// ── Auto-populate from Idea Workshop ─────────────────────────────────────────
+// ── Auto-populate from Ideation Wizard ─────────────────────────────────────────
 (function() {
   const payload = sessionStorage.getItem('idea_workshop_concept');
   if (!payload) return;
