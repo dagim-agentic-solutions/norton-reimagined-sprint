@@ -564,6 +564,37 @@
   .cap-grid { grid-template-columns: 1fr; }
   .build-toggle button { padding: 9px 16px; font-size: 13px; }
 }
+/* ── Norton logo toggle switch ──────────────────────────────────────────── */
+.logo-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.switch-track {
+  width: 44px;
+  height: 24px;
+  background: var(--line);
+  border-radius: 999px;
+  position: relative;
+  transition: background .2s;
+  flex-shrink: 0;
+}
+.switch-track.on { background: var(--ink); }
+.switch-knob {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  background: #fff;
+  border-radius: 50%;
+  transition: left .2s;
+  box-shadow: 0 1px 3px rgba(0,0,0,.25);
+}
+.switch-track.on .switch-knob { left: 23px; }
 </style>
 </head>
 <body>
@@ -698,6 +729,7 @@
           <li>Safe area: 44pt top, 34pt bottom</li>
           <li>Touch targets: minimum 44×44pt</li>
           <li>Status first: "You're protected" before any action</li>
+          <li><strong>Light/dark mode toggle required</strong> — all text, icons, and the logo must remain fully readable in both modes. Toggle must be accessible from the main screen.</li>
         </ul>
       </div>
     </div>
@@ -868,6 +900,19 @@
     <textarea class="cb-textarea" id="firstValueMoment" rows="4" placeholder="e.g. Laura opens the app after a 60-second setup and immediately sees 'All 8 of your family's devices are clean and protected.' No scanning needed — it already checked. That's the moment she knows Norton is quietly working for her."></textarea>
   </div>
 
+  <!-- Norton Logo Toggle -->
+  <div class="cb-section" id="logoSection">
+    <div class="sec-label">
+      <span class="sec-num">✦</span>
+      <h3>Use the Norton logo?</h3>
+    </div>
+    <p class="sec-hint">Should the generated prototype display the real Norton logo? Toggle <strong>on</strong> to use official light/dark mode logo assets. Toggle <strong>off</strong> to have Claude generate a simple, neutral wordmark — useful when you want unbiased concept feedback without brand recognition influencing reactions.</p>
+    <label class="logo-switch" onclick="toggleLogoUse()">
+      <div class="switch-track on" id="logoSwitchTrack"><div class="switch-knob"></div></div>
+      <span id="logoSwitchLabel" style="font-size:15px;font-weight:600;color:var(--ink);">Yes — use the Norton logo</span>
+    </label>
+  </div>
+
   <!-- Voice & Tone -->
   <div class="cb-section">
     <div class="sec-label">
@@ -908,6 +953,20 @@ function toggleLauraRef(header) {
   // Toggle the next sibling element (the body panel), not a hardcoded ID
   const body = header.nextElementSibling;
   if (body) body.classList.toggle('open');
+}
+
+// ── Norton logo toggle ───────────────────────────────────────────────────────
+let useNortonLogo = true;
+
+const NORTON_LOGO_LIGHT = 'https://images-eds-ssl.xboxlive.com/image?url=4rt9.lXDC4H_93laV1_eHHFT949fUipzkiFOBH3fAiZZKXeYzlQedBpm80htqxSBf3X3AoSSmNmk8XMPHxoU-&format=source';
+const NORTON_LOGO_DARK  = 'https://logos-world.net/wp-content/uploads/2021/11/Norton-New-Logo.png';
+
+function toggleLogoUse() {
+  useNortonLogo = !useNortonLogo;
+  document.getElementById('logoSwitchTrack').classList.toggle('on', useNortonLogo);
+  document.getElementById('logoSwitchLabel').textContent = useNortonLogo
+    ? 'Yes — use the Norton logo'
+    : 'No — generate a neutral wordmark';
 }
 
 // ── Build type ────────────────────────────────────────────────────────────────
@@ -1478,6 +1537,17 @@ function generate() {
   errEl.textContent = '';
 
   const concept       = document.getElementById('concept').value.trim();
+  // Logo
+  const logoSection = useNortonLogo
+    ? `LOGO ASSETS:
+- Light mode logo: ${NORTON_LOGO_LIGHT}
+- Dark mode logo: ${NORTON_LOGO_DARK}
+Use CSS (e.g. prefers-color-scheme or a JS className toggle) to swap between these two. Both images must remain legible against their respective backgrounds.`
+    : `LOGO:
+Do NOT use the Norton logo. Instead, generate a simple custom wordmark using only the product name, set in Inter Tight 700 weight.
+- Light mode: #242424 text on light background (#F8F8F7 or #FFFFFF)
+- Dark mode: #FFFFFF text on dark background (#242424 or #1a1a1a)
+No shield, no icon, no complex graphic — just a clean minimal wordmark that doesn't bias the concept test.`;
   const aiHook        = document.getElementById('aiHook').value.trim();
   const journey       = document.getElementById('journey').value.trim();
   const differentiators = document.getElementById('differentiators').value.trim();
@@ -1528,6 +1598,7 @@ DESIGN QA CHECKLIST — apply before outputting:
 - [ ] Cards have consistent internal padding — text never touches the border
 - [ ] Color contrast passes WCAG AA (white on #242424 ✓, #242424 on #FFE800 ✓)
 - [ ] On iOS: safe area insets are respected top and bottom
+- [ ] On iOS: light/dark mode toggle is present and functional; all content (text, icons, logo) is readable in both modes
 - [ ] Realistic data — no "Lorem ipsum", no placeholder@example.com, no "User Name"
 - [ ] The design looks like it was built by a senior designer, not assembled from a template
 ${voiceTone ? `\nVOICE & TONE (defined by the concept author):\n${voiceTone}` : '- Tone: calm, assured, protective — Norton as her fiduciary\n- Always show outcomes, not mechanics'}`;
@@ -1569,7 +1640,8 @@ TECHNICAL REQUIREMENTS:
 - Fully interactive with useState/useEffect
 - Realistic placeholder data (not "Lorem ipsum")
 - Pixel-perfect iOS feel: safe areas, native font stack fallback, touch targets ≥44pt
-- Include the three-tab nav if building a full-screen view`;
+- Include the three-tab nav if building a full-screen view
+- Light/dark mode toggle: include a visible toggle (e.g. sun/moon icon) on the main screen; swap backgrounds, text colors, and the logo asset accordingly; all content must be fully readable in both modes`;
   } else {
     platformSection = `TARGET PLATFORM: Landing Page (web, responsive)
 PAGE SECTION STRUCTURE (in order):
@@ -1632,6 +1704,11 @@ ${compSection ? `\n════════════════════�
 
 ═══════════════════════════════════════════
 ${designSystem}
+
+═══════════════════════════════════════════
+LOGO REQUIREMENTS
+═══════════════════════════════════════════
+${logoSection}
 
 ═══════════════════════════════════════════
 ${platformSection}
