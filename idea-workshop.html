@@ -601,8 +601,8 @@
       <div id="outputProse" style="font-size:15px;line-height:1.75;color:rgba(255,255,255,.88);white-space:pre-wrap;"></div>
       <div class="output-ctas" style="margin-top:28px;">
         <button type="button" id="copyBtn">Copy to Clipboard</button>
-        <a href="laura.html" target="_blank">→ Pressure-Test with Laura</a>
-        <a href="laura.html" target="_blank">→ Pitch to Laura</a>
+        <button type="button" onclick="openLauraWithConcept('pressure-test')" style="background:none;border:1.5px solid rgba(255,255,255,.3);border-radius:999px;padding:12px 20px;font-family:inherit;font-size:13px;font-weight:700;color:#fff;cursor:pointer;transition:all .15s;" onmouseover="this.style.background='rgba(255,255,255,.1)'" onmouseout="this.style.background='none'">→ Pressure-Test with Laura</button>
+        <button type="button" onclick="openLauraWithConcept('elevator-pitch')" style="background:none;border:1.5px solid rgba(255,255,255,.3);border-radius:999px;padding:12px 20px;font-family:inherit;font-size:13px;font-weight:700;color:#fff;cursor:pointer;transition:all .15s;" onmouseover="this.style.background='rgba(255,255,255,.1)'" onmouseout="this.style.background='none'">→ Pitch to Laura</button>
         <button type="button" onclick="resetWorkshop()" style="background:none;border:1.5px solid rgba(255,255,255,.2);border-radius:999px;padding:12px 20px;font-family:inherit;font-size:13px;font-weight:600;color:rgba(255,255,255,.5);cursor:pointer;transition:all .15s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,.5)'">↺ Start over</button>
       </div>
       <div class="output-note">Tip: copy your concept and paste it into the Concept Validation or Elevator Pitch tool on the Laura page.</div>
@@ -953,6 +953,17 @@
 
     function escHtml(s) {
       return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    function openLauraWithConcept(target) {
+      const fullText = (state.conceptName ? state.conceptName + '\n' + (state.tagline || '') + '\n\n' : '') + _generatedConcept;
+      sessionStorage.setItem('idea_workshop_concept', JSON.stringify({
+        target: target,
+        concept: fullText,
+        name: state.conceptName,
+        tagline: state.tagline,
+      }));
+      window.open('laura.html#' + target, '_blank');
     }
 
     document.getElementById('copyBtn').addEventListener('click', async function() {

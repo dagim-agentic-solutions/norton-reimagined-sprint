@@ -1494,7 +1494,7 @@
   <!-- ============================================ -->
   <!-- PRESSURE TEST SECTION -->
   <!-- ============================================ -->
-  <div class="pressure">
+  <div class="pressure" id="pressure-test">
     <span class="eyebrow">Design Sprint Tool</span>
     <h2>Pressure-test your concept against <em>Laura</em>.</h2>
     <p class="sub">
@@ -1554,7 +1554,7 @@
   <!-- ============================================ -->
   <!-- ELEVATOR PITCH TOOL -->
   <!-- ============================================ -->
-  <div class="ep-tool">
+  <div class="ep-tool" id="elevator-pitch">
     <!-- Yellow header — visually distinct from the dark pressure-test above -->
     <div class="ep-tool-header">
       <span class="eyebrow">Sprint Tool</span>
@@ -1803,6 +1803,36 @@ document.getElementById('concept').addEventListener('keydown', (e) => {
     runPressureTest();
   }
 });
+
+// ── Auto-populate from Idea Workshop ─────────────────────────────────────────
+(function() {
+  const payload = sessionStorage.getItem('idea_workshop_concept');
+  if (!payload) return;
+  try {
+    const data = JSON.parse(payload);
+    sessionStorage.removeItem('idea_workshop_concept'); // consume once
+
+    const fullText = (data.name ? data.name + '\n' + (data.tagline || '') + '\n\n' : '') + (data.concept || '');
+
+    if (data.target === 'pressure-test') {
+      const field = document.getElementById('concept');
+      if (field) {
+        field.value = fullText;
+        field.dispatchEvent(new Event('input'));
+      }
+      const section = document.getElementById('pressure-test');
+      if (section) setTimeout(() => section.scrollIntoView({ behavior: 'smooth', block: 'start' }), 150);
+    } else if (data.target === 'elevator-pitch') {
+      const field = document.getElementById('epPitch');
+      if (field) {
+        field.value = fullText;
+        document.getElementById('epCharCount').textContent = field.value.length;
+      }
+      const section = document.getElementById('elevator-pitch');
+      if (section) setTimeout(() => section.scrollIntoView({ behavior: 'smooth', block: 'start' }), 150);
+    }
+  } catch(e) {}
+})();
 
 // ===== Elevator Pitch Tool =====
 const EP_API = '/api/elevator-pitch';
