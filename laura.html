@@ -1094,6 +1094,12 @@
 .btn-ep-cta:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(255,232,0,0.5); }
 .ep-sidebar-divider { border: none; border-top: 1.5px solid var(--line); margin: 20px 0; }
 /* Pitch summary */
+
+.ep-summary-toggle {
+  background: none; border: none; cursor: pointer;
+  color: var(--ink-soft); font-size: 12px; text-decoration: underline;
+  font-style: normal; padding: 0; margin-left: 4px;
+}
 .ep-pitch-summary {
   background: #fffbe6;
   border-left: 3px solid var(--yellow);
@@ -2116,7 +2122,10 @@ async function epStart() {
   // Show conversation view
   document.getElementById('epStep1').style.display = 'none';
   document.getElementById('epConversation').style.display = 'block';
-  document.getElementById('epPitchSummary').textContent = '\u201C' + pitch + '\u201D';
+  const summaryEl = document.getElementById('epPitchSummary');
+  const shortPitch = pitch.length > 120 ? pitch.slice(0, 120).trimEnd() + '…' : pitch;
+  summaryEl.innerHTML = '\u201C<span class="ep-summary-text">' + escHtmlEP(shortPitch) + '</span>\u201D' +
+    (pitch.length > 120 ? ' <button class="ep-summary-toggle" onclick="this.closest(\'.ep-pitch-summary\').querySelector(\'.ep-summary-text\').textContent=\'\u201C\'+' + JSON.stringify(pitch) + '+\'\u201D\';this.remove();">Show full</button>' : '');
   document.getElementById('epThread').innerHTML = '';
   document.getElementById('epVerdict').style.display = 'none';
   // CTA sidebar always visible
