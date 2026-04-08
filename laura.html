@@ -1832,7 +1832,7 @@
 
   <div class="page-unlock-bar" id="unlockBar">
     <label for="unlockPw">🔒 Tools locked for sprint participants</label>
-    <input type="password" id="unlockPw" placeholder="Enter password…" maxlength="30" onkeydown="if(event.key==='Enter')pageUnlock()">
+    <input type="text" id="unlockPw" placeholder="Enter password…" maxlength="30" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" onkeydown="if(event.key==='Enter')pageUnlock()">
     <button class="btn-page-unlock" onclick="pageUnlock()">Unlock Tools</button>
     <span class="page-unlock-err" id="unlockErr"></span>
   </div>
@@ -2371,7 +2371,7 @@ function escHtmlEP(s) {
 <script src="nav.js">
 // ── Page-level tool unlock ────────────────────────────────────────────────
 function pageUnlock() {
-  const pw = (document.getElementById('unlockPw').value || '').trim();
+  const pw = (document.getElementById('unlockPw').value || '').trim().toLowerCase();
   if (pw === 'dagim') {
     ['pt-cs-overlay', 'ep-cs-overlay'].forEach(id => {
       const el = document.getElementById(id);
