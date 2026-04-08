@@ -1303,149 +1303,6 @@
     border-radius: 0;
     pointer-events: all;
   }
-
-  /* ── Tool Gate Overlay ─────────────────────────────────────── */
-  .tool-gate-wrap { position: relative; }
-  .tool-gate-overlay {
-    position: absolute;
-    inset: 0;
-    background: rgba(255, 232, 0, 0.55);
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
-    z-index: 20;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: inherit;
-  }
-  /* EP tool: overlay only covers header + left column, not the 280px sidebar */
-  #ep-gate-wrap > .tool-gate-overlay,
-  #ep-gate-wrap > .tool-gate-prompt { right: 280px; }
-  @media (max-width: 760px) {
-    #ep-gate-wrap > .tool-gate-overlay,
-    #ep-gate-wrap > .tool-gate-prompt { right: 0; }
-  }
-  .tool-gate-pill {
-    background: var(--ink);
-    color: var(--yellow);
-    font-size: 11px;
-    font-weight: 800;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    padding: 8px 18px;
-    border-radius: 999px;
-    pointer-events: none;
-    user-select: none;
-  }
-
-  .tool-gate-prompt-box {
-    background: var(--ink);
-    color: #fff;
-    border-radius: 12px;
-    padding: 24px 28px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    min-width: 260px;
-    text-align: center;
-  }
-  .tool-gate-prompt-box label {
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: rgba(255,255,255,0.65);
-  }
-  .tool-gate-prompt-box input {
-    width: 100%;
-    padding: 10px 14px;
-    border: 2px solid rgba(255,255,255,0.2);
-    border-radius: 8px;
-    background: rgba(255,255,255,0.1);
-    color: #fff;
-    font-size: 16px;
-    font-family: inherit;
-    outline: none;
-    text-align: center;
-    letter-spacing: 0.15em;
-  }
-  .tool-gate-prompt-box input:focus { border-color: var(--yellow); }
-  .tool-gate-prompt-box .gate-err { font-size: 12px; color: #ff6b6b; min-height: 14px; }
-  .tool-gate-prompt-box button {
-    background: var(--yellow);
-    color: var(--ink);
-    border: none;
-    border-radius: 8px;
-    padding: 10px;
-    font-family: inherit;
-    font-size: 14px;
-    font-weight: 800;
-    cursor: pointer;
-  }
-  .tool-gate-prompt-box .gate-cancel {
-    background: transparent;
-    color: rgba(255,255,255,0.5);
-    font-size: 12px;
-    padding: 4px;
-    font-weight: 600;
-  }
-
-  /* ── Tool lock banners ─────────────────────────────────────── */
-  .tool-lock-banner {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 10px 14px;
-    background: var(--paper);
-    border: 1.5px solid var(--line);
-    border-top: none;
-    padding: 14px 24px;
-    font-size: 14px;
-    color: var(--ink-soft);
-  }
-  .tool-lock-banner .lock-icon { font-size: 16px; }
-  .lock-unlock-btn {
-    background: var(--ink);
-    color: #fff;
-    border: none;
-    border-radius: 6px;
-    padding: 7px 16px;
-    font-family: inherit;
-    font-size: 13px;
-    font-weight: 700;
-    cursor: pointer;
-  }
-  .lock-unlock-btn:hover { opacity: 0.85; }
-  .gate-pw-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; width: 100%; }
-
-  /* ── Tool overlays ─────────────────────────────────────────── */
-  .tool-overlay-wrap { position: relative; }
-  .tool-overlay {
-    position: absolute;
-    inset: 0;
-    background: rgba(255, 232, 0, 0.55);
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
-    z-index: 20;
-    border-radius: inherit;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    pointer-events: none;
-  }
-  .tool-overlay-pill {
-    background: var(--ink);
-    color: var(--yellow);
-    font-size: 11px;
-    font-weight: 800;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    padding: 8px 18px;
-    border-radius: 999px;
-  }
-  /* EP: overlay stops before 280px sidebar */
-  #ep-overlay { right: 280px; }
-  @media (max-width: 760px) { #ep-overlay { right: 0; } }
 </style>
   <link rel="icon" type="image/svg+xml" href="assets/norton-checkmark.svg">
   <link rel="icon" type="image/png" sizes="32x32" href="assets/icon-32.png">
@@ -1759,11 +1616,6 @@
   <!-- ============================================ -->
   <!-- PRESSURE TEST SECTION -->
   <!-- ============================================ -->
-  <!-- pt-gate-wrap removed -->
-  <div class="tool-overlay-wrap">
-    <div class="tool-overlay" id="pt-overlay">
-      <span class="tool-overlay-pill">Coming Soon</span>
-    </div>
   <div class="pressure" id="pressure-test">
     <span class="eyebrow">Design Sprint Tool</span>
     <h2>Pressure-test your concept against <em>Laura</em>.</h2>
@@ -1822,15 +1674,8 @@
   </div>
 
   <!-- ============================================ -->
-
-
-    <!-- ELEVATOR PITCH TOOL -->
+  <!-- ELEVATOR PITCH TOOL -->
   <!-- ============================================ -->
-  <!-- ep-gate-wrap removed -->
-  <div class="tool-overlay-wrap">
-    <div class="tool-overlay" id="ep-overlay">
-      <span class="tool-overlay-pill">Coming Soon</span>
-    </div>
   <div class="ep-tool" id="elevator-pitch">
     <!-- Yellow header — visually distinct from the dark pressure-test above -->
     <div class="ep-tool-header">
@@ -1913,23 +1758,6 @@
 
     </div><!-- /ep-tool-body -->
   </div>
-
-
-
-  <!-- EP lock banner -->
-  <div class="tool-lock-banner" id="ep-lock-banner">
-    <span class="lock-icon">🔒</span>
-    <span>This tool is locked for the sprint.</span>
-    <button class="lock-unlock-btn" onclick="gateBannerClick('ep')">Click to Unlock</button>
-    <span class="gate-err" id="ep-err" style="color:#c01a1a;font-size:13px;"></span>
-    <div class="gate-pw-row" id="ep-pw-row" style="display:none;">
-      <input type="password" id="ep-pw" placeholder="Enter password…" maxlength="30" onkeydown="if(event.key==='Enter')gateUnlock('ep')" style="padding:8px 12px;border:1.5px solid var(--line);border-radius:6px;font-size:14px;font-family:inherit;outline:none;">
-      <button class="lock-unlock-btn" onclick="gateUnlock('ep')">Unlock →</button>
-      <button onclick="gateCancel('ep')" style="background:none;border:none;cursor:pointer;font-size:13px;color:var(--ink-soft);padding:4px 8px;">Cancel</button>
-    </div>
-  </div>
-
-  </div><!-- /ep-overlay-wrap -->
 
   <div class="footer">
     <span class="brand">Norton Reimagined</span>
@@ -2463,36 +2291,6 @@ function escHtmlEP(s) {
   return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 </script>
-<script src="nav.js">
-// ── Tool lock banner + overlay unlock ─────────────────────────────────────
-const GATE_PASS = 'dagim';
-
-function gateBannerClick(id) {
-  document.getElementById(id + '-pw-row').style.display = 'flex';
-  setTimeout(() => document.getElementById(id + '-pw').focus(), 50);
-}
-
-function gateCancel(id) {
-  document.getElementById(id + '-pw-row').style.display = 'none';
-  document.getElementById(id + '-pw').value = '';
-  document.getElementById(id + '-err').textContent = '';
-}
-
-function gateUnlock(id) {
-  const pw = (document.getElementById(id + '-pw').value || '').trim();
-  if (pw === GATE_PASS) {
-    // Remove banner
-    const banner = document.getElementById(id + '-lock-banner');
-    if (banner) banner.remove();
-    // Remove overlay
-    const overlay = document.getElementById(id + '-overlay');
-    if (overlay) overlay.remove();
-  } else {
-    document.getElementById(id + '-err').textContent = 'Incorrect password.';
-    document.getElementById(id + '-pw').value = '';
-    document.getElementById(id + '-pw').focus();
-  }
-}
-</script>
+<script src="nav.js"></script>
 </body>
 </html>
