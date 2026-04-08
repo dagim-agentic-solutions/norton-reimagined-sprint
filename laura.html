@@ -1303,6 +1303,101 @@
     border-radius: 0;
     pointer-events: all;
   }
+
+  /* ── Tool Gate Overlay ─────────────────────────────────────── */
+  .tool-gate-wrap { position: relative; }
+  .tool-gate-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(255, 232, 0, 0.55);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border-radius: inherit;
+  }
+  .tool-gate-overlay:hover { background: rgba(255, 232, 0, 0.65); }
+  .tool-gate-pill {
+    background: var(--ink);
+    color: var(--yellow);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 8px 18px;
+    border-radius: 999px;
+    pointer-events: none;
+    user-select: none;
+  }
+  .tool-gate-prompt {
+    position: absolute;
+    inset: 0;
+    background: rgba(255, 232, 0, 0.75);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 21;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    border-radius: inherit;
+  }
+  .tool-gate-prompt.active { display: flex; }
+  .tool-gate-prompt-box {
+    background: var(--ink);
+    color: #fff;
+    border-radius: 12px;
+    padding: 24px 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-width: 260px;
+    text-align: center;
+  }
+  .tool-gate-prompt-box label {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.65);
+  }
+  .tool-gate-prompt-box input {
+    width: 100%;
+    padding: 10px 14px;
+    border: 2px solid rgba(255,255,255,0.2);
+    border-radius: 8px;
+    background: rgba(255,255,255,0.1);
+    color: #fff;
+    font-size: 16px;
+    font-family: inherit;
+    outline: none;
+    text-align: center;
+    letter-spacing: 0.15em;
+  }
+  .tool-gate-prompt-box input:focus { border-color: var(--yellow); }
+  .tool-gate-prompt-box .gate-err { font-size: 12px; color: #ff6b6b; min-height: 14px; }
+  .tool-gate-prompt-box button {
+    background: var(--yellow);
+    color: var(--ink);
+    border: none;
+    border-radius: 8px;
+    padding: 10px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 800;
+    cursor: pointer;
+  }
+  .tool-gate-prompt-box .gate-cancel {
+    background: transparent;
+    color: rgba(255,255,255,0.5);
+    font-size: 12px;
+    padding: 4px;
+    font-weight: 600;
+  }
 </style>
   <link rel="icon" type="image/svg+xml" href="assets/norton-checkmark.svg">
   <link rel="icon" type="image/png" sizes="32x32" href="assets/icon-32.png">
@@ -1616,6 +1711,19 @@
   <!-- ============================================ -->
   <!-- PRESSURE TEST SECTION -->
   <!-- ============================================ -->
+  <div class="tool-gate-wrap" id="pt-gate-wrap">
+    <div class="tool-gate-overlay" id="pt-overlay" onclick="gateClick('pt')">
+      <span class="tool-gate-pill">Coming Soon — Click to Unlock</span>
+    </div>
+    <div class="tool-gate-prompt" id="pt-prompt">
+      <div class="tool-gate-prompt-box">
+        <label>Enter sprint password</label>
+        <input type="password" id="pt-pw" placeholder="••••••" maxlength="30" onkeydown="if(event.key==='Enter')gateUnlock('pt')">
+        <div class="gate-err" id="pt-err"></div>
+        <button onclick="gateUnlock('pt')">Unlock →</button>
+        <button class="gate-cancel" onclick="gateCancel('pt')">Cancel</button>
+      </div>
+    </div>
   <div class="pressure" id="pressure-test">
     <span class="eyebrow">Design Sprint Tool</span>
     <h2>Pressure-test your concept against <em>Laura</em>.</h2>
@@ -1674,8 +1782,23 @@
   </div>
 
   <!-- ============================================ -->
-  <!-- ELEVATOR PITCH TOOL -->
+  </div><!-- /pt-gate-wrap -->
+
+    <!-- ELEVATOR PITCH TOOL -->
   <!-- ============================================ -->
+  <div class="tool-gate-wrap" id="ep-gate-wrap">
+    <div class="tool-gate-overlay" id="ep-overlay" onclick="gateClick('ep')">
+      <span class="tool-gate-pill">Coming Soon — Click to Unlock</span>
+    </div>
+    <div class="tool-gate-prompt" id="ep-prompt">
+      <div class="tool-gate-prompt-box">
+        <label>Enter sprint password</label>
+        <input type="password" id="ep-pw" placeholder="••••••" maxlength="30" onkeydown="if(event.key==='Enter')gateUnlock('ep')">
+        <div class="gate-err" id="ep-err"></div>
+        <button onclick="gateUnlock('ep')">Unlock →</button>
+        <button class="gate-cancel" onclick="gateCancel('ep')">Cancel</button>
+      </div>
+    </div>
   <div class="ep-tool" id="elevator-pitch">
     <!-- Yellow header — visually distinct from the dark pressure-test above -->
     <div class="ep-tool-header">
@@ -1758,6 +1881,8 @@
 
     </div><!-- /ep-tool-body -->
   </div>
+
+  </div><!-- /ep-gate-wrap -->
 
   <div class="footer">
     <span class="brand">Norton Reimagined</span>
@@ -2291,6 +2416,50 @@ function escHtmlEP(s) {
   return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 </script>
-<script src="nav.js"></script>
+<script src="nav.js">
+// ── Tool gate unlock ─────────────────────────────────────────────────────
+const GATE_PASS = 'dagim';
+const GATE_KEYS = { pt: 'gate_pt_unlocked', ep: 'gate_ep_unlocked' };
+
+function gateInit() {
+  ['pt','ep'].forEach(id => {
+    if (sessionStorage.getItem(GATE_KEYS[id]) === '1') gateRemove(id);
+  });
+}
+
+function gateClick(id) {
+  document.getElementById(id + '-overlay').style.display = 'none';
+  const prompt = document.getElementById(id + '-prompt');
+  prompt.classList.add('active');
+  setTimeout(() => document.getElementById(id + '-pw').focus(), 50);
+}
+
+function gateCancel(id) {
+  document.getElementById(id + '-prompt').classList.remove('active');
+  document.getElementById(id + '-overlay').style.display = '';
+  document.getElementById(id + '-pw').value = '';
+  document.getElementById(id + '-err').textContent = '';
+}
+
+function gateUnlock(id) {
+  const pw = document.getElementById(id + '-pw').value;
+  if (pw === GATE_PASS) {
+    sessionStorage.setItem(GATE_KEYS[id], '1');
+    gateRemove(id);
+  } else {
+    document.getElementById(id + '-err').textContent = 'Incorrect password.';
+    document.getElementById(id + '-pw').value = '';
+  }
+}
+
+function gateRemove(id) {
+  const overlay = document.getElementById(id + '-overlay');
+  const prompt = document.getElementById(id + '-prompt');
+  if (overlay) overlay.remove();
+  if (prompt) prompt.remove();
+}
+
+document.addEventListener('DOMContentLoaded', gateInit);
+</script>
 </body>
 </html>
