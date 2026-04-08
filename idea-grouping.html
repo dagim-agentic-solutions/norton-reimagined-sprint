@@ -272,6 +272,57 @@
       .board-grid { grid-template-columns: 1fr; }
     }
 
+
+    /* ── Inbox (Ideas Pool) ─────────────────────────────────────── */
+    .board-inbox {
+      background: var(--paper);
+      border: 1.5px solid var(--line);
+      border-radius: 12px;
+      padding: 18px 20px 20px;
+      margin-bottom: 8px;
+    }
+    .inbox-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+    .inbox-label {
+      font-weight: 700;
+      font-size: 14px;
+      letter-spacing: .03em;
+      text-transform: uppercase;
+      color: var(--ink);
+    }
+    .inbox-count {
+      font-size: 12px;
+      color: var(--ink-softer);
+      background: rgba(0,0,0,.06);
+      padding: 2px 8px;
+      border-radius: 999px;
+    }
+    .inbox-cards {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      min-height: 52px;
+      border: 1.5px dashed var(--line);
+      border-radius: 8px;
+      padding: 10px;
+    }
+    .inbox-cards.drag-over {
+      border-color: var(--yellow);
+      background: rgba(255,232,0,.06);
+    }
+    .inbox-cards:empty::after {
+      content: 'New ideas appear here — drag to a group';
+      color: var(--ink-softer);
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      padding: 6px 4px;
+    }
+
     /* ── Column ── */
     .column {
       background: var(--card);
@@ -622,7 +673,19 @@
 
       <!-- Board -->
       <div class="board-area">
-        <h2>Board <span id="boardIdeaCount" style="font-weight:400;text-transform:none;letter-spacing:0;"></span></h2>
+        <!-- Inbox: unassigned ideas -->
+        <div class="board-inbox" id="boardInbox">
+          <div class="inbox-header">
+            <span class="inbox-label">💡 Ideas Pool</span>
+            <span class="inbox-count" id="inboxCount">0 ideas</span>
+          </div>
+          <div class="inbox-cards" id="inboxCards">
+            <!-- Unassigned cards rendered by JS -->
+          </div>
+        </div>
+
+        <!-- Grouping columns -->
+        <h2 style="margin:32px 0 12px;">Groups <span id="boardIdeaCount" style="font-weight:400;text-transform:none;letter-spacing:0;"></span></h2>
         <div class="board-grid" id="boardGrid">
           <!-- Columns rendered by JS -->
         </div>
@@ -721,11 +784,34 @@
     function render() {
       if (!board) return;
       const grid = document.getElementById('boardGrid');
-      const totalIdeas = board.ideas.length;
-      document.getElementById('boardIdeaCount').textContent = '— ' + totalIdeas + ' idea' + (totalIdeas !== 1 ? 's' : '');
+      const inboxCardsEl = document.getElementById('inboxCards');
+      const inboxCountEl = document.getElementById('inboxCount');
 
-      // Preserve existing column DOM order by id
-      board.columns.forEach(col => {
+      // Split inbox (col-0) from grouping columns
+      const inboxIdeas = board.ideas.filter(i => i.columnId === 'col-0');
+      const groupCols = board.columns.filter(c => c.id !== 'col-0');
+      const groupedIdeas = board.ideas.filter(i => i.columnId !== 'col-0');
+
+      // Render inbox
+      inboxCardsEl.innerHTML = '';
+      inboxIdeas.forEach(idea => inboxCardsEl.appendChild(createIdeaCardEl(idea)));
+      inboxCountEl.textContent = inboxIdeas.length + ' idea' + (inboxIdeas.length !== 1 ? 's' : '');
+
+      // Inbox drag-drop target
+      inboxCardsEl.ondragover = e => { e.preventDefault(); inboxCardsEl.classList.add('drag-over'); };
+      inboxCardsEl.ondragleave = () => inboxCardsEl.classList.remove('drag-over');
+      inboxCardsEl.ondrop = e => {
+        e.preventDefault();
+        inboxCardsEl.classList.remove('drag-over');
+        const id = e.dataTransfer.getData('text/plain');
+        if (id) moveIdea(id, 'col-0');
+      };
+
+      const totalIdeas = board.ideas.length;
+      document.getElementById('boardIdeaCount').textContent = '— ' + groupedIdeas.length + ' grouped';
+
+      // Preserve existing grouping column DOM order by id
+      groupCols.forEach(col => {
         let colEl = document.getElementById('col-' + col.id);
         if (!colEl) {
           colEl = createColumnEl(col);
@@ -763,7 +849,7 @@
       const existing = grid.querySelectorAll('.column');
       existing.forEach(el => {
         const colId = el.id.replace('col-', '');
-        if (!board.columns.find(c => c.id === colId)) {
+        if (!groupCols.find(c => c.id === colId)) {
           el.remove();
         }
       });
@@ -1117,7 +1203,11 @@
       const overlay = document.getElementById('bottomSheetOverlay');
       const opts = document.getElementById('bottomSheetOptions');
       opts.innerHTML = '';
-      board.columns.forEach(col => {
+      const moveColsList = [
+        { id: 'col-0', title: '💡 Ideas Pool' },
+        ...board.columns.filter(c => c.id !== 'col-0')
+      ];
+      moveColsList.forEach(col => {
         const btn = document.createElement('button');
         btn.className = 'bottom-sheet-option' + (col.id === currentColId ? ' active' : '');
         btn.textContent = col.title;

@@ -42,6 +42,7 @@ function defaultBoard() {
     locked: false,
     lockTimestamp: null,
     columns: [
+      { id: 'col-0', title: 'Ideas Pool', inbox: true },
       { id: 'col-1', title: 'Column 1' },
       { id: 'col-2', title: 'Column 2' },
       { id: 'col-3', title: 'Column 3' },
@@ -118,7 +119,7 @@ export async function onRequest(context) {
       description: description?.trim() || '',
       visionAlignment: visionAlignment?.trim() || '',
       lauraProblem: lauraProblem?.trim() || '',
-      columnId: board.columns[0]?.id || 'col-1',
+      columnId: 'col-0',
       createdAt: new Date().toISOString(),
     };
     board.ideas.push(idea);
