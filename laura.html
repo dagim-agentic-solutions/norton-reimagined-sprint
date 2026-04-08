@@ -1772,27 +1772,29 @@
 // Set TOOLS_LOCKED = false to lift the "Coming Soon" restrictions on both tools.
 const TOOLS_LOCKED = false;
 
-if (!TOOLS_LOCKED) {
-  // Remove all locked overlays
-  document.querySelectorAll('.tool-locked-overlay').forEach(el => el.remove());
-  // Re-enable pointer events inside locked zones
-  document.querySelectorAll('.ep-tool-main-locked > *:not(.tool-locked-overlay)').forEach(el => {
-    el.style.pointerEvents = '';
-    el.style.userSelect = '';
-  });
-  document.querySelectorAll('.ep-locked-header').forEach(el => {
-    el.style.pointerEvents = '';
-    el.style.userSelect = '';
-    el.classList.remove('ep-locked-header');
-  });
-  document.querySelector('.ep-tool-main-locked')?.classList.remove('ep-tool-main-locked');
-  // Unwrap pressure-test tool-locked-wrap
-  document.querySelectorAll('.tool-locked-wrap').forEach(wrap => {
-    const parent = wrap.parentNode;
-    while (wrap.firstChild) parent.insertBefore(wrap.firstChild, wrap);
-    wrap.remove();
-  });
-}
+document.addEventListener('DOMContentLoaded', function() {
+  if (!TOOLS_LOCKED) {
+    // Remove all locked overlays
+    document.querySelectorAll('.tool-locked-overlay').forEach(el => el.remove());
+    // Re-enable pointer events inside locked zones
+    document.querySelectorAll('.ep-tool-main-locked > *:not(.tool-locked-overlay)').forEach(el => {
+      el.style.pointerEvents = '';
+      el.style.userSelect = '';
+    });
+    document.querySelectorAll('.ep-locked-header').forEach(el => {
+      el.style.pointerEvents = '';
+      el.style.userSelect = '';
+      el.classList.remove('ep-locked-header');
+    });
+    document.querySelector('.ep-tool-main-locked')?.classList.remove('ep-tool-main-locked');
+    // Unwrap pressure-test tool-locked-wrap
+    document.querySelectorAll('.tool-locked-wrap').forEach(wrap => {
+      const parent = wrap.parentNode;
+      while (wrap.firstChild) parent.insertBefore(wrap.firstChild, wrap);
+      wrap.remove();
+    });
+  }
+});
 
 // ===== Pressure-test: thin client that calls the backend Pages Function =====
 // The Laura persona context lives server-side in functions/api/pressure-test.js
