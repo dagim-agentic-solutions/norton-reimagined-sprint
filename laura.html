@@ -1695,8 +1695,8 @@
         <div id="epStep1">
           <div class="ep-input-wrap">
             <label for="epPitch">Your Elevator Pitch</label>
-            <textarea id="epPitch" maxlength="4000" placeholder="e.g. Imagine a Norton app that sends you one text every morning — either 'Your family is protected' or 'One thing needs your attention.' No dashboards, no jargon. Just a single signal. If something needs fixing, we fix it for you."></textarea>
-            <div class="ep-char-count"><span id="epCharCount">0</span> / 600</div>
+            <textarea id="epPitch" maxlength="4000" placeholder="e.g. Imagine a Norton app that sends you one text every morning — either &apos;Your family is protected&apos; or &apos;One thing needs your attention.&apos; No dashboards, no jargon. Just a single signal. If something needs fixing, we fix it for you."></textarea>
+            <div class="ep-char-count"><span id="epCharCount">0</span> / 4000</div>
           </div>
           <div class="ep-actions">
             <button class="btn-ep-start" id="epStartBtn" onclick="epStart()">
@@ -1704,17 +1704,15 @@
             </button>
           </div>
           <div class="ep-error" id="epError"></div>
-      <div style="margin-top:8px;font-size:12px;color:var(--ink-softer);font-weight:600;" id="epUsageCounter"></div>
-      <!-- Bypass block (hidden until limit hit) -->
-      <div id="epBypassWrap" style="display:none;margin-top:12px;padding:14px 16px;background:var(--paper);border:1.5px solid var(--line);border-radius:8px;">
-        <div style="font-size:12px;font-weight:700;color:var(--ink-soft);margin-bottom:8px;">Enter password to continue</div>
-        <div style="display:flex;gap:8px;align-items:center;">
-          <input type="password" id="epBypassInput" placeholder="Password…" maxlength="40" style="flex:1;padding:9px 12px;border:1.5px solid var(--line);border-radius:6px;font-family:inherit;font-size:14px;outline:none;background:#fff;" onkeydown="if(event.key==='Enter')epTryBypass()">
-          <button onclick="epTryBypass()" style="background:var(--ink);color:#fff;border:none;border-radius:6px;padding:9px 18px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;">Unlock</button>
-        </div>
-        <div id="epBypassErr" style="font-size:12px;color:#c01a1a;margin-top:6px;min-height:14px;"></div>
-        </div>
-      </div>
+          <div style="margin-top:8px;font-size:12px;color:var(--ink-softer);font-weight:600;" id="epUsageCounter"></div>
+          <div id="epBypassWrap" style="display:none;margin-top:12px;padding:14px 16px;background:var(--paper);border:1.5px solid var(--line);border-radius:8px;">
+            <div style="font-size:12px;font-weight:700;color:var(--ink-soft);margin-bottom:8px;">Enter password to continue</div>
+            <div style="display:flex;gap:8px;align-items:center;">
+              <input type="password" id="epBypassInput" placeholder="Password…" maxlength="40" style="flex:1;padding:9px 12px;border:1.5px solid var(--line);border-radius:6px;font-family:inherit;font-size:14px;outline:none;background:#fff;" onkeydown="if(event.key===&apos;Enter&apos;)epTryBypass()">
+              <button onclick="epTryBypass()" style="background:var(--ink);color:#fff;border:none;border-radius:6px;padding:9px 18px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;">Unlock</button>
+            </div>
+            <div id="epBypassErr" style="font-size:12px;color:#c01a1a;margin-top:6px;min-height:14px;"></div>
+          </div>
         </div>
 
         <!-- Step 2: conversation -->
@@ -1725,7 +1723,7 @@
           <!-- Reply input (hidden after round 5) -->
           <div class="ep-reply-wrap" id="epReplyWrap">
             <div class="ep-reply-row">
-              <textarea id="epReply" placeholder="Your response to Laura…" maxlength="500" rows="3" onkeydown="if((event.metaKey||event.ctrlKey)&&event.key==='Enter')epSend()"></textarea>
+              <textarea id="epReply" placeholder="Your response to Laura…" maxlength="500" rows="3" onkeydown="if((event.metaKey||event.ctrlKey)&&event.key===&apos;Enter&apos;)epSend()"></textarea>
               <button class="btn-ep-send" id="epSendBtn" onclick="epSend()">
                 <span id="epSendBtnText">Send</span>
               </button>
@@ -1746,7 +1744,7 @@
         <div class="ep-sidebar-cta">
           <div class="ep-sidebar-eyebrow">Go deeper</div>
           <h4>Interview Laura with the Gen Research Tool</h4>
-          <p>This simulator is a quick gut-check. For longer sessions, richer feedback, and research-grade analysis, use the Gen Research team's full interview tool.</p>
+          <p>This simulator is a quick gut-check. For longer sessions, richer feedback, and research-grade analysis, use the Gen Research team’s full interview tool.</p>
           <a href="https://gen.thealphabase.com/" target="_blank" rel="noopener" class="btn-ep-cta">
             Open Interview Tool →
           </a>
@@ -2087,7 +2085,7 @@ async function epStart() {
     });
     const data = await res.json();
     if (!data.valid) {
-      errorEl.textContent = data.feedback || 'That doesn\'t read as an elevator pitch. Describe your product idea.';
+      errorEl.textContent = '⚡ Stronger Elevator Pitch Needed — ' + (data.feedback || 'Describe what your product is and why it matters for a household like Laura\'s.');
       epBusy = false;
       btnText.textContent = 'Pitch Laura →';
       btn.disabled = false;
