@@ -1303,6 +1303,75 @@
     border-radius: 0;
     pointer-events: all;
   }
+
+  /* ── Coming Soon overlays ───────────────────────────────────── */
+  .cs-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(255, 232, 0, 0.52);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 20;
+    border-radius: inherit;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+  }
+  .cs-pill {
+    background: var(--ink);
+    color: var(--yellow);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 8px 20px;
+    border-radius: 999px;
+  }
+  /* EP: leave 280px sidebar uncovered */
+  #ep-cs-overlay { right: 280px; }
+  @media (max-width: 760px) { #ep-cs-overlay { right: 0; } }
+
+  /* ── Page-level unlock button ───────────────────────────────── */
+  .page-unlock-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 18px 24px;
+    background: var(--paper);
+    border-top: 1.5px solid var(--line);
+    flex-wrap: wrap;
+  }
+  .page-unlock-bar label {
+    font-size: 13px;
+    color: var(--ink-soft);
+    font-weight: 600;
+  }
+  .page-unlock-bar input[type=password] {
+    padding: 8px 14px;
+    border: 1.5px solid var(--line);
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 14px;
+    outline: none;
+    width: 180px;
+  }
+  .page-unlock-bar input[type=password]:focus { border-color: var(--ink); }
+  .btn-page-unlock {
+    background: var(--ink);
+    color: var(--yellow);
+    border: none;
+    border-radius: 8px;
+    padding: 9px 20px;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 800;
+    cursor: pointer;
+    letter-spacing: .03em;
+  }
+  .btn-page-unlock:hover { opacity: .85; }
+  .page-unlock-err { font-size: 12px; color: #c01a1a; min-height: 16px; }
 </style>
   <link rel="icon" type="image/svg+xml" href="assets/norton-checkmark.svg">
   <link rel="icon" type="image/png" sizes="32x32" href="assets/icon-32.png">
@@ -1616,7 +1685,8 @@
   <!-- ============================================ -->
   <!-- PRESSURE TEST SECTION -->
   <!-- ============================================ -->
-  <div class="pressure" id="pressure-test">
+  <div class="pressure" id="pressure-test" style="position:relative;">
+    <div class="cs-overlay" id="pt-cs-overlay"><span class="cs-pill">Coming Soon</span></div>
     <span class="eyebrow">Design Sprint Tool</span>
     <h2>Pressure-test your concept against <em>Laura</em>.</h2>
     <p class="sub">
@@ -1676,7 +1746,8 @@
   <!-- ============================================ -->
   <!-- ELEVATOR PITCH TOOL -->
   <!-- ============================================ -->
-  <div class="ep-tool" id="elevator-pitch">
+  <div class="ep-tool" id="elevator-pitch" style="position:relative;">
+    <div class="cs-overlay" id="ep-cs-overlay"><span class="cs-pill">Coming Soon</span></div>
     <!-- Yellow header — visually distinct from the dark pressure-test above -->
     <div class="ep-tool-header">
       <span class="eyebrow">Sprint Tool</span>
@@ -1759,6 +1830,12 @@
     </div><!-- /ep-tool-body -->
   </div>
 
+  <div class="page-unlock-bar" id="unlockBar">
+    <label for="unlockPw">🔒 Tools locked for sprint participants</label>
+    <input type="password" id="unlockPw" placeholder="Enter password…" maxlength="30" onkeydown="if(event.key==='Enter')pageUnlock()">
+    <button class="btn-page-unlock" onclick="pageUnlock()">Unlock Tools</button>
+    <span class="page-unlock-err" id="unlockErr"></span>
+  </div>
   <div class="footer">
     <span class="brand">Norton Reimagined</span>
     <span>Source: Project Spotlight (Jan 2026) · Norton Reimagine Qual Study · Acquisition Line-ups Phase 1</span>
@@ -2291,6 +2368,22 @@ function escHtmlEP(s) {
   return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 </script>
-<script src="nav.js"></script>
+<script src="nav.js">
+// ── Page-level tool unlock ────────────────────────────────────────────────
+function pageUnlock() {
+  const pw = (document.getElementById('unlockPw').value || '').trim();
+  if (pw === 'dagim') {
+    ['pt-cs-overlay', 'ep-cs-overlay'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.remove();
+    });
+    document.getElementById('unlockBar').remove();
+  } else {
+    document.getElementById('unlockErr').textContent = 'Incorrect password.';
+    document.getElementById('unlockPw').value = '';
+    document.getElementById('unlockPw').focus();
+  }
+}
+</script>
 </body>
 </html>
