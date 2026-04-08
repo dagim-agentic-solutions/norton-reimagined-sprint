@@ -2368,7 +2368,8 @@ function escHtmlEP(s) {
   return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 </script>
-<script src="nav.js">
+<script src="nav.js"></script>
+<script>
 // ── Page-level tool unlock ────────────────────────────────────────────────
 function pageUnlock() {
   const pw = (document.getElementById('unlockPw').value || '').trim().toLowerCase();
