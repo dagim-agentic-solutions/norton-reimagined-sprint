@@ -2,7 +2,7 @@ name = "norton-reimagined-sprint"
 pages_build_output_dir = "."
 
 [vars]
-IDEA_GROUPING_WS_URL = "https://idea-grouping-hub.norton-reimagined-sprint.workers.dev"
+IDEA_GROUPING_WS_URL = "https://idea-grouping-hub.og-norton.workers.dev"
 
 [[kv_namespaces]]
 binding = "PROTOTYPES_KV"
