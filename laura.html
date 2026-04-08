@@ -1417,6 +1417,35 @@
   }
   .lock-unlock-btn:hover { opacity: 0.85; }
   .gate-pw-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; width: 100%; }
+
+  /* ── Tool overlays ─────────────────────────────────────────── */
+  .tool-overlay-wrap { position: relative; }
+  .tool-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(255, 232, 0, 0.55);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 20;
+    border-radius: inherit;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+  }
+  .tool-overlay-pill {
+    background: var(--ink);
+    color: var(--yellow);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 8px 18px;
+    border-radius: 999px;
+  }
+  /* EP: overlay stops before 280px sidebar */
+  #ep-overlay { right: 280px; }
+  @media (max-width: 760px) { #ep-overlay { right: 0; } }
 </style>
   <link rel="icon" type="image/svg+xml" href="assets/norton-checkmark.svg">
   <link rel="icon" type="image/png" sizes="32x32" href="assets/icon-32.png">
@@ -1731,6 +1760,10 @@
   <!-- PRESSURE TEST SECTION -->
   <!-- ============================================ -->
   <!-- pt-gate-wrap removed -->
+  <div class="tool-overlay-wrap">
+    <div class="tool-overlay" id="pt-overlay">
+      <span class="tool-overlay-pill">Coming Soon</span>
+    </div>
   <div class="pressure" id="pressure-test">
     <span class="eyebrow">Design Sprint Tool</span>
     <h2>Pressure-test your concept against <em>Laura</em>.</h2>
@@ -1794,6 +1827,10 @@
     <!-- ELEVATOR PITCH TOOL -->
   <!-- ============================================ -->
   <!-- ep-gate-wrap removed -->
+  <div class="tool-overlay-wrap">
+    <div class="tool-overlay" id="ep-overlay">
+      <span class="tool-overlay-pill">Coming Soon</span>
+    </div>
   <div class="ep-tool" id="elevator-pitch">
     <!-- Yellow header — visually distinct from the dark pressure-test above -->
     <div class="ep-tool-header">
@@ -1891,6 +1928,8 @@
       <button onclick="gateCancel('ep')" style="background:none;border:none;cursor:pointer;font-size:13px;color:var(--ink-soft);padding:4px 8px;">Cancel</button>
     </div>
   </div>
+
+  </div><!-- /ep-overlay-wrap -->
 
   <div class="footer">
     <span class="brand">Norton Reimagined</span>
@@ -2425,7 +2464,7 @@ function escHtmlEP(s) {
 }
 </script>
 <script src="nav.js">
-// ── Tool lock banner unlock ───────────────────────────────────────────────
+// ── Tool lock banner + overlay unlock ─────────────────────────────────────
 const GATE_PASS = 'dagim';
 
 function gateBannerClick(id) {
@@ -2442,7 +2481,12 @@ function gateCancel(id) {
 function gateUnlock(id) {
   const pw = (document.getElementById(id + '-pw').value || '').trim();
   if (pw === GATE_PASS) {
-    document.getElementById(id + '-lock-banner').remove();
+    // Remove banner
+    const banner = document.getElementById(id + '-lock-banner');
+    if (banner) banner.remove();
+    // Remove overlay
+    const overlay = document.getElementById(id + '-overlay');
+    if (overlay) overlay.remove();
   } else {
     document.getElementById(id + '-err').textContent = 'Incorrect password.';
     document.getElementById(id + '-pw').value = '';
