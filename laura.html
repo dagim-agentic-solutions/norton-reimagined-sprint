@@ -1704,7 +1704,7 @@
   <!-- ============================================ -->
   <div class="tool-gate-wrap" id="pt-gate-wrap">
     <div class="tool-gate-overlay" id="pt-overlay">
-      <div class="gate-idle" id="pt-idle" onclick="gateClick('pt')" style="display:flex;flex-direction:column;align-items:center;gap:10px;cursor:pointer;">
+      <div class="gate-idle" id="pt-idle" onclick="gateClick('pt')" style="display:flex;flex-direction:column;align-items:center;gap:10px;cursor:pointer;pointer-events:all;width:100%;height:100%;position:absolute;inset:0;justify-content:center;">
         <span class="tool-gate-pill">Coming Soon — Click to Unlock</span>
       </div>
       <div class="tool-gate-prompt-box" id="pt-form" style="display:none;">
@@ -1779,7 +1779,7 @@
   <!-- ============================================ -->
   <div class="tool-gate-wrap" id="ep-gate-wrap">
     <div class="tool-gate-overlay" id="ep-overlay">
-      <div class="gate-idle" id="ep-idle" onclick="gateClick('ep')" style="display:flex;flex-direction:column;align-items:center;gap:10px;cursor:pointer;">
+      <div class="gate-idle" id="ep-idle" onclick="gateClick('ep')" style="display:flex;flex-direction:column;align-items:center;gap:10px;cursor:pointer;pointer-events:all;width:100%;height:100%;position:absolute;inset:0;justify-content:center;">
         <span class="tool-gate-pill">Coming Soon — Click to Unlock</span>
       </div>
       <div class="tool-gate-prompt-box" id="ep-form" style="display:none;">
@@ -2413,9 +2413,8 @@ const GATE_PASS = 'dagim';
 const GATE_KEYS = { pt: 'gate_pt_unlocked', ep: 'gate_ep_unlocked' };
 
 function gateInit() {
-  ['pt','ep'].forEach(id => {
-    if (sessionStorage.getItem(GATE_KEYS[id]) === '1') gateRemove(id);
-  });
+  // Clear any stale unlock sessions so gate always shows on fresh page load
+  ['pt','ep'].forEach(id => sessionStorage.removeItem(GATE_KEYS[id]));
 }
 
 function gateClick(id) {
