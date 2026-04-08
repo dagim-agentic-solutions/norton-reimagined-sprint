@@ -1316,10 +1316,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    cursor: pointer;
     border-radius: inherit;
   }
-  .tool-gate-overlay:hover { background: rgba(255, 232, 0, 0.65); }
   /* EP tool: overlay only covers header + left column, not the 280px sidebar */
   #ep-gate-wrap > .tool-gate-overlay,
   #ep-gate-wrap > .tool-gate-prompt { right: 280px; }
@@ -1339,21 +1337,7 @@
     pointer-events: none;
     user-select: none;
   }
-  .tool-gate-prompt {
-    position: absolute;
-    inset: 0;
-    background: rgba(255, 232, 0, 0.75);
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
-    z-index: 21;
-    display: none;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    border-radius: inherit;
-  }
-  .tool-gate-prompt.active { display: flex; }
+
   .tool-gate-prompt-box {
     background: var(--ink);
     color: #fff;
@@ -1719,11 +1703,11 @@
   <!-- PRESSURE TEST SECTION -->
   <!-- ============================================ -->
   <div class="tool-gate-wrap" id="pt-gate-wrap">
-    <div class="tool-gate-overlay" id="pt-overlay" onclick="gateClick('pt')">
-      <span class="tool-gate-pill">Coming Soon — Click to Unlock</span>
-    </div>
-    <div class="tool-gate-prompt" id="pt-prompt">
-      <div class="tool-gate-prompt-box">
+    <div class="tool-gate-overlay" id="pt-overlay">
+      <div class="gate-idle" id="pt-idle" onclick="gateClick('pt')" style="display:flex;flex-direction:column;align-items:center;gap:10px;cursor:pointer;">
+        <span class="tool-gate-pill">Coming Soon — Click to Unlock</span>
+      </div>
+      <div class="tool-gate-prompt-box" id="pt-form" style="display:none;">
         <label>Enter sprint password</label>
         <input type="password" id="pt-pw" placeholder="••••••" maxlength="30" onkeydown="if(event.key==='Enter')gateUnlock('pt')">
         <div class="gate-err" id="pt-err"></div>
@@ -1794,11 +1778,11 @@
     <!-- ELEVATOR PITCH TOOL -->
   <!-- ============================================ -->
   <div class="tool-gate-wrap" id="ep-gate-wrap">
-    <div class="tool-gate-overlay" id="ep-overlay" onclick="gateClick('ep')">
-      <span class="tool-gate-pill">Coming Soon — Click to Unlock</span>
-    </div>
-    <div class="tool-gate-prompt" id="ep-prompt">
-      <div class="tool-gate-prompt-box">
+    <div class="tool-gate-overlay" id="ep-overlay">
+      <div class="gate-idle" id="ep-idle" onclick="gateClick('ep')" style="display:flex;flex-direction:column;align-items:center;gap:10px;cursor:pointer;">
+        <span class="tool-gate-pill">Coming Soon — Click to Unlock</span>
+      </div>
+      <div class="tool-gate-prompt-box" id="ep-form" style="display:none;">
         <label>Enter sprint password</label>
         <input type="password" id="ep-pw" placeholder="••••••" maxlength="30" onkeydown="if(event.key==='Enter')gateUnlock('ep')">
         <div class="gate-err" id="ep-err"></div>
@@ -2435,15 +2419,15 @@ function gateInit() {
 }
 
 function gateClick(id) {
-  document.getElementById(id + '-overlay').style.display = 'none';
-  const prompt = document.getElementById(id + '-prompt');
-  prompt.classList.add('active');
+  document.getElementById(id + '-idle').style.display = 'none';
+  document.getElementById(id + '-form').style.display = 'flex';
+  document.getElementById(id + '-form').style.flexDirection = 'column';
   setTimeout(() => document.getElementById(id + '-pw').focus(), 50);
 }
 
 function gateCancel(id) {
-  document.getElementById(id + '-prompt').classList.remove('active');
-  document.getElementById(id + '-overlay').style.display = '';
+  document.getElementById(id + '-form').style.display = 'none';
+  document.getElementById(id + '-idle').style.display = 'flex';
   document.getElementById(id + '-pw').value = '';
   document.getElementById(id + '-err').textContent = '';
 }
@@ -2460,10 +2444,11 @@ function gateUnlock(id) {
 }
 
 function gateRemove(id) {
+  const wrap = document.getElementById(id + '-gate-wrap');
   const overlay = document.getElementById(id + '-overlay');
-  const prompt = document.getElementById(id + '-prompt');
   if (overlay) overlay.remove();
-  if (prompt) prompt.remove();
+  // Remove the outer gate-wrap class so layout resets
+  if (wrap) wrap.classList.remove('tool-gate-wrap');
 }
 
 document.addEventListener('DOMContentLoaded', gateInit);
