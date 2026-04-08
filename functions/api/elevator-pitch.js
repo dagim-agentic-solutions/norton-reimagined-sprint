@@ -1,3 +1,5 @@
+import { runLLM } from "../_lib/llmRouter";
+
 /**
  * POST /api/elevator-pitch
  * Elevator pitch roleplay between Laura and a sprint participant.
@@ -110,29 +112,8 @@ export async function onRequestPost({ request, env }) {
     return new Response(JSON.stringify({ error: "Invalid JSON." }), { status: 400, headers });
   }
 
-  const apiKey = env.ANTHROPIC_API_KEY;
-  if (!apiKey) {
-    return new Response(JSON.stringify({ error: "Service misconfiguration." }), { status: 500, headers });
-  }
-
-  const callClaude = async (system, messages, maxTokens = 600) => {
-    const res = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": apiKey,
-        "anthropic-version": "2023-06-01",
-      },
-      body: JSON.stringify({
-        model: "claude-sonnet-4-5",
-        max_tokens: maxTokens,
-        system,
-        messages,
-      }),
-    });
-    if (!res.ok) throw new Error(`Anthropic ${res.status}`);
-    const data = await res.json();
-    return data.content?.[0]?.text || "";
+  const callLaura = async (system, messages, maxTokens = 600, mode = "strategy") => {
+    return runLLM({ env, mode, system, messages, maxTokens, temperature: 0.25 });
   };
 
   // ── VALIDATE ────────────────────────────────────────────────────────────────
@@ -160,7 +141,7 @@ Respond ONLY with valid JSON, no prose:
 { "valid": <true|false>, "feedback": "<if invalid: short friendly reason why, and what to add; if valid: empty string>" }`;
 
     try {
-      const raw = await callClaude("You are a validation assistant. Return only valid JSON.", [{ role: "user", content: validationPrompt }], 200);
+      const raw = await callLaura("You are a validation assistant. Return only valid JSON.", [{ role: "user", content: validationPrompt }], 200);
       const json = JSON.parse(raw.match(/\{[\s\S]*\}/)?.[0] || raw);
       return new Response(JSON.stringify(json), { status: 200, headers });
     } catch (err) {
@@ -189,7 +170,7 @@ ${lauraTurns >= 4 ? "This is your FINAL response. After addressing any remaining
     const messages = history.length > 0 ? history : [{ role: "user", content: `Hi, I'd like to pitch you an idea.` }];
 
     try {
-      const lauraReply = await callClaude(systemPrompt, messages, 400);
+      const lauraReply = await callLaura(systemPrompt, messages, 400);
 
       // If this was turn 5, also get the final verdict
       if (lauraTurns + 1 >= 5) {
@@ -198,7 +179,7 @@ ${lauraTurns >= 4 ? "This is your FINAL response. After addressing any remaining
           { role: "assistant", content: lauraReply },
           { role: "user", content: "Based on our conversation, what's your final verdict on this pitch?" },
         ];
-        const verdictRaw = await callClaude(
+        const verdictRaw = await callLaura(
           `You are Laura, the Outsourcer. You just had a 5-turn conversation about a product pitch. Provide your final verdict.\n${SPRINT_CHECKS_CONTEXT}\n${FINAL_VERDICT_PROMPT}`,
           verdictMessages,
           600

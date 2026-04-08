@@ -1,3 +1,5 @@
+import { runLLM } from "../_lib/llmRouter";
+
 /**
  * POST /api/idea-workshop
  * Takes the 7-step workshop state and either:
@@ -112,11 +114,6 @@ export async function onRequestPost({ request, env }) {
     return new Response(JSON.stringify({ error: "Invalid JSON." }), { status: 400, headers });
   }
 
-  const apiKey = env.ANTHROPIC_API_KEY;
-  if (!apiKey) {
-    return new Response(JSON.stringify({ error: "Service misconfiguration." }), { status: 500, headers });
-  }
-
   const {
     problem = '', persona = '', capabilities = [], coreIdea = '',
     differentiation = '', differentiators = [], magicMoment = '',
@@ -153,37 +150,17 @@ Evaluate the inputs now. If they are thin or generic, return followup mode. If t
 Return ONLY the JSON — no preamble, no explanation.`;
 
   try {
-    const res = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": apiKey,
-        "anthropic-version": "2023-06-01",
-      },
-      body: JSON.stringify({
-        model: "claude-sonnet-4-5",
-        max_tokens: 1500,
-        system: SYSTEM_PROMPT,
-        messages: [{ role: "user", content: userPrompt }],
-      }),
+    const raw = await runLLM({
+      env,
+      mode: "execution",
+      system: SYSTEM_PROMPT,
+      messages: [{ role: "user", content: userPrompt }],
+      maxTokens: refined ? 1500 : 900,
+      temperature: 0.4,
     });
-
-    if (!res.ok) {
-      const err = await res.text();
-      return new Response(JSON.stringify({ error: `API error: ${err.slice(0,200)}` }), { status: 502, headers });
-    }
-
-    const data = await res.json();
-    const raw = data.content?.[0]?.text || '{}';
-    let parsed;
-    try {
-      parsed = JSON.parse(raw.match(/\{[\s\S]*\}/)?.[0] || raw);
-    } catch {
-      return new Response(JSON.stringify({ error: "Could not parse AI response. Try again." }), { status: 500, headers });
-    }
-
+    const parsed = JSON.parse(raw.match(/\{[\s\S]*\}/)?.[0] || raw);
     return new Response(JSON.stringify(parsed), { status: 200, headers });
   } catch (err) {
-    return new Response(JSON.stringify({ error: `Network error: ${err.message}` }), { status: 502, headers });
+    return new Response(JSON.stringify({ error: `LLM error: ${err.message}` }), { status: 502, headers });
   }
 }

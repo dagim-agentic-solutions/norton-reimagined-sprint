@@ -1,3 +1,5 @@
+import { runLLM } from "../_lib/llmRouter";
+
 /**
  * POST /api/pressure-test
  * Scope: norton-reimagined-sprint only.
@@ -204,14 +206,6 @@ export async function onRequestPost({ request, env }) {
   }
 
   // 4. Load API key — never from caller, always from env
-  const apiKey = env.ANTHROPIC_API_KEY;
-  if (!apiKey) {
-    return new Response(
-      JSON.stringify({ error: "Service misconfiguration. Contact the sprint lead." }),
-      { status: 500, headers }
-    );
-  }
-
   // 5. Build prompt — Laura context + concept + schema
   const userPrompt = `${LAURA_CONTEXT}
 
@@ -223,69 +217,24 @@ ${concept.trim()}
 RESPONSE FORMAT (return ONLY this JSON, no other text):
 ${RESPONSE_SCHEMA}`;
 
-  // 6. Call Anthropic — model is fixed; caller cannot override
-  let anthropicRes;
   try {
-    anthropicRes = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": apiKey,
-        "anthropic-version": "2023-06-01",
-      },
-      body: JSON.stringify({
-        model: "claude-sonnet-4-5",
-        max_tokens: 1500,
-        messages: [{ role: "user", content: userPrompt }],
-      }),
+    const rawText = await runLLM({
+      env,
+      mode: "strategy",
+      messages: [{ role: "user", content: userPrompt }],
+      maxTokens: 1500,
+      temperature: 0.15,
     });
+    const cleaned = rawText
+      .replace(/^```(?:json)?\s*/i, "")
+      .replace(/\s*```$/, "")
+      .trim();
+    const result = JSON.parse(cleaned);
+    return new Response(JSON.stringify(result), { status: 200, headers });
   } catch (err) {
     return new Response(
-      JSON.stringify({ error: "Failed to reach Anthropic API.", detail: err.message }),
+      JSON.stringify({ error: "LLM error", detail: err.message }),
       { status: 502, headers }
     );
   }
-
-  if (!anthropicRes.ok) {
-    const errText = await anthropicRes.text().catch(() => "");
-    return new Response(
-      JSON.stringify({
-        error: "Anthropic API error.",
-        status: anthropicRes.status,
-        detail: errText.slice(0, 300),
-      }),
-      { status: 502, headers }
-    );
-  }
-
-  // 7. Parse Anthropic response
-  let data;
-  try {
-    data = await anthropicRes.json();
-  } catch {
-    return new Response(
-      JSON.stringify({ error: "Malformed response from Anthropic." }),
-      { status: 502, headers }
-    );
-  }
-
-  const rawText = data?.content?.[0]?.text ?? "";
-
-  // Strip accidental markdown code fences server-side
-  const cleaned = rawText
-    .replace(/^```(?:json)?\s*/i, "")
-    .replace(/\s*```$/, "")
-    .trim();
-
-  let result;
-  try {
-    result = JSON.parse(cleaned);
-  } catch {
-    return new Response(
-      JSON.stringify({ error: "Model returned invalid JSON", raw: rawText.slice(0, 500) }),
-      { status: 502, headers }
-    );
-  }
-
-  return new Response(JSON.stringify(result), { status: 200, headers });
 }
