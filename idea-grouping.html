@@ -1,0 +1,1264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Norton Reimagined Sprint · Idea Grouping</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" type="image/svg+xml" href="assets/norton-checkmark.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/icon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/icon-16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/icon-180.png">
+  <link rel="manifest" href="assets/site.webmanifest">
+  <style>
+    :root {
+      --ink: #242424;
+      --yellow: #FFE800;
+      --paper: #F8F8F7;
+      --card: #FFFFFF;
+      --line: #E6E6E4;
+      --ink-soft: #5a5a5a;
+      --ink-softer: #8a8a8a;
+      --green: #22c55e;
+      --red: #ef4444;
+      --blue: #3b82f6;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Inter Tight', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--paper);
+      color: var(--ink);
+      margin: 0;
+      min-height: 100vh;
+    }
+    .page {
+      padding: 32px 24px 80px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    @media (max-width: 768px) {
+      .page { padding: 24px 20px 64px; }
+    }
+
+    /* ── Header ── */
+    .page-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 32px;
+      flex-wrap: wrap;
+    }
+    .page-header-left {}
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-weight: 700;
+      border-radius: 999px;
+      background: var(--ink);
+      color: var(--yellow);
+      padding: 4px 12px;
+      margin-bottom: 12px;
+    }
+    .beta-badge {
+      background: #7c3aed;
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      padding: 2px 7px;
+      border-radius: 999px;
+      text-transform: uppercase;
+      margin-left: 4px;
+      vertical-align: middle;
+    }
+    .page-header h1 {
+      font-size: clamp(28px, 5vw, 48px);
+      font-weight: 800;
+      margin: 0 0 8px;
+      line-height: 1.1;
+    }
+    .page-header p {
+      font-size: 16px;
+      color: var(--ink-soft);
+      margin: 0;
+      max-width: 480px;
+    }
+
+    /* ── Lock status banner ── */
+    .lock-status {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+    .lock-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: 999px;
+      border: 2px solid transparent;
+    }
+    .lock-badge.unlocked {
+      background: #dcfce7;
+      color: #166534;
+      border-color: #bbf7d0;
+    }
+    .lock-badge.locked {
+      background: #fef2f2;
+      color: #991b1b;
+      border-color: #fecaca;
+    }
+    .lock-timestamp {
+      font-size: 11px;
+      color: var(--ink-softer);
+    }
+    .lock-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .lock-pw-wrap {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+    .lock-pw-wrap input {
+      font-size: 13px;
+      padding: 5px 10px;
+      border: 1.5px solid var(--line);
+      border-radius: 6px;
+      background: #fff;
+      width: 120px;
+    }
+
+    /* ── Layout ── */
+    .main-layout {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+    @media (max-width: 900px) {
+      .main-layout { grid-template-columns: 1fr; }
+    }
+
+    /* ── Form panel ── */
+    .form-panel {
+      background: var(--card);
+      border: 1.5px solid var(--line);
+      border-radius: 16px;
+      padding: 24px;
+      position: sticky;
+      top: 80px;
+    }
+    .form-panel h2 {
+      font-size: 15px;
+      font-weight: 700;
+      margin: 0 0 16px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--ink-softer);
+    }
+    .form-group {
+      margin-bottom: 14px;
+    }
+    .form-group label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--ink-softer);
+      margin-bottom: 5px;
+    }
+    .form-group input,
+    .form-group textarea {
+      width: 100%;
+      font-family: inherit;
+      font-size: 14px;
+      padding: 8px 12px;
+      border: 1.5px solid var(--line);
+      border-radius: 8px;
+      background: var(--paper);
+      color: var(--ink);
+      resize: vertical;
+      transition: border-color 0.15s;
+    }
+    .form-group input:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: var(--ink);
+    }
+    .form-group textarea { min-height: 70px; }
+    .form-group input:disabled,
+    .form-group textarea:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 700;
+      padding: 9px 18px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      transition: opacity 0.15s, transform 0.1s;
+    }
+    .btn:active { transform: scale(0.97); }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+    .btn-primary {
+      background: var(--ink);
+      color: var(--yellow);
+      width: 100%;
+      margin-top: 4px;
+    }
+    .btn-secondary {
+      background: var(--line);
+      color: var(--ink);
+    }
+    .btn-danger {
+      background: #fef2f2;
+      color: #dc2626;
+      border: 1px solid #fecaca;
+      font-size: 12px;
+      padding: 5px 10px;
+    }
+    .btn-lock {
+      background: #fef2f2;
+      color: #dc2626;
+      border: 1.5px solid #fecaca;
+    }
+    .btn-unlock {
+      background: #dcfce7;
+      color: #166534;
+      border: 1.5px solid #bbf7d0;
+    }
+
+    /* ── Board ── */
+    .board-area h2 {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--ink-softer);
+      margin: 0 0 14px;
+    }
+    .board-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+    }
+    @media (max-width: 1100px) {
+      .board-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 600px) {
+      .board-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ── Column ── */
+    .column {
+      background: var(--card);
+      border: 1.5px solid var(--line);
+      border-radius: 14px;
+      padding: 14px;
+      min-height: 200px;
+      display: flex;
+      flex-direction: column;
+      transition: border-color 0.15s;
+    }
+    .column.dragover {
+      border-color: var(--ink);
+      background: #f0f0ed;
+    }
+    .column-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .column-title-input {
+      flex: 1;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 700;
+      border: none;
+      background: transparent;
+      padding: 4px 6px;
+      border-radius: 6px;
+      color: var(--ink);
+      transition: background 0.15s;
+    }
+    .column-title-input:hover:not(:disabled) { background: var(--line); }
+    .column-title-input:focus { outline: 2px solid var(--ink); background: #fff; }
+    .column-title-input:disabled { cursor: not-allowed; }
+    .column-count {
+      font-size: 11px;
+      font-weight: 700;
+      background: var(--line);
+      color: var(--ink-softer);
+      border-radius: 999px;
+      padding: 2px 8px;
+      flex-shrink: 0;
+    }
+    .column-cards {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-height: 60px;
+    }
+
+    /* ── Idea card ── */
+    .idea-card {
+      background: var(--paper);
+      border: 1.5px solid var(--line);
+      border-radius: 10px;
+      padding: 12px;
+      cursor: grab;
+      transition: box-shadow 0.15s, border-color 0.15s;
+    }
+    .idea-card:active { cursor: grabbing; }
+    .idea-card.dragging {
+      opacity: 0.5;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    }
+    .idea-card-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 6px;
+      margin-bottom: 6px;
+    }
+    .drag-handle {
+      color: var(--ink-softer);
+      cursor: grab;
+      font-size: 14px;
+      flex-shrink: 0;
+      margin-top: 1px;
+      user-select: none;
+    }
+    @media (max-width: 768px) { .drag-handle { display: none; } }
+    .idea-title {
+      font-size: 14px;
+      font-weight: 700;
+      flex: 1;
+      line-height: 1.3;
+    }
+    .idea-desc {
+      font-size: 12px;
+      color: var(--ink-soft);
+      margin-bottom: 6px;
+      line-height: 1.5;
+    }
+    .idea-desc.clamped {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .expand-btn {
+      background: none;
+      border: none;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--ink-softer);
+      cursor: pointer;
+      padding: 0;
+      margin-bottom: 6px;
+      font-family: inherit;
+    }
+    .idea-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      margin-bottom: 8px;
+    }
+    .idea-meta-item {
+      font-size: 11px;
+      color: var(--ink-softer);
+      line-height: 1.4;
+    }
+    .idea-meta-item strong {
+      color: var(--ink-soft);
+      font-weight: 600;
+    }
+    .idea-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .idea-time {
+      font-size: 11px;
+      color: var(--ink-softer);
+    }
+    .idea-actions {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+    .move-btn {
+      display: none;
+      font-size: 12px;
+      font-weight: 600;
+      background: var(--line);
+      color: var(--ink);
+      border: none;
+      border-radius: 6px;
+      padding: 4px 10px;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    @media (max-width: 768px) { .move-btn { display: inline-flex; } }
+    .delete-inline {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .delete-pw-input {
+      font-size: 12px;
+      padding: 3px 8px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      width: 90px;
+      font-family: inherit;
+    }
+    .delete-pw-input:focus { outline: 1px solid var(--ink); }
+
+    /* ── Toast ── */
+    #toast-container {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      pointer-events: none;
+    }
+    .toast {
+      background: var(--ink);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 10px 18px;
+      border-radius: 10px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+      animation: toast-in 0.2s ease;
+      pointer-events: auto;
+    }
+    .toast.success { background: #166534; }
+    .toast.error { background: #991b1b; }
+    @keyframes toast-in {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Bottom sheet (mobile move) ── */
+    .bottom-sheet-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.4);
+      z-index: 1000;
+      align-items: flex-end;
+    }
+    .bottom-sheet-overlay.open { display: flex; }
+    .bottom-sheet {
+      background: #fff;
+      width: 100%;
+      border-radius: 16px 16px 0 0;
+      padding: 20px;
+      max-height: 70vh;
+      overflow-y: auto;
+    }
+    .bottom-sheet h3 {
+      font-size: 16px;
+      font-weight: 700;
+      margin: 0 0 14px;
+    }
+    .bottom-sheet-option {
+      display: block;
+      width: 100%;
+      text-align: left;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 600;
+      padding: 12px 16px;
+      border: 1.5px solid var(--line);
+      border-radius: 10px;
+      background: var(--paper);
+      cursor: pointer;
+      margin-bottom: 8px;
+    }
+    .bottom-sheet-option.active {
+      background: var(--ink);
+      color: var(--yellow);
+      border-color: var(--ink);
+    }
+    .bottom-sheet-cancel {
+      display: block;
+      width: 100%;
+      text-align: center;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 12px;
+      border: none;
+      background: none;
+      color: var(--ink-softer);
+      cursor: pointer;
+      margin-top: 4px;
+    }
+
+    .empty-col {
+      font-size: 12px;
+      color: var(--ink-softer);
+      text-align: center;
+      padding: 20px 0;
+      border: 1.5px dashed var(--line);
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-brand">
+        <img src="assets/norton-checkmark.svg" alt="" width="22" height="22">
+        Norton Reimagined
+      </a>
+      <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+      <ul class="nav-links" id="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="laura.html">Laura</a></li>
+        <li><a href="where-is-norton.html">Where is Norton</a></li>
+        <li><a href="prototypes.html">Prototypes</a></li>
+        <li><a href="resources.html">Resources</a></li>
+        <li class="nav-dropdown">
+          <button class="nav-dropdown-btn" id="sprintToolsBtn" aria-expanded="false" aria-haspopup="true">
+            Sprint Tools <span class="dropdown-arrow">▾</span>
+          </button>
+          <ul class="nav-dropdown-menu" id="sprintToolsMenu" role="menu">
+            <li><a href="concept-builder.html" role="menuitem">Prototype Builder</a></li>
+            <li><a href="competitive-analysis.html" role="menuitem">Competitive Analysis</a></li>
+            <li><a href="idea-workshop.html" role="menuitem">Ideation Wizard</a></li>
+            <li><a href="idea-grouping.html" role="menuitem" class="active">Idea Grouping β</a></li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="page">
+    <!-- Header -->
+    <div class="page-header">
+      <div class="page-header-left">
+        <div class="eyebrow">Sprint Tools <span class="beta-badge">Beta</span></div>
+        <h1>Idea Grouping</h1>
+        <p>Drag ideas into themed columns and lock the board when you're ready to present. Real-time collaboration — everyone sees changes instantly.</p>
+      </div>
+      <div class="lock-status" id="lockStatus">
+        <div class="lock-badge unlocked" id="lockBadge">
+          <span>🟢</span> <span id="lockBadgeText">Unlocked</span>
+        </div>
+        <div class="lock-timestamp" id="lockTimestampEl" style="display:none"></div>
+        <div class="lock-controls">
+          <div class="lock-pw-wrap" id="lockPwWrap" style="display:none">
+            <input type="password" id="lockPwInput" placeholder="Password…" autocomplete="off">
+            <button class="btn btn-secondary" id="lockPwConfirm" style="font-size:12px;padding:5px 12px;">Confirm</button>
+            <button class="btn btn-secondary" id="lockPwCancel" style="font-size:12px;padding:5px 12px;">✕</button>
+          </div>
+          <button class="btn btn-lock" id="lockBtn">🔒 Lock Board</button>
+          <button class="btn btn-unlock" id="unlockBtn" style="display:none">🔓 Unlock</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main layout -->
+    <div class="main-layout">
+      <!-- Submission form -->
+      <div class="form-panel">
+        <h2>Submit an Idea</h2>
+        <form id="ideaForm">
+          <div class="form-group">
+            <label for="ideaTitle">Title *</label>
+            <input type="text" id="ideaTitle" placeholder="Short, memorable name" required>
+          </div>
+          <div class="form-group">
+            <label for="ideaDesc">Description</label>
+            <textarea id="ideaDesc" placeholder="What is this idea?"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="ideaVision">How does this align to Norton's vision?</label>
+            <textarea id="ideaVision" placeholder="Describe the connection…"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="ideaLaura">What problems does this solve for Laura?</label>
+            <textarea id="ideaLaura" placeholder="Laura's pain points this addresses…"></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary" id="submitBtn">Submit Idea</button>
+        </form>
+      </div>
+
+      <!-- Board -->
+      <div class="board-area">
+        <h2>Board <span id="boardIdeaCount" style="font-weight:400;text-transform:none;letter-spacing:0;"></span></h2>
+        <div class="board-grid" id="boardGrid">
+          <!-- Columns rendered by JS -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom sheet for mobile move -->
+  <div class="bottom-sheet-overlay" id="bottomSheetOverlay">
+    <div class="bottom-sheet">
+      <h3>Move to column…</h3>
+      <div id="bottomSheetOptions"></div>
+      <button class="bottom-sheet-cancel" id="bottomSheetCancel">Cancel</button>
+    </div>
+  </div>
+
+  <!-- Toast container -->
+  <div id="toast-container"></div>
+
+  <script src="nav.js"></script>
+  <script>
+  (function () {
+    const API = '/api/idea-grouping';
+    const WS_PATH = '/ws/idea-grouping';
+
+    let board = null;
+    let draggedIdeaId = null;
+    let mobileMovingIdeaId = null;
+    let socket = null;
+    let wsRetries = 0;
+    const MAX_WS_RETRIES = 5;
+    let pollInterval = null;
+
+    // ── Toast ──────────────────────────────────────────────────────────────
+    function toast(msg, type = 'info') {
+      const el = document.createElement('div');
+      el.className = 'toast ' + type;
+      el.textContent = msg;
+      document.getElementById('toast-container').appendChild(el);
+      setTimeout(() => el.remove(), 3500);
+    }
+
+    // ── Relative time ──────────────────────────────────────────────────────
+    function relTime(iso) {
+      if (!iso) return '';
+      const diff = Date.now() - new Date(iso).getTime();
+      const s = Math.floor(diff / 1000);
+      if (s < 60) return 'just now';
+      const m = Math.floor(s / 60);
+      if (m < 60) return m + 'm ago';
+      const h = Math.floor(m / 60);
+      if (h < 24) return h + 'h ago';
+      return Math.floor(h / 24) + 'd ago';
+    }
+
+    // ── Lock UI ────────────────────────────────────────────────────────────
+    function updateLockUI() {
+      if (!board) return;
+      const lockBadge = document.getElementById('lockBadge');
+      const lockBadgeText = document.getElementById('lockBadgeText');
+      const lockTimestampEl = document.getElementById('lockTimestampEl');
+      const lockBtn = document.getElementById('lockBtn');
+      const unlockBtn = document.getElementById('unlockBtn');
+
+      if (board.locked) {
+        lockBadge.className = 'lock-badge locked';
+        lockBadgeText.textContent = 'Locked';
+        lockBadge.querySelector('span').textContent = '🔴';
+        lockBtn.style.display = 'none';
+        unlockBtn.style.display = '';
+        if (board.lockTimestamp) {
+          lockTimestampEl.style.display = '';
+          lockTimestampEl.textContent = 'Locked ' + relTime(board.lockTimestamp);
+        }
+      } else {
+        lockBadge.className = 'lock-badge unlocked';
+        lockBadgeText.textContent = 'Unlocked';
+        lockBadge.querySelector('span').textContent = '🟢';
+        lockBtn.style.display = '';
+        unlockBtn.style.display = 'none';
+        lockTimestampEl.style.display = 'none';
+      }
+
+      // Disable form inputs when locked
+      const formInputs = document.querySelectorAll('#ideaForm input, #ideaForm textarea, #ideaForm button');
+      formInputs.forEach(el => { el.disabled = board.locked; });
+
+      // Disable column title inputs when locked
+      document.querySelectorAll('.column-title-input').forEach(el => { el.disabled = board.locked; });
+
+      // Disable delete buttons when locked
+      document.querySelectorAll('.btn-danger').forEach(el => { el.disabled = board.locked; });
+    }
+
+    // ── Render board ───────────────────────────────────────────────────────
+    function render() {
+      if (!board) return;
+      const grid = document.getElementById('boardGrid');
+      const totalIdeas = board.ideas.length;
+      document.getElementById('boardIdeaCount').textContent = '— ' + totalIdeas + ' idea' + (totalIdeas !== 1 ? 's' : '');
+
+      // Preserve existing column DOM order by id
+      board.columns.forEach(col => {
+        let colEl = document.getElementById('col-' + col.id);
+        if (!colEl) {
+          colEl = createColumnEl(col);
+          grid.appendChild(colEl);
+        } else {
+          // Update title input if not focused
+          const titleInput = colEl.querySelector('.column-title-input');
+          if (titleInput && document.activeElement !== titleInput) {
+            titleInput.value = col.title;
+          }
+        }
+
+        const ideas = board.ideas.filter(i => i.columnId === col.id);
+        // Update count
+        colEl.querySelector('.column-count').textContent = ideas.length;
+
+        const cardsEl = colEl.querySelector('.column-cards');
+        // Rebuild cards
+        cardsEl.innerHTML = '';
+        if (ideas.length === 0) {
+          const empty = document.createElement('div');
+          empty.className = 'empty-col';
+          empty.textContent = 'Drop ideas here';
+          cardsEl.appendChild(empty);
+        } else {
+          ideas.forEach(idea => {
+            cardsEl.appendChild(createIdeaCardEl(idea));
+          });
+        }
+
+        // Remove columns not in board
+      });
+
+      // Remove stale columns
+      const existing = grid.querySelectorAll('.column');
+      existing.forEach(el => {
+        const colId = el.id.replace('col-', '');
+        if (!board.columns.find(c => c.id === colId)) {
+          el.remove();
+        }
+      });
+
+      updateLockUI();
+    }
+
+    function createColumnEl(col) {
+      const el = document.createElement('div');
+      el.className = 'column';
+      el.id = 'col-' + col.id;
+      el.dataset.colId = col.id;
+      el.innerHTML = `
+        <div class="column-header">
+          <input class="column-title-input" type="text" value="${escHtml(col.title)}" title="Click to rename column" ${board.locked ? 'disabled' : ''}>
+          <span class="column-count">0</span>
+        </div>
+        <div class="column-cards"></div>
+      `;
+
+      // Column title rename
+      const titleInput = el.querySelector('.column-title-input');
+      titleInput.addEventListener('keydown', e => {
+        if (e.key === 'Enter') { titleInput.blur(); }
+        if (e.key === 'Escape') { titleInput.value = col.title; titleInput.blur(); }
+      });
+      titleInput.addEventListener('blur', () => {
+        const newTitle = titleInput.value.trim();
+        if (newTitle && newTitle !== col.title) {
+          patchColumn(col.id, newTitle);
+        } else {
+          titleInput.value = col.title;
+        }
+      });
+
+      // Drag-over events
+      el.addEventListener('dragover', e => {
+        e.preventDefault();
+        el.classList.add('dragover');
+      });
+      el.addEventListener('dragleave', e => {
+        if (!el.contains(e.relatedTarget)) el.classList.remove('dragover');
+      });
+      el.addEventListener('drop', e => {
+        e.preventDefault();
+        el.classList.remove('dragover');
+        if (draggedIdeaId) {
+          moveIdea(draggedIdeaId, col.id);
+          draggedIdeaId = null;
+        }
+      });
+
+      return el;
+    }
+
+    function createIdeaCardEl(idea) {
+      const el = document.createElement('div');
+      el.className = 'idea-card';
+      el.draggable = !board.locked;
+      el.dataset.ideaId = idea.id;
+
+      const hasDesc = idea.description && idea.description.trim();
+      const hasVision = idea.visionAlignment && idea.visionAlignment.trim();
+      const hasLaura = idea.lauraProblem && idea.lauraProblem.trim();
+
+      el.innerHTML = `
+        <div class="idea-card-header">
+          <span class="drag-handle" title="Drag to move">⠿</span>
+          <div class="idea-title">${escHtml(idea.title)}</div>
+        </div>
+        ${hasDesc ? `
+          <div class="idea-desc clamped" id="desc-${idea.id}">${escHtml(idea.description)}</div>
+          <button class="expand-btn" id="expand-${idea.id}">Show more ▾</button>
+        ` : ''}
+        <div class="idea-meta">
+          ${hasVision ? `<div class="idea-meta-item"><strong>Vision:</strong> ${escHtml(idea.visionAlignment)}</div>` : ''}
+          ${hasLaura ? `<div class="idea-meta-item"><strong>Laura:</strong> ${escHtml(idea.lauraProblem)}</div>` : ''}
+        </div>
+        <div class="idea-footer">
+          <span class="idea-time">${relTime(idea.createdAt)}</span>
+          <div class="idea-actions">
+            <button class="move-btn" data-idea-id="${idea.id}">Move →</button>
+            <div class="delete-inline" id="del-${idea.id}">
+              <button class="btn btn-danger" id="delBtn-${idea.id}" ${board.locked ? 'disabled' : ''}>✕</button>
+            </div>
+          </div>
+        </div>
+      `;
+
+      // Expand/collapse
+      const expandBtn = el.querySelector('#expand-' + idea.id);
+      if (expandBtn) {
+        expandBtn.addEventListener('click', () => {
+          const descEl = el.querySelector('#desc-' + idea.id);
+          const expanded = !descEl.classList.contains('clamped');
+          descEl.classList.toggle('clamped', expanded);
+          expandBtn.textContent = expanded ? 'Show more ▾' : 'Show less ▴';
+        });
+      }
+
+      // Drag events
+      el.addEventListener('dragstart', e => {
+        if (board.locked) { e.preventDefault(); return; }
+        draggedIdeaId = idea.id;
+        el.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+      });
+      el.addEventListener('dragend', () => {
+        el.classList.remove('dragging');
+        draggedIdeaId = null;
+      });
+
+      // Mobile move button
+      const moveBtn = el.querySelector('.move-btn');
+      if (moveBtn) {
+        moveBtn.addEventListener('click', () => {
+          if (board.locked) return;
+          mobileMovingIdeaId = idea.id;
+          openBottomSheet(idea.columnId);
+        });
+      }
+
+      // Delete button
+      const delBtn = el.querySelector('#delBtn-' + idea.id);
+      if (delBtn) {
+        let deleteMode = false;
+        delBtn.addEventListener('click', () => {
+          if (board.locked) return;
+          if (deleteMode) return;
+          deleteMode = true;
+          const wrap = el.querySelector('#del-' + idea.id);
+          wrap.innerHTML = `
+            <input type="password" class="delete-pw-input" placeholder="Password" autocomplete="off" id="delPw-${idea.id}">
+            <button class="btn btn-danger" id="delConfirm-${idea.id}" style="font-size:12px;padding:4px 10px;">Delete</button>
+            <button class="btn btn-secondary" id="delCancel-${idea.id}" style="font-size:12px;padding:4px 8px;">✕</button>
+          `;
+          wrap.querySelector('#delPw-' + idea.id).focus();
+          wrap.querySelector('#delConfirm-' + idea.id).addEventListener('click', () => {
+            const pw = wrap.querySelector('#delPw-' + idea.id).value;
+            deleteIdea(idea.id, pw);
+          });
+          wrap.querySelector('#delCancel-' + idea.id).addEventListener('click', () => {
+            deleteMode = false;
+            wrap.innerHTML = `<button class="btn btn-danger" id="delBtn-${idea.id}" ${board.locked ? 'disabled' : ''}>✕</button>`;
+            wrap.querySelector('#delBtn-' + idea.id).addEventListener('click', arguments.callee);
+          });
+          wrap.querySelector('#delPw-' + idea.id).addEventListener('keydown', e => {
+            if (e.key === 'Enter') deleteIdea(idea.id, e.target.value);
+          });
+        });
+      }
+
+      return el;
+    }
+
+    // ── API calls ──────────────────────────────────────────────────────────
+    async function fetchBoard() {
+      try {
+        const res = await fetch(API);
+        if (!res.ok) throw new Error('Failed to load board');
+        board = await res.json();
+        render();
+      } catch (e) {
+        toast('Failed to load board', 'error');
+      }
+    }
+
+    async function submitIdea(data) {
+      const btn = document.getElementById('submitBtn');
+      btn.disabled = true;
+      btn.textContent = 'Submitting…';
+      try {
+        const res = await fetch(API + '/idea', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+        });
+        if (!res.ok) {
+          const e = await res.json().catch(() => ({}));
+          throw new Error(e.error || 'Failed to submit');
+        }
+        const idea = await res.json();
+        if (!board.ideas.find(i => i.id === idea.id)) {
+          board.ideas.push(idea);
+          render();
+        }
+        toast('Idea submitted!', 'success');
+        document.getElementById('ideaForm').reset();
+      } catch (e) {
+        toast(e.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Submit Idea';
+      }
+    }
+
+    async function moveIdea(ideaId, columnId) {
+      if (board.locked) return;
+      const idea = board.ideas.find(i => i.id === ideaId);
+      if (!idea || idea.columnId === columnId) return;
+      idea.columnId = columnId; // optimistic
+      render();
+      try {
+        const res = await fetch(API + '/idea/' + ideaId, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ columnId }),
+        });
+        if (!res.ok) {
+          const e = await res.json().catch(() => ({}));
+          throw new Error(e.error || 'Failed to move');
+        }
+        toast('Moved!', 'success');
+      } catch (e) {
+        toast(e.message, 'error');
+        await fetchBoard(); // rollback
+      }
+    }
+
+    async function deleteIdea(ideaId, password) {
+      try {
+        const res = await fetch(API + '/idea/' + ideaId, {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password }),
+        });
+        if (!res.ok) {
+          const e = await res.json().catch(() => ({}));
+          throw new Error(e.error || 'Failed to delete');
+        }
+        board.ideas = board.ideas.filter(i => i.id !== ideaId);
+        render();
+        toast('Idea deleted', 'success');
+      } catch (e) {
+        toast(e.message, 'error');
+      }
+    }
+
+    async function patchColumn(colId, title) {
+      try {
+        const res = await fetch(API + '/column/' + colId, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title }),
+        });
+        if (!res.ok) {
+          const e = await res.json().catch(() => ({}));
+          throw new Error(e.error || 'Failed to rename column');
+        }
+        const col = board.columns.find(c => c.id === colId);
+        if (col) col.title = title;
+        render();
+        toast('Column renamed', 'success');
+      } catch (e) {
+        toast(e.message, 'error');
+        await fetchBoard();
+      }
+    }
+
+    async function lockBoard(password) {
+      try {
+        const res = await fetch(API + '/lock', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password }),
+        });
+        if (!res.ok) {
+          const e = await res.json().catch(() => ({}));
+          throw new Error(e.error || 'Failed to lock');
+        }
+        const data = await res.json();
+        board.locked = true;
+        board.lockTimestamp = data.lockTimestamp;
+        hideLockPw();
+        render();
+        toast('Board locked 🔒', 'success');
+      } catch (e) {
+        toast(e.message, 'error');
+      }
+    }
+
+    async function unlockBoard(password) {
+      try {
+        const res = await fetch(API + '/unlock', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password }),
+        });
+        if (!res.ok) {
+          const e = await res.json().catch(() => ({}));
+          throw new Error(e.error || 'Failed to unlock');
+        }
+        board.locked = false;
+        board.lockTimestamp = null;
+        hideLockPw();
+        render();
+        toast('Board unlocked 🔓', 'success');
+      } catch (e) {
+        toast(e.message, 'error');
+      }
+    }
+
+    // ── Lock UI controls ───────────────────────────────────────────────────
+    let lockAction = null; // 'lock' | 'unlock'
+
+    function showLockPw(action) {
+      lockAction = action;
+      const wrap = document.getElementById('lockPwWrap');
+      wrap.style.display = 'flex';
+      document.getElementById('lockPwInput').value = '';
+      document.getElementById('lockPwInput').focus();
+      document.getElementById('lockBtn').style.display = 'none';
+      document.getElementById('unlockBtn').style.display = 'none';
+    }
+
+    function hideLockPw() {
+      document.getElementById('lockPwWrap').style.display = 'none';
+      document.getElementById('lockPwInput').value = '';
+    }
+
+    document.getElementById('lockBtn').addEventListener('click', () => showLockPw('lock'));
+    document.getElementById('unlockBtn').addEventListener('click', () => showLockPw('unlock'));
+    document.getElementById('lockPwCancel').addEventListener('click', () => {
+      hideLockPw();
+      updateLockUI();
+    });
+    document.getElementById('lockPwConfirm').addEventListener('click', () => {
+      const pw = document.getElementById('lockPwInput').value;
+      if (lockAction === 'lock') lockBoard(pw);
+      else unlockBoard(pw);
+    });
+    document.getElementById('lockPwInput').addEventListener('keydown', e => {
+      if (e.key === 'Enter') document.getElementById('lockPwConfirm').click();
+      if (e.key === 'Escape') document.getElementById('lockPwCancel').click();
+    });
+
+    // ── Form submit ────────────────────────────────────────────────────────
+    document.getElementById('ideaForm').addEventListener('submit', e => {
+      e.preventDefault();
+      if (board && board.locked) return;
+      submitIdea({
+        title: document.getElementById('ideaTitle').value,
+        description: document.getElementById('ideaDesc').value,
+        visionAlignment: document.getElementById('ideaVision').value,
+        lauraProblem: document.getElementById('ideaLaura').value,
+      });
+    });
+
+    // ── Bottom sheet (mobile) ──────────────────────────────────────────────
+    function openBottomSheet(currentColId) {
+      const overlay = document.getElementById('bottomSheetOverlay');
+      const opts = document.getElementById('bottomSheetOptions');
+      opts.innerHTML = '';
+      board.columns.forEach(col => {
+        const btn = document.createElement('button');
+        btn.className = 'bottom-sheet-option' + (col.id === currentColId ? ' active' : '');
+        btn.textContent = col.title;
+        btn.addEventListener('click', () => {
+          if (mobileMovingIdeaId && col.id !== currentColId) {
+            moveIdea(mobileMovingIdeaId, col.id);
+          }
+          closeBottomSheet();
+        });
+        opts.appendChild(btn);
+      });
+      overlay.classList.add('open');
+    }
+
+    function closeBottomSheet() {
+      document.getElementById('bottomSheetOverlay').classList.remove('open');
+      mobileMovingIdeaId = null;
+    }
+
+    document.getElementById('bottomSheetCancel').addEventListener('click', closeBottomSheet);
+    document.getElementById('bottomSheetOverlay').addEventListener('click', e => {
+      if (e.target === document.getElementById('bottomSheetOverlay')) closeBottomSheet();
+    });
+
+    // ── WebSocket ──────────────────────────────────────────────────────────
+    function connectWS() {
+      if (socket) return;
+      const proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
+      // WS URL: if IDEA_GROUPING_WS_URL is set in env, use it; otherwise fall back to same host pattern
+      // We'll use a data attribute or just try the CF worker URL pattern
+      // For Pages, the WS goes to the separate worker
+      const wsUrl = (window.__WS_URL__ || proto + '//' + location.host + WS_PATH);
+      try {
+        socket = new WebSocket(wsUrl);
+      } catch {
+        scheduleReconnect();
+        return;
+      }
+
+      socket.addEventListener('open', () => {
+        wsRetries = 0;
+        stopPolling();
+      });
+
+      socket.addEventListener('message', e => {
+        try {
+          const evt = JSON.parse(e.data);
+          handleWSEvent(evt);
+        } catch {}
+      });
+
+      socket.addEventListener('close', () => {
+        socket = null;
+        scheduleReconnect();
+      });
+
+      socket.addEventListener('error', () => {
+        socket = null;
+      });
+    }
+
+    function scheduleReconnect() {
+      if (wsRetries >= MAX_WS_RETRIES) {
+        startPolling();
+        return;
+      }
+      const delay = Math.min(1000 * Math.pow(2, wsRetries), 30000);
+      wsRetries++;
+      setTimeout(() => {
+        socket = null;
+        connectWS();
+      }, delay);
+    }
+
+    function startPolling() {
+      if (pollInterval) return;
+      pollInterval = setInterval(fetchBoard, 15000);
+    }
+
+    function stopPolling() {
+      if (pollInterval) {
+        clearInterval(pollInterval);
+        pollInterval = null;
+      }
+    }
+
+    function handleWSEvent(evt) {
+      if (!board) return;
+      const { type, payload } = evt;
+      switch (type) {
+        case 'idea:created':
+          if (!board.ideas.find(i => i.id === payload.id)) {
+            board.ideas.push(payload);
+            render();
+            toast('New idea: ' + payload.title);
+          }
+          break;
+        case 'idea:updated': {
+          const idx = board.ideas.findIndex(i => i.id === payload.id);
+          if (idx !== -1) {
+            board.ideas[idx] = { ...board.ideas[idx], ...payload };
+            render();
+          }
+          break;
+        }
+        case 'idea:deleted':
+          board.ideas = board.ideas.filter(i => i.id !== payload.id);
+          render();
+          break;
+        case 'column:updated': {
+          const col = board.columns.find(c => c.id === payload.id);
+          if (col) { col.title = payload.title; render(); }
+          break;
+        }
+        case 'board:lock':
+          board.locked = true;
+          board.lockTimestamp = payload.lockTimestamp;
+          render();
+          toast('Board locked by someone else 🔒');
+          break;
+        case 'board:unlock':
+          board.locked = false;
+          board.lockTimestamp = null;
+          render();
+          toast('Board unlocked 🔓');
+          break;
+      }
+    }
+
+    // ── Helpers ────────────────────────────────────────────────────────────
+    function escHtml(str) {
+      if (!str) return '';
+      return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    // ── Init ───────────────────────────────────────────────────────────────
+    fetchBoard().then(() => {
+      connectWS();
+    });
+
+  })();
+  </script>
+</body>
+</html>
