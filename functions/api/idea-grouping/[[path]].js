@@ -56,7 +56,12 @@ async function getBoard(env) {
   const raw = await env.PROTOTYPES_KV.get(KV_KEY);
   if (!raw) return defaultBoard();
   try {
-    return JSON.parse(raw);
+    const board = JSON.parse(raw);
+    // Ensure col-0 (Ideas Pool) always exists — backfill for boards saved before it was added
+    if (!board.columns.find(c => c.id === 'col-0')) {
+      board.columns.unshift({ id: 'col-0', title: 'Ideas Pool', inbox: true });
+    }
+    return board;
   } catch {
     return defaultBoard();
   }
