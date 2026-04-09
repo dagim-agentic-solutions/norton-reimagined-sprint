@@ -829,15 +829,18 @@
         if (!res.ok || !data.ok) throw new Error(data.error || 'Generation failed');
 
         const newItems = data.items || [];
-        if (newItems.length === 0) {
-          toast('All generated items were duplicates', 'error');
+        // Deduplicate against already-rendered items (WS may arrive before or after this)
+        const fresh = newItems.filter(item => !allItems.find(i => i.id === item.id));
+        if (fresh.length === 0) {
+          toast('All generated items were duplicates or already shown', 'info');
         } else {
-          newItems.forEach(item => {
+          fresh.forEach(item => {
             allItems.unshift(item);
             renderCard(item, true);
           });
           updateCount();
-          toast(newItems.length + ' HMW statement' + (newItems.length > 1 ? 's' : '') + ' added', 'success');
+          updateRankButtons();
+          toast(fresh.length + ' HMW statement' + (fresh.length > 1 ? 's' : '') + ' added', 'success');
         }
       } catch (e) {
         toast(e.message || 'Generation failed', 'error');
