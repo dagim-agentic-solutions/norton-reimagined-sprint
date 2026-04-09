@@ -587,7 +587,10 @@
       border: 1.5px dashed var(--line);
       border-radius: 8px;
     }
-  </style>
+  
+    .req-star { color: #e63946; font-size: 0.85em; margin-left: 2px; }
+    textarea:required:invalid { border-color: #e63946; }
+</style>
 </head>
 <body>
   <nav class="nav">
@@ -656,16 +659,16 @@
             <input type="text" id="ideaTitle" placeholder="Short, memorable name" required>
           </div>
           <div class="form-group">
-            <label for="ideaDesc">Description</label>
-            <textarea id="ideaDesc" placeholder="What is this idea?"></textarea>
+            <label for="ideaDesc">Description <span class="req-star">*</span></label>
+            <textarea id="ideaDesc" placeholder="What is this idea?" required></textarea>
           </div>
           <div class="form-group">
-            <label for="ideaVision">How does this align to Norton's vision?</label>
-            <textarea id="ideaVision" placeholder="Describe the connection…"></textarea>
+            <label for="ideaVision">How does this align to Norton's vision? <span class="req-star">*</span></label>
+            <textarea id="ideaVision" placeholder="Describe the connection…" required></textarea>
           </div>
           <div class="form-group">
-            <label for="ideaLaura">What problems does this solve for Laura?</label>
-            <textarea id="ideaLaura" placeholder="Laura's pain points this addresses…"></textarea>
+            <label for="ideaLaura">What problems does this solve for Laura? <span class="req-star">*</span></label>
+            <textarea id="ideaLaura" placeholder="Laura's pain points this addresses…" required></textarea>
           </div>
           <button type="submit" class="btn btn-primary" id="submitBtn">Submit Idea</button>
         </form>
@@ -1190,6 +1193,15 @@
     document.getElementById('ideaForm').addEventListener('submit', e => {
       e.preventDefault();
       if (board && board.locked) return;
+      // Validate required fields
+      const desc = document.getElementById('ideaDesc').value.trim();
+      const vision = document.getElementById('ideaVision').value.trim();
+      const laura = document.getElementById('ideaLaura').value.trim();
+      if (!desc || !vision || !laura) {
+        const missing = [!desc && 'Description', !vision && 'How does this align to Norton's vision', !laura && 'What problems does this solve for Laura'].filter(Boolean);
+        alert('Please fill in: ' + missing.join(', '));
+        return;
+      }
       submitIdea({
         title: document.getElementById('ideaTitle').value,
         description: document.getElementById('ideaDesc').value,
