@@ -595,6 +595,7 @@
   <script>
     // ── State ──
     let allItems = [];
+    const pendingIds = new Set(); // IDs currently being added by this client — WS ignores these
 
     // ── Nav ──
     (function() {
@@ -818,19 +819,34 @@
 
       generateBtn.disabled = true;
       generateBtn.innerHTML = '<span class="spinner"></span> Generating...';
+      const myClientId = Math.random().toString(36).slice(2);
 
       try {
         const res = await fetch('/api/hmw', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ painPoints, variants, channel, journeyStage }),
+          body: JSON.stringify({ painPoints, variants, channel, journeyStage, clientId: myClientId }),
         });
         const data = await res.json();
         if (!res.ok || !data.ok) throw new Error(data.error || 'Generation failed');
 
+                // Claim these IDs before rendering so WS handler skips them
         const newItems = data.items || [];
-        // Deduplicate against already-rendered items (WS may arrive before or after this)
+        newItems.forEach(item => pendingIds.add(item.id));
         const fresh = newItems.filter(item => !allItems.find(i => i.id === item.id));
+        if (fresh.length === 0) {
+          toast('All generated items were duplicates or already shown', 'info');
+        } else {
+          fresh.forEach(item => {
+            allItems.unshift(item);
+            renderCard(item, true);
+          });
+          updateCount();
+          updateRankButtons();
+          toast(fresh.length + ' HMW statement' + (fresh.length > 1 ? 's' : '') + ' added', 'success');
+        }
+        // Release pending lock after a short delay (WS should have fired by then)
+        setTimeout(() => newItems.forEach(item => pendingIds.delete(item.id)), 3000);
         if (fresh.length === 0) {
           toast('All generated items were duplicates or already shown', 'info');
         } else {
@@ -929,6 +945,8 @@
             const msg = JSON.parse(e.data);
             if (msg.type === 'hmw:new' && Array.isArray(msg.items)) {
               msg.items.forEach(function(item) {
+                // Skip items this client is already adding (from its own POST response)
+                if (pendingIds.has(item.id)) return;
                 if (!allItems.find(function(i) { return i.id === item.id; })) {
                   allItems.unshift(item);
                   renderCard(item, true);
