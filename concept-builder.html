@@ -477,6 +477,34 @@
   color: var(--yellow);
 }
 .tone-item.selected .tone-check { display: inline; }
+.tone-item.custom-tone { border-style: dashed; }
+.tone-item.custom-tone .tone-name { color: var(--ink-soft); }
+.tone-item.custom-tone.has-content .tone-name { color: var(--ink); font-style: normal; }
+.tone-item.custom-tone.selected .tone-name { color: #fff; }
+.tone-custom-textarea {
+  width: 100%;
+  margin-top: 10px;
+  background: rgba(255,255,255,.06);
+  border: 1.5px solid rgba(0,0,0,.12);
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-size: 12px;
+  font-family: inherit;
+  color: var(--ink);
+  resize: vertical;
+  min-height: 72px;
+  outline: none;
+  box-sizing: border-box;
+  line-height: 1.45;
+  transition: border-color .15s;
+}
+.tone-custom-textarea:focus { border-color: var(--ink); }
+.tone-item.selected .tone-custom-textarea {
+  background: rgba(255,255,255,.1);
+  border-color: rgba(255,255,255,.25);
+  color: #fff;
+}
+.tone-item.selected .tone-custom-textarea::placeholder { color: rgba(255,255,255,.4); }
 
 /* ── Generate button ─────────────────────────────────────────────────────── */
 .generate-wrap {
@@ -1498,10 +1526,48 @@ let _selectedTone = null;
     });
     grid.appendChild(item);
   });
+
+  // Custom voice & tone card
+  const custom = document.createElement('div');
+  custom.className = 'tone-item custom-tone';
+  custom.id = 'tone-custom';
+  custom.innerHTML = `
+    <span class="tone-check">✓</span>
+    <div class="tone-name" style="font-style:italic;">+ Custom voice &amp; tone</div>
+    <div class="tone-desc">Define your own voice — describe the personality, feeling, and writing style you want the prototype to use.</div>
+    <textarea class="tone-custom-textarea" id="customToneText" maxlength="400" rows="3"
+      placeholder="e.g. Empowering and bold — speaks to Laura like she's the hero, not the victim. Short punchy sentences. Never passive. Ends every interaction with a clear next action."
+      onclick="event.stopPropagation()"
+      oninput="onCustomToneInput(this)"></textarea>
+    <div style="font-size:10px;color:rgba(0,0,0,.3);text-align:right;margin-top:3px;" id="customToneCC">0 / 400</div>`;
+  custom.addEventListener('click', () => {
+    document.querySelectorAll('.tone-item').forEach(el => el.classList.remove('selected'));
+    custom.classList.add('selected');
+    _selectedTone = 'custom';
+    setTimeout(() => document.getElementById('customToneText')?.focus(), 50);
+  });
+  grid.appendChild(custom);
 })();
+
+function onCustomToneInput(el) {
+  const cc = document.getElementById('customToneCC');
+  if (cc) cc.textContent = `${el.value.length} / 400`;
+  const card = document.getElementById('tone-custom');
+  if (card) card.classList.toggle('has-content', el.value.trim().length > 0);
+  // Auto-select this card when user types
+  if (el.value.trim()) {
+    document.querySelectorAll('.tone-item').forEach(e => e.classList.remove('selected'));
+    card?.classList.add('selected');
+    _selectedTone = 'custom';
+  }
+}
 
 function getSelectedTone() {
   if (_selectedTone === null) return '';
+  if (_selectedTone === 'custom') {
+    const val = (document.getElementById('customToneText')?.value || '').trim();
+    return val ? `Custom voice & tone defined by the participant: ${val}` : '';
+  }
   return TONE_OPTIONS[_selectedTone].prompt;
 }
 
