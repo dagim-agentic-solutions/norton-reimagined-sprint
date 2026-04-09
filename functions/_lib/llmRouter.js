@@ -1,7 +1,7 @@
 const MODE_CHAINS = {
   strategy: [
     { provider: "anthropic", model: "claude-sonnet-4-6" },
-    { provider: "openai", model: "gpt-4.1-mini" }
+    { provider: "anthropic", model: "claude-haiku-4-5" }
   ],
   research: [
     { provider: "gemini", model: "gemini-2.0-pro" },
