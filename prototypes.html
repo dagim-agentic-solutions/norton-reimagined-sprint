@@ -996,7 +996,7 @@ async function loadPrototypes() {
           ${p.lauraScore != null ? `
           <div class="laura-score" id="score-wrap-${p.id}">
             <div>
-              <button class="btn-show-score" id="score-btn-${p.id}" data-id="${p.id}" onclick="revealScore(this.dataset.id)">Show Score</button>
+              <button class="btn-show-score" id="score-btn-${p.id}" data-reveal-id="${p.id}">Show Score</button>
               <span class="score-badge ${lauraClass(p.lauraVerdict)}" id="score-num-${p.id}" style="display:none;">${p.lauraScore}</span>
             </div>
             <div>
@@ -1925,12 +1925,14 @@ function lauraClass(verdict) {
 
 <script src="nav.js"></script>
 <script>
-function revealScore(id) {
-  const btn = document.getElementById('score-btn-' + id);
+document.addEventListener('click', function(e) {
+  const btn = e.target.closest('[data-reveal-id]');
+  if (!btn) return;
+  const id = btn.getAttribute('data-reveal-id');
+  btn.style.display = 'none';
   const num = document.getElementById('score-num-' + id);
-  if (btn) btn.style.display = 'none';
   if (num) num.style.display = 'inline';
-}
+});
 </script>
 </body>
 </html>
