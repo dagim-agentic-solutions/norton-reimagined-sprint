@@ -781,6 +781,27 @@
     border-radius: 5px;
     border: 1px solid #e8e8e6;
   }
+  .score-reveal-wrap {
+    margin-top: 12px;
+    padding: 8px 12px;
+    background: #f8f8f7;
+    border-radius: 5px;
+    border: 1px solid #e8e8e6;
+  }
+  .btn-show-score {
+    background: none;
+    border: 1.5px solid #d0d0ce;
+    border-radius: 5px;
+    padding: 5px 14px;
+    font-size: 12px;
+    font-weight: 700;
+    font-family: inherit;
+    color: #666;
+    cursor: pointer;
+    letter-spacing: .03em;
+    transition: border-color .15s, color .15s;
+  }
+  .btn-show-score:hover { border-color: #888; color: #333; }
   .score-badge {
     font-size: 20px;
     font-weight: 800;
@@ -842,6 +863,8 @@
           <li><a href="competitive-analysis.html" role="menuitem">Competitive Analysis</a></li>
           <li><a href="idea-workshop.html" role="menuitem">Ideation Wizard</a></li>
             <li><a href="idea-grouping.html" role="menuitem">Idea Grouping</a></li>
+            <li><a href="dependency-assessment.html" role="menuitem">Dependency Assessment</a></li>
+            <li><a href="how-might-we.html" role="menuitem">How Might We</a></li>
         </ul>
       </li>
     </ul>
@@ -971,11 +994,14 @@ async function loadPrototypes() {
             </a>
           </div>
           ${p.lauraScore != null ? `
-          <div class="laura-score">
-            <div class="score-badge ${lauraClass(p.lauraVerdict)}">${p.lauraScore}</div>
-            <div>
-              <div class="score-verdict">${escapeHtml(p.lauraVerdict || '')}</div>
-              <div class="score-reco">${escapeHtml(p.lauraRecommendation || '')}</div>
+          <div class="score-reveal-wrap" id="score-wrap-${p.id}">
+            <button class="btn-show-score" onclick="revealScore('${p.id}')">Show Score</button>
+            <div class="laura-score" id="score-body-${p.id}" style="display:none;margin-top:0;padding:0;background:none;border:none;">
+              <div class="score-badge ${lauraClass(p.lauraVerdict)}">${p.lauraScore}</div>
+              <div>
+                <div class="score-verdict">${escapeHtml(p.lauraVerdict || '')}</div>
+                <div class="score-reco">${escapeHtml(p.lauraRecommendation || '')}</div>
+              </div>
             </div>
           </div>` : ''}
           <div class="vote-row" id="vr-${escapeAttr(p.id)}">
@@ -1897,6 +1923,14 @@ function lauraClass(verdict) {
   </div>
 </div>
 
-<script src="nav.js"></script>
+<script src="nav.js">
+function revealScore(id) {
+  const wrap = document.getElementById('score-wrap-' + id);
+  const body = document.getElementById('score-body-' + id);
+  const btn = wrap && wrap.querySelector('.btn-show-score');
+  if (btn) btn.style.display = 'none';
+  if (body) body.style.display = 'flex';
+}
+</script>
 </body>
 </html>
