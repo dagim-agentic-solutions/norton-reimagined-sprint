@@ -191,6 +191,9 @@ Verdict bands: 90-100 → LOVES IT | 75-89 → LIKES IT | 55-74 → MEH | 35-54 
     lauraScore: updated.lauraScore,
     lauraVerdict: updated.lauraVerdict,
     lauraRecommendation: updated.lauraRecommendation,
+    lauraEngagementScore: updated.lauraEngagementScore,
+    lauraGrowthScore: updated.lauraGrowthScore,
+    lauraHeritageScore: updated.lauraHeritageScore,
     screensAnalyzed: crawlResult.screens.length,
   });
 }
