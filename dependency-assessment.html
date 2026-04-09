@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Norton Reimagined Sprint · Dependency Assessment</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="assets/favicon.ico">
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/icon-180.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="assets/icon-152.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="assets/icon-144.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="assets/icon-120.png">
+  <link rel="manifest" href="assets/site.webmanifest">
+  <style>
+    /* ── Dependency Assessment specific styles ── */
+    .dep-disclaimer {
+      background: #fffbeb;
+      border: 1.5px solid #f59e0b;
+      border-radius: 10px;
+      padding: 1rem 1.25rem;
+      margin-bottom: 2rem;
+      font-size: 0.875rem;
+      color: #78350f;
+      line-height: 1.6;
+    }
+    .dep-disclaimer strong { color: #92400e; }
+
+    .dep-form {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      max-width: 640px;
+    }
+
+    .dep-form label {
+      font-weight: 600;
+      font-size: 0.875rem;
+      color: var(--fg, #111);
+      margin-bottom: 0.35rem;
+      display: block;
+    }
+
+    .dep-form select {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 1.5px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 0.9375rem;
+      font-family: inherit;
+      background: #fff;
+      color: #111;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b7280' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 1rem center;
+      cursor: pointer;
+    }
+
+    .dep-form select:focus {
+      outline: none;
+      border-color: #fbbf24;
+      box-shadow: 0 0 0 3px rgba(251,191,36,0.2);
+    }
+
+    .dep-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.5rem;
+      background: #111;
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.9375rem;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.15s, opacity 0.15s;
+      width: fit-content;
+    }
+    .dep-btn:hover:not(:disabled) { background: #fbbf24; color: #111; }
+    .dep-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+    .dep-loading {
+      display: none;
+      align-items: center;
+      gap: 1rem;
+      padding: 1.5rem;
+      color: #6b7280;
+      font-size: 0.9375rem;
+    }
+    .dep-loading.visible { display: flex; }
+
+    .dep-spinner {
+      width: 24px; height: 24px;
+      border: 3px solid #e5e7eb;
+      border-top-color: #fbbf24;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      flex-shrink: 0;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Report ── */
+    .dep-report {
+      display: none;
+      margin-top: 2.5rem;
+    }
+    .dep-report.visible { display: block; }
+
+    .dep-report-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 1.5rem;
+    }
+
+    .dep-report-title {
+      font-size: 1.375rem;
+      font-weight: 800;
+      color: #111;
+    }
+
+    .dep-copy-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.5rem 1rem;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      background: #f3f4f6;
+      border: 1.5px solid #e5e7eb;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.15s;
+      white-space: nowrap;
+    }
+    .dep-copy-btn:hover { background: #e5e7eb; }
+    .dep-copy-btn.copied { background: #d1fae5; border-color: #6ee7b7; color: #065f46; }
+
+    .dep-cache-note {
+      font-size: 0.8125rem;
+      color: #6b7280;
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      padding: 0.5rem 0.75rem;
+      margin-bottom: 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+    .dep-cache-note span { flex: 1; }
+    .btn-regenerate {
+      background: none;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      padding: 4px 12px;
+      font-size: 0.75rem;
+      color: #6b7280;
+      cursor: pointer;
+      font-family: inherit;
+      white-space: nowrap;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .btn-regenerate:hover { border-color: #9ca3af; color: #374151; }
+    .btn-regenerate:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .dep-summary {
+      background: #f9fafb;
+      border-radius: 10px;
+      padding: 1rem 1.25rem;
+      font-size: 0.9375rem;
+      line-height: 1.65;
+      color: #374151;
+      margin-bottom: 2rem;
+    }
+
+    .dep-section {
+      margin-bottom: 2rem;
+    }
+    .dep-section-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #111;
+      margin-bottom: 0.75rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1.5px solid #e5e7eb;
+    }
+
+    /* Tags */
+    .dep-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.2rem 0.55rem;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+    .dep-tag.exists       { background: #d1fae5; color: #065f46; }
+    .dep-tag.enhancement  { background: #fef3c7; color: #92400e; }
+    .dep-tag.net-new      { background: #fee2e2; color: #991b1b; }
+    .dep-tag.config-change{ background: #dbeafe; color: #1e40af; }
+    .dep-tag.review-needed{ background: #f3f4f6; color: #374151; border: 1px solid #d1d5db; }
+    .dep-tag.new-integration { background: #ede9fe; color: #5b21b6; }
+
+    /* Shared Services Table */
+    .dep-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.875rem;
+    }
+    .dep-table th {
+      text-align: left;
+      font-weight: 600;
+      color: #6b7280;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 0.5rem 0.75rem;
+      background: #f9fafb;
+      border-bottom: 1.5px solid #e5e7eb;
+    }
+    .dep-table td {
+      padding: 0.65rem 0.75rem;
+      border-bottom: 1px solid #f3f4f6;
+      vertical-align: top;
+      line-height: 1.5;
+    }
+    .dep-table tr:last-child td { border-bottom: none; }
+    .dep-table tr:hover td { background: #fafafa; }
+
+    /* Lists */
+    .dep-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .dep-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.6rem;
+      font-size: 0.9rem;
+      line-height: 1.5;
+      color: #374151;
+    }
+    .dep-list li .dep-tag { flex-shrink: 0; margin-top: 0.05rem; }
+
+    .dep-empty {
+      font-size: 0.875rem;
+      color: #9ca3af;
+      font-style: italic;
+    }
+
+    .dep-report-disclaimer {
+      background: #fffbeb;
+      border: 1.5px solid #f59e0b;
+      border-radius: 10px;
+      padding: 0.875rem 1.125rem;
+      font-size: 0.8125rem;
+      color: #78350f;
+      line-height: 1.6;
+      margin-top: 2rem;
+    }
+  </style>
+</head>
+<body>
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-brand">
+        <img src="assets/norton-logo.png" alt="Norton" class="nav-logo">
+        <span class="nav-sprint-label">Design Sprint</span>
+      </a>
+      <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+      <ul class="nav-links" id="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="laura.html">Laura</a></li>
+        <li><a href="where-is-norton.html">Where is Norton</a></li>
+        <li><a href="prototypes.html">Prototypes</a></li>
+        <li><a href="resources.html">Resources</a></li>
+        <li class="nav-dropdown">
+          <button class="nav-dropdown-btn" id="sprintToolsBtn" aria-expanded="false" aria-haspopup="true">
+            Sprint Tools <span class="nav-beta-pill">✦</span>
+          </button>
+          <ul class="nav-dropdown-menu" id="sprintToolsMenu" role="menu">
+            <li><a href="concept-builder.html" role="menuitem">Prototype Builder</a></li>
+            <li><a href="competitive-analysis.html" role="menuitem">Competitive Analysis</a></li>
+            <li><a href="idea-workshop.html" role="menuitem">Ideation Wizard</a></li>
+            <li><a href="idea-grouping.html" role="menuitem">Idea Grouping</a></li>
+            <li><a href="dependency-assessment.html" role="menuitem" class="active">Dependency Assessment</a></li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+  <main class="page">
+    <div class="hero">
+      <div class="eyebrow">Sprint Tool</div>
+      <h2>Dependency <span class="mark">Assessment</span>.</h2>
+      <p>Select a submitted prototype to get an AI-powered technical dependency report — surfacing shared services, existing capabilities, net-new builds, and risk flags.</p>
+    </div>
+
+    <section class="workshop-shell" style="max-width: 860px;">
+
+      <div class="dep-disclaimer">
+        <strong>⚠️ Important Disclaimer:</strong> This tool provides an automated, preliminary estimate of technical dependencies and is intended solely as a quick directional gauge during the design sprint process. It does not replace a proper technical feasibility assessment. A detailed analysis must still be conducted with all relevant engineering, platform, and product teams before any build decisions are made.
+      </div>
+
+      <form class="dep-form" id="depForm" onsubmit="return false;">
+        <div>
+          <label for="protoSelect">Select a Prototype</label>
+          <select id="protoSelect" disabled>
+            <option value="">Loading prototypes…</option>
+          </select>
+        </div>
+        <button type="button" class="dep-btn" id="analyzeBtn" disabled>
+          Analyze Dependencies →
+        </button>
+      </form>
+
+      <div class="dep-loading" id="loadingState">
+        <div class="dep-spinner"></div>
+        <span>Analyzing prototype… this may take 20–30 seconds</span>
+      </div>
+
+      <!-- Report -->
+      <div class="dep-report" id="reportEl">
+        <div class="dep-report-header">
+          <div class="dep-report-title" id="reportTitle">Dependency Report</div>
+          <button class="dep-copy-btn" id="copyBtn" type="button">📋 Copy Report</button>
+        </div>
+
+        <div class="dep-cache-note" id="cacheNote" style="display:none;"><span id="cacheNoteText"></span><button class="btn-regenerate" id="btnRegenerate" onclick="regenerateReport()">↺ Regenerate</button></div>
+
+        <div class="dep-summary" id="reportSummary"></div>
+
+        <!-- Section 1: Shared Services -->
+        <div class="dep-section">
+          <div class="dep-section-title">Shared Service Dependencies</div>
+          <div id="sharedServicesWrap">
+            <table class="dep-table" id="sharedServicesTable">
+              <thead>
+                <tr>
+                  <th>Service</th>
+                  <th>Work Type</th>
+                  <th>Notes</th>
+                </tr>
+              </thead>
+              <tbody id="sharedServicesTbody"></tbody>
+            </table>
+            <p class="dep-empty" id="sharedServicesEmpty" style="display:none;">No shared service dependencies identified.</p>
+          </div>
+        </div>
+
+        <!-- Section 2: Existing iOS Capabilities -->
+        <div class="dep-section">
+          <div class="dep-section-title">Existing iOS Capabilities Used</div>
+          <ul class="dep-list" id="existingCapList"></ul>
+          <p class="dep-empty" id="existingCapEmpty" style="display:none;">None identified.</p>
+        </div>
+
+        <!-- Section 3: Net-New Feature Builds -->
+        <div class="dep-section">
+          <div class="dep-section-title">Net-New Feature Builds</div>
+          <ul class="dep-list" id="netNewList"></ul>
+          <p class="dep-empty" id="netNewEmpty" style="display:none;">No net-new builds required.</p>
+        </div>
+
+        <!-- Section 4: Foundational Platform Builds -->
+        <div class="dep-section">
+          <div class="dep-section-title">Foundational Platform Builds Required</div>
+          <ul class="dep-list" id="foundationalList"></ul>
+          <p class="dep-empty" id="foundationalEmpty" style="display:none;">No foundational builds required.</p>
+        </div>
+
+        <!-- Section 5: Risk / Ambiguity Flags -->
+        <div class="dep-section">
+          <div class="dep-section-title">Risk / Ambiguity Flags</div>
+          <ul class="dep-list" id="riskFlagList"></ul>
+          <p class="dep-empty" id="riskFlagEmpty" style="display:none;">No risk flags identified.</p>
+        </div>
+
+        <div class="dep-report-disclaimer">
+          <strong>⚠️ Reminder:</strong> This assessment is an automated, preliminary estimate for directional use only during the design sprint. It does not replace a proper technical feasibility assessment. Engage all relevant engineering, platform, and product teams before any build decisions are made.
+        </div>
+      </div>
+
+    </section>
+  </main>
+
+  <script src="nav.js"></script>
+  <script>
+    const protoSelect = document.getElementById('protoSelect');
+    const analyzeBtn  = document.getElementById('analyzeBtn');
+    const loadingState = document.getElementById('loadingState');
+    const reportEl    = document.getElementById('reportEl');
+    const copyBtn     = document.getElementById('copyBtn');
+
+    let currentReport = null;
+    let currentProtoTitle = '';
+
+    // ── Load prototypes ──────────────────────────────────────────────────────
+    async function loadPrototypes() {
+      try {
+        const res = await fetch('/api/prototypes');
+        const data = await res.json();
+        const list = Array.isArray(data) ? data : (data.prototypes || []);
+        protoSelect.innerHTML = '';
+        if (!list.length) {
+          protoSelect.innerHTML = '<option value="">No prototypes submitted yet.</option>';
+          return;
+        }
+        const placeholder = document.createElement('option');
+        placeholder.value = '';
+        placeholder.textContent = 'Select a prototype…';
+        protoSelect.appendChild(placeholder);
+        list.forEach(p => {
+          const opt = document.createElement('option');
+          opt.value = p.id;
+          opt.textContent = p.title || p.id;
+          protoSelect.appendChild(opt);
+        });
+        protoSelect.disabled = false;
+      } catch (err) {
+        protoSelect.innerHTML = '<option value="">Failed to load prototypes.</option>';
+      }
+    }
+
+    protoSelect.addEventListener('change', () => {
+      analyzeBtn.disabled = !protoSelect.value;
+    });
+
+    // ── Analyze ──────────────────────────────────────────────────────────────
+    async function runAnalysis(protoId, protoTitle, force = false) {
+      currentProtoTitle = protoTitle;
+      analyzeBtn.disabled = true;
+      loadingState.classList.add('visible');
+      reportEl.classList.remove('visible');
+      try {
+        const res = await fetch('/api/dependency-assessment', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ protoId, ...(force ? { force: true } : {}) }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Unknown error');
+        renderReport(data, currentProtoTitle);
+      } catch (err) {
+        alert('Error: ' + err.message);
+      } finally {
+        loadingState.classList.remove('visible');
+        analyzeBtn.disabled = false;
+      }
+    }
+
+    analyzeBtn.addEventListener('click', () => {
+      const protoId = protoSelect.value;
+      if (!protoId) return;
+      runAnalysis(protoId, protoSelect.options[protoSelect.selectedIndex].text);
+    });
+
+    // ── Render Report ────────────────────────────────────────────────────────
+    function workTypeTag(wt) {
+      const map = {
+        'config-change':   { cls: 'config-change',  label: 'config-change' },
+        'enhancement':     { cls: 'enhancement',    label: 'enhancement' },
+        'new-integration': { cls: 'new-integration',label: 'new-integration' },
+        'exists':          { cls: 'exists',         label: 'exists' },
+        'net-new':         { cls: 'net-new',        label: 'net-new' },
+        'review-needed':   { cls: 'review-needed',  label: 'review-needed' },
+      };
+      const t = map[wt] || { cls: 'review-needed', label: wt };
+      return `<span class="dep-tag ${t.cls}">${t.label}</span>`;
+    }
+
+    function renderList(ulId, emptyId, items, tagClass, tagLabel) {
+      const ul = document.getElementById(ulId);
+      const emptyEl = document.getElementById(emptyId);
+      ul.innerHTML = '';
+      if (!items || !items.length) {
+        ul.style.display = 'none';
+        emptyEl.style.display = '';
+        return;
+      }
+      ul.style.display = '';
+      emptyEl.style.display = 'none';
+      items.forEach(item => {
+        const li = document.createElement('li');
+        li.innerHTML = `<span class="dep-tag ${tagClass}">${tagLabel}</span> ${escHtml(item)}`;
+        ul.appendChild(li);
+      });
+    }
+
+    function escHtml(s) {
+      return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    function renderReport(data, protoTitle) {
+      currentReport = data;
+      const r = data.report;
+
+      // Title
+      document.getElementById('reportTitle').textContent = `Dependency Report — ${protoTitle}`;
+
+      // Cache note
+      const cacheNote = document.getElementById('cacheNote');
+      if (data.cached && data.cachedAt) {
+        const d = new Date(data.cachedAt).toLocaleString();
+        document.getElementById('cacheNoteText').textContent = `📦 Generated on ${d} — retrieved from cache.`;
+        cacheNote.style.display = '';
+      } else {
+        cacheNote.style.display = 'none';
+      }
+
+      // Summary
+      document.getElementById('reportSummary').textContent = r.summary || '';
+
+      // Shared Services Table
+      const tbody = document.getElementById('sharedServicesTbody');
+      const tableEl = document.getElementById('sharedServicesTable');
+      const tableEmpty = document.getElementById('sharedServicesEmpty');
+      tbody.innerHTML = '';
+      if (r.sharedServices && r.sharedServices.length) {
+        tableEl.style.display = '';
+        tableEmpty.style.display = 'none';
+        r.sharedServices.forEach(s => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `<td><strong>${escHtml(s.service)}</strong></td><td>${workTypeTag(s.workType)}</td><td>${escHtml(s.notes || '')}</td>`;
+          tbody.appendChild(tr);
+        });
+      } else {
+        tableEl.style.display = 'none';
+        tableEmpty.style.display = '';
+      }
+
+      renderList('existingCapList', 'existingCapEmpty', r.existingCapabilities, 'exists', 'exists');
+      renderList('netNewList', 'netNewEmpty', r.netNewBuilds, 'net-new', 'net-new');
+      renderList('foundationalList', 'foundationalEmpty', r.foundationalBuilds, 'enhancement', 'foundational');
+      renderList('riskFlagList', 'riskFlagEmpty', r.riskFlags, 'review-needed', 'review-needed');
+
+      reportEl.classList.add('visible');
+      reportEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    // ── Copy Report ──────────────────────────────────────────────────────────
+    copyBtn.addEventListener('click', () => {
+      if (!currentReport) return;
+      const r = currentReport.report;
+      const lines = [];
+      lines.push(`DEPENDENCY ASSESSMENT — ${currentProtoTitle}`);
+      lines.push('='.repeat(60));
+      if (currentReport.cached && currentReport.cachedAt) {
+        lines.push(`[Cached: generated on ${new Date(currentReport.cachedAt).toLocaleString()}]`);
+      }
+      lines.push('');
+      lines.push('SUMMARY');
+      lines.push(r.summary || '');
+      lines.push('');
+      lines.push('SHARED SERVICE DEPENDENCIES');
+      (r.sharedServices || []).forEach(s => {
+        lines.push(`  • ${s.service} [${s.workType}] — ${s.notes || ''}`);
+      });
+      lines.push('');
+      lines.push('EXISTING iOS CAPABILITIES USED');
+      (r.existingCapabilities || []).forEach(c => lines.push(`  • ${c}`));
+      lines.push('');
+      lines.push('NET-NEW FEATURE BUILDS');
+      (r.netNewBuilds || []).forEach(c => lines.push(`  • ${c}`));
+      lines.push('');
+      lines.push('FOUNDATIONAL PLATFORM BUILDS REQUIRED');
+      (r.foundationalBuilds || []).forEach(c => lines.push(`  • ${c}`));
+      lines.push('');
+      lines.push('RISK / AMBIGUITY FLAGS');
+      (r.riskFlags || []).forEach(c => lines.push(`  • ${c}`));
+      lines.push('');
+      lines.push('DISCLAIMER: This is an automated, preliminary estimate for directional use only during the design sprint. It does not replace a proper technical feasibility assessment.');
+
+      navigator.clipboard.writeText(lines.join('\n')).then(() => {
+        copyBtn.textContent = '✅ Copied!';
+        copyBtn.classList.add('copied');
+        setTimeout(() => {
+          copyBtn.textContent = '📋 Copy Report';
+          copyBtn.classList.remove('copied');
+        }, 2500);
+      }).catch(() => alert('Copy failed. Please copy manually.'));
+    });
+
+    // ── Init ─────────────────────────────────────────────────────────────────
+    loadPrototypes();
+  
+    function regenerateReport() {
+      const sel = document.getElementById('protoSelect');
+      if (!sel || !sel.value) return;
+      const btn = document.getElementById('btnRegenerate');
+      if (btn) { btn.disabled = true; btn.textContent = '↺ Regenerating…'; }
+      runAnalysis(sel.value, sel.options[sel.selectedIndex]?.text || 'Prototype', true);
+    }
+</script>
+</body>
+</html>

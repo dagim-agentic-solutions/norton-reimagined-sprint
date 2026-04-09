@@ -84,19 +84,21 @@ export async function onRequestPost({ request, env }) {
     return json({ error: 'Invalid JSON body' }, 400);
   }
 
-  const { protoId } = body;
+  const { protoId, force } = body;
   if (!protoId || typeof protoId !== 'string') {
     return json({ error: 'protoId is required' }, 400);
   }
 
-  // Check cache
+  // Check cache (skip if force=true)
   const cacheKey = `dep-assessment::${protoId}`;
-  const cached = await kv.get(cacheKey);
-  if (cached) {
-    try {
-      return json({ cached: true, ...JSON.parse(cached) });
-    } catch {
-      // Fall through to regenerate
+  if (!force) {
+    const cached = await kv.get(cacheKey);
+    if (cached) {
+      try {
+        return json({ cached: true, ...JSON.parse(cached) });
+      } catch {
+        // Fall through to regenerate
+      }
     }
   }
 
