@@ -1085,10 +1085,6 @@ const ROLE_OPTIONS = [
 
   // Featured caps first — full-width with role selector
   Object.entries(FEATURED_CAPS).forEach(([cap, desc]) => {
-    const wrapper = document.createElement('div');
-    wrapper.style.gridColumn = '1 / -1';
-    wrapper.style.marginBottom = '4px';
-
     const item = document.createElement('div');
     item.className = 'cap-item featured-cap';
     item.dataset.cap = cap;
@@ -1125,8 +1121,7 @@ const ROLE_OPTIONS = [
         </div>
       </div>`;
 
-    wrapper.appendChild(item);
-    grid.appendChild(wrapper);
+    grid.appendChild(item);
   });
 
   // Regular caps — with inline role picker on check
