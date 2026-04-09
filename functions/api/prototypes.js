@@ -332,41 +332,55 @@ async function screenshotUrl(url) {
   }
 }
 
+// ── Deep text extraction from HTML ─────────────────────────────────────────
+// Preserves button labels, headings, link text, aria-labels, placeholder text,
+// and screen section hints so the LLM sees the full prototype content.
+function extractDeepText(html) {
+  // Pull aria-labels, alt text, placeholders, titles before stripping tags
+  const extras = [];
+  for (const m of html.matchAll(/(?:aria-label|alt|placeholder|title)="([^"]{2,120})"/gi)) {
+    extras.push(m[1]);
+  }
+  // Preserve button/heading content with context hint
+  const withHints = html
+    .replace(/<(h[1-6])[^>]*>([\s\S]*?)<\/\1>/gi, (_, tag, inner) =>
+      `[${tag.toUpperCase()}] ${inner} `)
+    .replace(/<button[^>]*>([\s\S]*?)<\/button>/gi, (_, inner) =>
+      `[BTN] ${inner} `)
+    .replace(/<a[^>]*>([\s\S]*?)<\/a>/gi, (_, inner) =>
+      `[LINK] ${inner} `)
+    .replace(/<(label|span|p|li|td|th)[^>]*>([\s\S]*?)<\/\1>/gi, (_, _t, inner) => inner + ' ');
+  const cleaned = withHints
+    .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+    .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+    .replace(/<!--[\s\S]*?-->/g, ' ')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&nbsp;/g, ' ')
+    .replace(/\s+/g, ' ').trim();
+  const combined = extras.join(' | ') + ' ' + cleaned;
+  return combined.slice(0, 12000);
+}
+
 async function scoreLaura(prototype, fileContent, env) {
-  // Scores a prototype against Laura using text extraction.
-  // Screenshots were too slow (Vercel cold start + Microlink + Claude vision
-  // exceeded the Worker CPU budget). Text-based scoring is fast and reliable.
+  // Scores a prototype against Laura using deep text extraction across all screens.
   if (!env.ANTHROPIC_API_KEY) return null;
 
   let extractedText = '';
 
   // 1. For file uploads, extract text directly from the HTML/JS content
   if (fileContent && typeof fileContent === 'string' && fileContent.trim().length > 0) {
-    extractedText = fileContent
-      .replace(/<script[\s\S]*?<\/script>/gi, ' ')
-      .replace(/<style[\s\S]*?<\/style>/gi, ' ')
-      .replace(/<!--[\s\S]*?-->/g, ' ')
-      .replace(/<[^>]+>/g, ' ')
-      .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&nbsp;/g, ' ')
-      .replace(/\s+/g, ' ').trim().slice(0, 2000);
+    extractedText = extractDeepText(fileContent);
   }
 
-  // 2. For URL submissions, try to fetch the page
+  // 2. For URL submissions, fetch and deep-extract the page
   if (!extractedText && prototype.url && !prototype.url.startsWith('/api/')) {
     try {
       const res = await fetch(prototype.url, {
         headers: { 'User-Agent': 'NortonSprint-LauraBot/1.0' },
-        signal: AbortSignal.timeout(8000),
+        signal: AbortSignal.timeout(12000),
       });
       if (res.ok) {
-        const html = await res.text();
-        extractedText = html
-          .replace(/<script[\s\S]*?<\/script>/gi, ' ')
-          .replace(/<style[\s\S]*?<\/style>/gi, ' ')
-          .replace(/<!--[\s\S]*?-->/g, ' ')
-          .replace(/<[^>]+>/g, ' ')
-          .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&nbsp;/g, ' ')
-          .replace(/\s+/g, ' ').trim().slice(0, 2000);
+        extractedText = extractDeepText(await res.text());
       }
     } catch { /* unreachable URL — skip */ }
   }
@@ -376,7 +390,7 @@ async function scoreLaura(prototype, fileContent, env) {
     `Title: "${prototype.title}"`,
     `Submitted by: ${prototype.name}`,
     `Summary: ${prototype.summary}`,
-    extractedText ? `\nPrototype content (extracted):\n${extractedText}` : '',
+    extractedText ? `\nPrototype content (all screens, buttons, headings extracted):\n${extractedText}` : '',
   ].join('\n');
 
   const prompt = `${LAURA_CONTEXT_SCORE}
