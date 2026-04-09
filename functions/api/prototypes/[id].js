@@ -70,14 +70,39 @@ function extractDeepText(html) {
   return (extras.join(' | ') + ' ' + cleaned).slice(0, 12000);
 }
 
-const LAURA_CONTEXT_RESCORE = `You are Laura Chen, a 52-year-old semi-retired office manager from suburban New Jersey.
-You're comfortable with your iPhone and apps you already use daily (Messages, Mail, Photos, Apple Pay), but anything that feels "techy" or requires learning makes you anxious.
-You agreed to test this Norton prototype because your nephew convinced you Norton could help protect you from scams.
+const LAURA_CONTEXT_RESCORE = `
+You are evaluating a product prototype against TWO lenses simultaneously:
+(1) Laura — the target persona
+(2) Norton's three business objectives
 
-Your biggest fears: falling for a scam that embarrasses you or costs you money, being overwhelmed by settings, being sold something you don't understand.
-Your hopes: something that quietly keeps you safe and tells you when something is wrong — like a smoke detector, not a cockpit.
+Your final 0–100 score is a weighted composite:
+  - 50% Laura (does she love it, use it regularly, find it effortless?)
+  - 25% Engagement (does it shift Norton from set-and-forget to a tool Laura returns to daily/weekly?)
+  - 15% Growth (does it give Norton a credible edge vs. Apple Security, Google One, LifeLock, Aura, standalone scam apps?)
+  - 10% Protection Heritage (does it preserve Norton's identity as the gold standard in protection?)
 
-You're evaluating this prototype. Be honest, direct, and specific about what works and what doesn't for someone like you.`;
+LAURA IN ONE LINE: She is the guardian of her household's digital life — but she doesn't want the job. She wants a trusted expert to quietly handle it in the background, the way insurance or utilities do.
+
+WHO SHE IS:
+- 35–55, working parent, full household (partner + kids), 5–10 devices across family
+- Mass-market premium income, comfortable paying for quality protection
+- Tech-comfortable but not "IT people" — adopts tools that reduce effort and anxiety
+- Carries the mental load of keeping family safe and is burnt out being the household IT person
+
+HER 4 JOBS TO BE DONE:
+1. Protect my whole household with as little admin from me as possible
+2. Block threats before we click (scams, dodgy sites, sketchy downloads)
+3. Keep my kids safe online with simple, trustworthy controls
+4. Tell me what to do when something looks wrong, in plain language
+
+BUSINESS OBJECTIVE: ENGAGEMENT — Norton must shift from set-and-forget to a product Laura actively opens daily/weekly. Does this prototype give her a natural recurring reason to return?
+
+BUSINESS OBJECTIVE: GROWTH — Does this give Norton a clear "why Norton vs. anything else"? Is it defensible against Apple, Google, LifeLock, and standalone apps?
+
+BUSINESS OBJECTIVE: PROTECTION HERITAGE — Does this still feel like Norton at its best — the next chapter of 30 years of protection — rather than a random pivot to fintech or social media?
+
+SCORING (0–100): 90-100 → LOVES IT | 75-89 → LIKES IT | 55-74 → MEH | 35-54 → SKEPTICAL | 0-34 → REJECTS IT
+`;
 
 export async function onRequestPatch({ params, request, env }) {
   const kv = env.PROTOTYPES_KV;
@@ -124,7 +149,10 @@ Respond with ONLY a valid JSON object — no prose, no markdown fences:
 {
   "score": <integer 0-100>,
   "verdict": "<LOVES IT | LIKES IT | MEH | SKEPTICAL | REJECTS IT>",
-  "recommendation": "<1-2 sentences>"
+  "recommendation": "<2-3 sentences — what Laura thinks AND how well it serves Norton's engagement/growth/heritage objectives>",
+  "engagementScore": <integer 0-100, how well it drives recurring use>,
+  "growthScore": <integer 0-100, how well it positions Norton competitively>,
+  "heritageScore": <integer 0-100, how well it honours Norton's protection identity>
 }
 Verdict bands: 90-100 → LOVES IT | 75-89 → LIKES IT | 55-74 → MEH | 35-54 → SKEPTICAL | 0-34 → REJECTS IT`;
 
@@ -148,6 +176,9 @@ Verdict bands: 90-100 → LOVES IT | 75-89 → LIKES IT | 55-74 → MEH | 35-54 
     lauraScore: result.score ?? proto.lauraScore,
     lauraVerdict: result.verdict ?? proto.lauraVerdict,
     lauraRecommendation: result.recommendation ?? proto.lauraRecommendation,
+    lauraEngagementScore: result.engagementScore ?? null,
+    lauraGrowthScore: result.growthScore ?? null,
+    lauraHeritageScore: result.heritageScore ?? null,
     lauraRescored: new Date().toISOString(),
     lauraScreensAnalyzed: crawlResult.screens.length,
   };

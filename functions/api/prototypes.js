@@ -270,9 +270,19 @@ export async function onRequestPost({ request, env }) {
 // ═══════════════════════════════════════════════════════════════════════════════
 
 const LAURA_CONTEXT_SCORE = `
-You are evaluating a product prototype on behalf of "Laura, the Outsourcer" —
-the target persona for Norton Reimagined, a Digital Fiduciary Advisory platform.
+You are evaluating a product prototype against TWO lenses simultaneously:
+(1) Laura — the target persona
+(2) Norton's three business objectives
 
+Your final 0–100 score is a weighted composite:
+  - 50% Laura (does she love it, use it regularly, find it effortless?)
+  - 25% Business Objective: Engagement (does it shift Norton from set-and-forget to a tool Laura returns to daily/weekly?)
+  - 15% Business Objective: Growth (does it give Norton a credible edge in the competitive landscape vs. Apple Security, Google One, standalone scam apps, LifeLock?)
+  - 10% Business Objective: Protection Heritage (does it preserve and honour Norton's 30-year identity as the gold standard in protection — not a pivot away from security?)
+
+════════════════════════════════════════════
+LENS 1 — LAURA, THE OUTSOURCER
+════════════════════════════════════════════
 LAURA IN ONE LINE: She is the guardian of her household's digital life — but
 she doesn't want the job. She wants a trusted expert to quietly handle it in
 the background, the way insurance or utilities do.
@@ -300,12 +310,30 @@ WHAT "PEACE OF MIND" MEANS TO HER — THE 4Ps:
 WHAT SHE LOVES: Default-on protection, household framing, calm assured tone, zero config.
 WHAT SHE REJECTS: Dashboards of toggles, jargon, gamification, dark patterns, added admin.
 
-SCORING GUIDE (Laura Score 0–100):
-- 90–100 LOVES IT: Solves a top JTBD, feels effortless, removes mental load.
-- 75–89 LIKES IT: Clearly useful, aligned with 4Ps, low friction.
-- 55–74 MEH: Mixed signals — solves something real but asks too much.
-- 35–54 SKEPTICAL: Violates core principles (too much control, jargon, unclear value).
-- 0–34 REJECTS IT: Fundamentally misreads Laura, adds to mental load.
+════════════════════════════════════════════
+LENS 2 — NORTON'S BUSINESS OBJECTIVES
+════════════════════════════════════════════
+
+OBJECTIVE A — ENGAGEMENT (weight: 25%)
+Norton's strategic shift: move from a "set it and forget it" security utility to a product Laura actively opens and values regularly (daily or weekly). A high-scoring prototype creates natural, recurring reasons for Laura to return — not because she has to, but because she wants to.
+Ask: Does this prototype give Laura a reason to open Norton tomorrow? Next week? Does it build habit or ritual? Or is it still a background process she never thinks about?
+
+OBJECTIVE B — GROWTH & COMPETITIVE EDGE (weight: 15%)
+Norton competes with Apple's built-in security, Google One, identity-focused players (LifeLock, Aura, Lifelock), standalone scam apps (Robokiller, Genie), and password managers (1Password). A high-scoring prototype gives Norton a clear "why Norton vs. anything else" — either through breadth (one app for everything), trust (30-year brand), or a category Norton can own that competitors can't easily replicate.
+Ask: Does this prototype help Norton win in the market? Does it differentiate meaningfully? Could a competitor easily copy it in 12 months?
+
+OBJECTIVE C — PROTECTION HERITAGE (weight: 10%)
+Norton's brand equity is built on 30 years of being the most trusted name in protection. The reimagined product must evolve Norton — not abandon it. It should feel like the next logical chapter of the protection story, not a random pivot.
+Ask: Does this prototype still feel like Norton at its best? Does it reinforce the idea that Norton = protection, now for the modern threat landscape? Or does it drift into territory that feels un-Norton (fintech, social media, entertainment)?
+
+════════════════════════════════════════════
+COMPOSITE SCORING GUIDE (0–100)
+════════════════════════════════════════════
+- 90–100 LOVES IT: Exceptional on all lenses — Laura loves it, it drives habit, it's competitively defensible, and it's unmistakably Norton.
+- 75–89 LIKES IT: Strong on most lenses — clear value for Laura and business, minor gaps.
+- 55–74 MEH: Passes on some lenses but has real weaknesses — either Laura won't use it regularly, or business impact is unclear.
+- 35–54 SKEPTICAL: Significant concerns on 2+ lenses — either Laura rejects it or it undermines business objectives.
+- 0–34 REJECTS IT: Fails fundamentally — wrong persona, damages the brand, or has no competitive merit.
 `;
 
 async function screenshotUrl(url) {
@@ -402,9 +430,12 @@ ${screensFound > 0 ? `You are being shown ${crawlResult.screens.length} screensh
 ---
 Respond with ONLY a valid JSON object — no prose, no markdown fences:
 {
-  "score": <integer 0-100>,
+  "score": <integer 0-100, weighted composite across all lenses>,
   "verdict": "<LOVES IT | LIKES IT | MEH | SKEPTICAL | REJECTS IT>",
-  "recommendation": "<1-2 sentences — the single most important change to make this land better for Laura, or why it already works>"
+  "recommendation": "<2-3 sentences covering both Laura's reaction AND how well the concept serves Norton's engagement, growth, and heritage objectives>",
+  "engagementScore": <integer 0-100, does it drive regular use vs. set-and-forget?>,
+  "growthScore": <integer 0-100, does it give Norton a defensible competitive edge?>,
+  "heritageScore": <integer 0-100, does it honour Norton's protection identity?>
 }
 The verdict MUST match the score band: 90-100 → LOVES IT | 75-89 → LIKES IT | 55-74 → MEH | 35-54 → SKEPTICAL | 0-34 → REJECTS IT`;
 
@@ -432,9 +463,12 @@ The verdict MUST match the score band: 90-100 → LOVES IT | 75-89 → LIKES IT 
     const raw = (data?.content?.[0]?.text ?? '').replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '').trim();
     const result = JSON.parse(raw);
     return {
-      lauraScore:          result.score          ?? null,
-      lauraVerdict:        result.verdict         ?? null,
-      lauraRecommendation: result.recommendation  ?? null,
+      lauraScore:           result.score           ?? null,
+      lauraVerdict:         result.verdict          ?? null,
+      lauraRecommendation:  result.recommendation   ?? null,
+      lauraEngagementScore: result.engagementScore  ?? null,
+      lauraGrowthScore:     result.growthScore      ?? null,
+      lauraHeritageScore:   result.heritageScore    ?? null,
     };
   } catch {
     return null;
