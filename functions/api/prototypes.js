@@ -450,15 +450,24 @@ async function scoreLaura(prototype, fileContent, env) {
   const isPdfUpload   = fileExt === 'pdf';
   const isBinaryMedia = isImageUpload || isPdfUpload;
 
+  // If fileContent was stored separately (large file), load it from KV
+  if (!fileContent && prototype.fileStoredSeparately && env.PROTOTYPES_KV) {
+    try { fileContent = await env.PROTOTYPES_KV.get(`file:${prototype.id}`) || ''; } catch {}
+  }
+  // Also check if prototype itself has fileContent (passed directly)
+  if (!fileContent && prototype.fileContent) {
+    fileContent = prototype.fileContent;
+  }
+
   // ── 2. Crawl the prototype for all screens + screenshots ────────────────
   const protoUrl = prototype.url || prototype.resolvedUrl || '';
   let crawlResult = { screens: [], textContent: '' };
 
   if (isBinaryMedia && fileContent) {
-    // Directly use the uploaded image as a vision screen
-    const mediaMime = prototype.mimeType || (isImageUpload ? 'image/' + fileExt : 'image/png');
+    // Directly use the uploaded image/PDF as a vision input
+    const mediaMime = prototype.mimeType || (isPdfUpload ? 'application/pdf' : 'image/' + fileExt);
     const safeBase64 = fileContent.replace(/[^A-Za-z0-9+/=]/g, '');
-    crawlResult.screens = [{ url: prototype.fileName, label: prototype.fileName, base64: safeBase64, mimeType: mediaMime }];
+    crawlResult.screens = [{ url: prototype.fileName, label: prototype.fileName, base64: safeBase64, mimeType: mediaMime, isPdf: isPdfUpload }];
   } else if (protoUrl && !protoUrl.startsWith('/api/')) {
     try {
       crawlResult = await crawlPrototype(protoUrl, { fileContent: fileContent || '' });

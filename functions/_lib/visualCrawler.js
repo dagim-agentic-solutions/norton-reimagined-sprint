@@ -147,14 +147,26 @@ export function buildVisionContent(screens, analysisInstruction) {
     });
 
     if (screen.base64) {
-      blocks.push({
-        type: 'image',
-        source: {
-          type: 'base64',
-          media_type: screen.mimeType || 'image/png',
-          data: screen.base64,
-        },
-      });
+      if (screen.isPdf) {
+        // PDFs use document content block (Claude supports up to 100 pages)
+        blocks.push({
+          type: 'document',
+          source: {
+            type: 'base64',
+            media_type: 'application/pdf',
+            data: screen.base64,
+          },
+        });
+      } else {
+        blocks.push({
+          type: 'image',
+          source: {
+            type: 'base64',
+            media_type: screen.mimeType || 'image/png',
+            data: screen.base64,
+          },
+        });
+      }
     } else {
       blocks.push({
         type: 'text',

@@ -123,8 +123,14 @@ export async function onRequestPatch({ params, request, env }) {
 
   const protoUrl = proto.url || proto.resolvedUrl || '';
   let crawlResult = { screens: [], textContent: '' };
+
+  // Load fileContent from KV if stored separately
+  let rescoreFileContent = proto.fileContent || '';
+  if (!rescoreFileContent && proto.fileStoredSeparately) {
+    try { rescoreFileContent = await kv.get(`file:${id}`) || ''; } catch {}
+  }
   if (protoUrl && !protoUrl.startsWith('/api/')) {
-    try { crawlResult = await crawlPrototype(protoUrl, {}); } catch {}
+    try { crawlResult = await crawlPrototype(protoUrl, { fileContent: rescoreFileContent }); } catch {}
   }
   const textFallback = extractDeepText(crawlResult.textContent || '');
   const screensFound = crawlResult.screens.filter(s => s.base64).length;
