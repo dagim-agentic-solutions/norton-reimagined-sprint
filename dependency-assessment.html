@@ -449,18 +449,51 @@
       analyzeBtn.disabled = true;
       loadingState.classList.add('visible');
       reportEl.classList.remove('visible');
+
       try {
-        const res = await fetch('/api/dependency-assessment', {
+        // Kick off analysis (returns immediately with status: pending or done)
+        const postRes = await fetch('/api/dependency-assessment', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ protoId, ...(force ? { force: true } : {}) }),
         });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Unknown error');
-        renderReport(data, currentProtoTitle);
+        const postData = await postRes.json();
+        if (!postRes.ok) throw new Error(postData.error || 'Unknown error');
+
+        // If already done (cached), render immediately
+        if (postData.status === 'done') {
+          renderReport(postData, currentProtoTitle);
+          return;
+        }
+
+        // Otherwise poll GET until done or error
+        const loadingMsg = loadingState.querySelector('p, .loading-text, span');
+        let dots = 0;
+        const pollInterval = setInterval(async () => {
+          dots = (dots + 1) % 4;
+          if (loadingMsg) loadingMsg.textContent = 'Running visual analysis' + '.'.repeat(dots + 1) + ' (this may take up to 60s)';
+          try {
+            const pollRes = await fetch(`/api/dependency-assessment?protoId=${encodeURIComponent(protoId)}`);
+            const pollData = await pollRes.json();
+            if (pollData.status === 'done') {
+              clearInterval(pollInterval);
+              renderReport(pollData, currentProtoTitle);
+              loadingState.classList.remove('visible');
+              analyzeBtn.disabled = false;
+            } else if (pollData.status === 'error') {
+              clearInterval(pollInterval);
+              throw new Error(pollData.error || 'Analysis failed');
+            }
+          } catch (pollErr) {
+            clearInterval(pollInterval);
+            alert('Error: ' + pollErr.message);
+            loadingState.classList.remove('visible');
+            analyzeBtn.disabled = false;
+          }
+        }, 3000);
+
       } catch (err) {
         alert('Error: ' + err.message);
-      } finally {
         loadingState.classList.remove('visible');
         analyzeBtn.disabled = false;
       }

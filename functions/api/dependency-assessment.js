@@ -1,19 +1,23 @@
 /**
  * /api/dependency-assessment
  *
- * POST { protoId } → run (or return cached) dependency assessment
- * GET  ?protoId=   → return cached assessment or 404
+ * POST { protoId, force? }
+ *   → If cached and !force: return cached report immediately.
+ *   → Otherwise: return { status: "pending", jobKey } immediately,
+ *     kick off visual analysis via ctx.waitUntil (no timeout limit).
  *
- * KV binding: PROTOTYPES_KV
- *   "dep-assessment::<protoId>" → { cachedAt, report }
- *   "proto:<protoId>"           → prototype object
+ * GET ?protoId=
+ *   → Return cached report, or { status: "pending" } if job is running, or 404.
+ *
+ * KV keys:
+ *   "dep-assessment::<protoId>"       → { cachedAt, report }
+ *   "dep-assessment-job::<protoId>"   → { status: "pending"|"error", startedAt, error? }
  */
 
 import { runLLM } from '../_lib/llmRouter.js';
 import { crawlPrototype, buildVisionContent } from '../_lib/visualCrawler.js';
-// ── Deep text extraction from HTML ─────────────────────────────────────────
-// Preserves button labels, headings, link text, aria-labels so the LLM sees
-// all screens and interactions in the prototype.
+
+// ── Deep text extraction ──────────────────────────────────────────────────────
 function extractDeepText(html) {
   const extras = [];
   for (const m of html.matchAll(/(?:aria-label|alt|placeholder|title)="([^"]{2,120})"/gi)) {
@@ -34,17 +38,11 @@ function extractDeepText(html) {
   return (extras.join(' | ') + ' ' + cleaned).slice(0, 12000);
 }
 
-
-
-
-// ── Robust JSON extraction (module-level) ────────────────────────────────────
+// ── Robust JSON extraction ────────────────────────────────────────────────────
 function extractJSON(raw) {
   if (!raw) return null;
-  // Strip markdown fences (multiline)
   let s = raw.replace(/^```(?:json)?\s*/im, '').replace(/^```\s*$/im, '').trim();
-  // Try direct parse
   try { return JSON.parse(s); } catch {}
-  // Find outermost { ... } block
   let depth = 0, start = -1, end = -1;
   for (let i = 0; i < s.length; i++) {
     if (s[i] === '{') { if (depth === 0) start = i; depth++; }
@@ -73,7 +71,7 @@ export async function onRequestOptions() {
   return new Response(null, { status: 204, headers: CORS });
 }
 
-// ── GET: return cached report ──────────────────────────────────────────────────
+// ── GET: poll for result ──────────────────────────────────────────────────────
 export async function onRequestGet({ request, env }) {
   const kv = env.PROTOTYPES_KV;
   if (!kv) return json({ error: 'KV unavailable' }, 503);
@@ -82,43 +80,47 @@ export async function onRequestGet({ request, env }) {
   const protoId = url.searchParams.get('protoId');
   if (!protoId) return json({ error: 'protoId is required' }, 400);
 
+  // Check for completed report
   const cached = await kv.get(`dep-assessment::${protoId}`);
-  if (!cached) return json({ error: 'No cached assessment found' }, 404);
-
-  try {
-    return json({ cached: true, ...JSON.parse(cached) });
-  } catch {
-    return json({ error: 'Cached data corrupted' }, 500);
+  if (cached) {
+    try { return json({ status: 'done', cached: true, ...JSON.parse(cached) }); } catch {}
   }
+
+  // Check for in-progress job
+  const job = await kv.get(`dep-assessment-job::${protoId}`);
+  if (job) {
+    try {
+      const j = JSON.parse(job);
+      return json({ status: j.status, startedAt: j.startedAt, error: j.error });
+    } catch {}
+  }
+
+  return json({ status: 'not_found' }, 404);
 }
 
-// ── POST: generate (or return cached) assessment ──────────────────────────────
-export async function onRequestPost({ request, env }) {
+// ── POST: kick off analysis ───────────────────────────────────────────────────
+export async function onRequestPost({ request, env, ctx }) {
   const kv = env.PROTOTYPES_KV;
   if (!kv) return json({ error: 'KV unavailable' }, 503);
 
-  let body;
-  try {
-    body = await request.json();
-  } catch {
-    return json({ error: 'Invalid JSON body' }, 400);
+  if (!env.OPENAI_API_KEY && !env.ANTHROPIC_API_KEY && !env.GEMINI_API_KEY) {
+    return json({ error: 'No LLM API keys configured. Use https://norton-reimagined-sprint.pages.dev' }, 503);
   }
+
+  let body;
+  try { body = await request.json(); } catch { return json({ error: 'Invalid JSON body' }, 400); }
 
   const { protoId, force } = body;
-  if (!protoId || typeof protoId !== 'string') {
-    return json({ error: 'protoId is required' }, 400);
-  }
+  if (!protoId || typeof protoId !== 'string') return json({ error: 'protoId is required' }, 400);
 
-  // Check cache (skip if force=true)
   const cacheKey = `dep-assessment::${protoId}`;
+  const jobKey   = `dep-assessment-job::${protoId}`;
+
+  // Return cached result immediately if not forcing
   if (!force) {
     const cached = await kv.get(cacheKey);
     if (cached) {
-      try {
-        return json({ cached: true, ...JSON.parse(cached) });
-      } catch {
-        // Fall through to regenerate
-      }
+      try { return json({ status: 'done', cached: true, ...JSON.parse(cached) }); } catch {}
     }
   }
 
@@ -127,131 +129,155 @@ export async function onRequestPost({ request, env }) {
   if (!protoRaw) return json({ error: 'Prototype not found' }, 404);
 
   let proto;
+  try { proto = JSON.parse(protoRaw); } catch { return json({ error: 'Prototype data corrupted' }, 500); }
+
+  // Mark job as pending
+  await kv.put(jobKey, JSON.stringify({ status: 'pending', startedAt: new Date().toISOString() }), { expirationTtl: 600 });
+
+  // ── Run analysis in background (no timeout limit) ─────────────────────────
+  ctx.waitUntil(runAnalysis({ proto, protoId, cacheKey, jobKey, kv, env }));
+
+  // Return pending immediately — frontend will poll GET
+  return json({ status: 'pending', protoId });
+}
+
+// ── Core analysis (runs via waitUntil) ────────────────────────────────────────
+async function runAnalysis({ proto, protoId, cacheKey, jobKey, kv, env }) {
   try {
-    proto = JSON.parse(protoRaw);
-  } catch {
-    return json({ error: 'Prototype data corrupted' }, 500);
-  }
+    const title        = proto.title || 'Untitled';
+    const description  = proto.description || '';
+    const summary      = proto.summary || proto.aiSummary || '';
+    const capabilities = Array.isArray(proto.capabilities) ? proto.capabilities.join(', ') : (proto.capabilities || '');
+    const protoUrl     = proto.url || proto.resolvedUrl || '';
 
-  const title = proto.title || 'Untitled';
-  const description = proto.description || '';
-  const summary = proto.summary || proto.aiSummary || '';
-  const capabilities = Array.isArray(proto.capabilities)
-    ? proto.capabilities.join(', ')
-    : (proto.capabilities || '');
+    // ── 1. Visual crawl — screenshot every screen ───────────────────────────
+    let crawlResult = { screens: [], textContent: '' };
+    if (protoUrl && !protoUrl.startsWith('/api/')) {
+      try { crawlResult = await crawlPrototype(protoUrl, { fileContent: proto.fileContent || '' }); } catch {}
+    } else if (proto.fileContent) {
+      crawlResult.textContent = proto.fileContent;
+    }
 
-  // ── Visual crawl + deep text extraction ─────────────────────────────────
-  const protoUrl = proto.url || proto.resolvedUrl || '';
-  let crawlResult = { screens: [], textContent: '' };
-  if (protoUrl && !protoUrl.startsWith('/api/')) {
-    try {
-      crawlResult = await crawlPrototype(protoUrl, { fileContent: proto.fileContent || '' });
-    } catch { /* fall through */ }
-  } else if (proto.fileContent) {
-    crawlResult.textContent = proto.fileContent;
-  }
-  const protoContent = extractDeepText(crawlResult.textContent || proto.fileContent || '');
-  const screensFound = crawlResult.screens.filter(s => s.base64).length;
+    const protoContent = extractDeepText(crawlResult.textContent || proto.fileContent || '');
+    const screensFound = crawlResult.screens.filter(s => s.base64).length;
 
-  const systemPrompt = `You are a technical dependency analyst for the Norton iOS app design sprint. Return ONLY valid JSON — no prose, no markdown fences.`;
+    const systemPrompt = `You are a technical dependency analyst for the Norton iOS app design sprint. Return ONLY valid JSON — no prose, no markdown fences.`;
 
-  const userPrompt = `A prototype has been submitted with the following details:
-Title: ${title}
-Description: ${description}
-Summary: ${summary}
-Capabilities selected: ${capabilities}
-${protoContent ? `\nPrototype content (all screens, buttons, and interactions extracted):\n${protoContent}` : ''}
-
-Using the knowledge base below, produce a structured dependency assessment JSON.
-
-## Knowledge Base
+    const knowledgeBase = `## Knowledge Base
 
 ### Gen Shared Services
-- OLP/COLP (Online Licensing Platform): Central licensing, subscription, SKU and entitlement platform. Enhancement = new APIs/behaviors/license types/entitlement changes. Config = adding/editing SKUs, SiteDirector rules, tenant flags.
+- OLP/COLP: Central licensing, subscription, SKU and entitlement platform. Enhancement = new APIs/license types/entitlement changes. Config = adding/editing SKUs, SiteDirector rules, tenant flags.
 - NGP/My Norton Portal: Cross-brand customer portal. Enhancement = new pages/flows/UX redesigns. Config = toggling features per tenant, navigation config, content copy.
-- CCT (Cloud Connect): Client integration layer for device registration, entitlement checks. Enhancement = new client types, new flows/endpoints. Config = onboarding new app/tenant, updating client IDs, feature flags.
-- NSL (Norton Secure Login): SSO/account system (OAuth/OIDC/SAML). Enhancement = new auth flows, token changes, new IDP flows. Config = registering clients, updating redirect URIs, policies.
+- CCT (Cloud Connect): Client integration layer. Enhancement = new client types, new flows/endpoints. Config = onboarding new tenant, updating client IDs, feature flags.
+- NSL (Norton Secure Login): SSO/account system. Enhancement = new auth flows, token changes. Config = registering clients, updating redirect URIs, policies.
 - IPM Platform/MarTech: In-product messaging & experimentation. Enhancement = new templates, new decisioning logic. Config = creating/updating campaigns, audiences, copy.
 - CDP (Customer Data Platform): Customer data and audience platform. Enhancement = new schemas, identity stitching. Config = defining segments, traits, journeys.
-- NCS/UMO2 (Norton Cloud Services/Unified Messaging): Backend messaging/orchestration. Enhancement = new message types, channels. Config = routing rules, template bindings.
-- Reputation Service ("Shasta"): URL reputation service for Safe Search, Safe Web. Enhancement = new APIs, detection logic. Config = allow/deny lists, thresholds.
+- NCS/UMO2: Backend messaging/orchestration. Enhancement = new message types, channels. Config = routing rules, template bindings.
+- Reputation Service ("Shasta"): URL reputation for Safe Search, Safe Web. Enhancement = new APIs, detection logic. Config = allow/deny lists, thresholds.
 - Norton Storage Platform/Backup (NSP): Cloud backup platform. Enhancement = new backup capabilities, API changes. Config = retention policies, storage tier mappings.
 - Gen Score Service (GSS/Protection Score): Shared scoring service. Enhancement = new vectors, scoring algorithms. Config = weights, thresholds, rollout rules.
 
-### Current Norton iOS App Features (these EXIST — do not flag as net-new)
+### Current Norton iOS Features (EXIST — do NOT flag as net-new)
 Scam & Phishing: Genie/Scam Protection Hub, Safe Web, Safe SMS, Safe Call, Safe Email, Secure Calendar, Scam Support, Scam Reimbursement/Insurance.
-Device & Network: Smart Scan, Device Security, Wi-Fi Security/Suspicious Network Detection, Device Report Card/Protection Report.
+Device & Network: Smart Scan, Device Security, Wi-Fi Security, Device Report Card/Protection Report.
 Privacy & VPN: Secure VPN, Ad Tracker Blocker.
 Identity: Dark Web Monitoring, Privacy Monitor, Privacy Monitor Assistant.
 Account: In-app Account & Device Management, Updated Onboarding/Permission Flows, Protection Score Tile.
 
 ### Net-New Builds
-- NeoClaw — ALWAYS flag as net-new if seen. New scanning/detection engine, does not exist.
-- Daily Digest — Flag as net-new ONLY if you see it in the prototype content above. Recurring summary notification/feed.
-- Content Feed — Flag as net-new ONLY if you see it in the prototype content above. In-app content/article stream.
-- Trending Scams — Flag as net-new ONLY if you see it in the prototype content above. Curated/dynamic scam alerts feed.
+- NeoClaw — ALWAYS net-new. New scanning/detection engine.
+- Daily Digest — net-new ONLY if visible in prototype.
+- Content Feed — net-new ONLY if visible in prototype.
+- Trending Scams — net-new ONLY if visible in prototype.
 
-### Foundational Platform Builds (flag if prototype depends on any of these)
+### Foundational Platform Builds (flag if prototype depends on these)
 - Native Privacy Monitor experience
-- Native Sign Up/Log In experience (OTP, Google/Apple login, email+password)
+- Native Sign Up/Log In (OTP, Google/Apple, email+password)
 - Product Telemetry (in-app analytics/event tracking)
 - Native License Sharing experience
-- CSP Lineup Update (3-tier product lineup — still TBD, flag with open questions)
+- CSP Lineup Update (3-tier lineup — still TBD, flag with open questions)
 - Enhanced Profile/Settings
 
-## Output Format
-Return ONLY valid JSON, no prose, no markdown fences:
+## Output Format — ONLY this JSON, nothing else:
 {
-  "sharedServices": [
-    { "service": "name", "workType": "config-change|enhancement|new-integration", "notes": "why" }
-  ],
-  "existingCapabilities": ["list of existing iOS features this prototype uses"],
-  "netNewBuilds": ["list of net-new features needed"],
-  "foundationalBuilds": ["list of foundational builds this depends on"],
-  "riskFlags": ["list of ambiguous items needing human review"],
+  "sharedServices": [{ "service": "name", "workType": "config-change|enhancement|new-integration", "notes": "why" }],
+  "existingCapabilities": ["existing iOS features this prototype uses"],
+  "netNewBuilds": ["net-new features needed"],
+  "foundationalBuilds": ["foundational builds this depends on"],
+  "riskFlags": ["ambiguous items needing human review"],
   "summary": "2-3 sentence plain-English summary of overall complexity"
 }`;
 
-  // Verify at least one LLM key is present before attempting
-  if (!env.OPENAI_API_KEY && !env.ANTHROPIC_API_KEY && !env.GEMINI_API_KEY) {
-    return json({ error: 'No LLM API keys configured. Open this page on the production URL: https://norton-reimagined-sprint.pages.dev' }, 503);
-  }
+    const userPrompt = `Prototype details:
+Title: ${title}
+Description: ${description}
+Summary: ${summary}
+Capabilities selected: ${capabilities}
+${protoContent ? `\nExtracted content from all screens (buttons, headings, links, labels):\n${protoContent}` : ''}
 
-  // Text-only analysis — vision calls exceed CF Pages 30s CPU limit.
-  // Text extraction (12k chars with button/heading hints) is fed to the LLM.
-  let reportText;
-  try {
-    reportText = await runLLM({
-      mode: 'execution',
-      system: systemPrompt + ' Return ONLY a raw JSON object — no markdown fences, no prose.',
-      messages: [{ role: 'user', content: userPrompt + '\n\nRespond with ONLY the JSON object. No markdown, no explanation.' }],
-      maxTokens: 2500,
-      env,
-    });
-  } catch (err) {
-    return json({ error: `LLM error: ${err.message}` }, 502);
-  }
+${screensFound > 0 ? `${screensFound} screenshot(s) of every prototype screen are attached. Study EVERY screen — all UI elements, features, flows, interactions. Base your assessment on what you actually see in the screenshots AND the extracted text above.` : ''}
 
-  let report = extractJSON(reportText);
-  if (!report) {
-    // Final fallback: re-run with text-only (no vision) to get clean JSON
-    try {
-      const fallbackText = await runLLM({
+${knowledgeBase}`;
+
+    let report = null;
+
+    // ── 2. Vision path (preferred) — send screenshots to Claude ────────────
+    if (screensFound > 0 && env.ANTHROPIC_API_KEY) {
+      try {
+        const msgContent = buildVisionContent(crawlResult.screens, userPrompt);
+        const res = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': env.ANTHROPIC_API_KEY,
+            'anthropic-version': '2023-06-01',
+          },
+          body: JSON.stringify({
+            model: 'claude-opus-4-5',
+            max_tokens: 3000,
+            system: systemPrompt + ' CRITICAL: respond with ONLY the raw JSON object. No markdown fences, no prose, no explanation.',
+            messages: [{ role: 'user', content: msgContent }],
+          }),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          const raw = data?.content?.[0]?.text?.trim() || '';
+          report = extractJSON(raw);
+        }
+      } catch {}
+    }
+
+    // ── 3. Text-only fallback ───────────────────────────────────────────────
+    if (!report) {
+      const textOnlyPrompt = userPrompt.replace(/\d+ screenshot\(s\).*\n/, '');
+      const rawText = await runLLM({
         mode: 'execution',
-        system: systemPrompt + ' You MUST respond with ONLY a valid JSON object — no prose, no markdown, no explanation.',
-        messages: [{ role: 'user', content: userPrompt + '\n\nIMPORTANT: Return ONLY the raw JSON object. No prose before or after it.' }],
-        maxTokens: 2000,
+        system: systemPrompt + ' Return ONLY a raw JSON object — no markdown fences, no prose.',
+        messages: [{ role: 'user', content: textOnlyPrompt + '\n\nRespond with ONLY the JSON object.' }],
+        maxTokens: 2500,
         env,
       });
-      report = extractJSON(fallbackText);
-    } catch {}
-  }
-  if (!report) {
-    return json({ error: 'Failed to parse LLM response as JSON', raw: reportText.slice(0, 500) }, 500);
-  }
+      report = extractJSON(rawText);
+    }
 
-  const cachedAt = new Date().toISOString();
-  await kv.put(cacheKey, JSON.stringify({ cachedAt, report }));
+    if (!report) throw new Error('Could not parse LLM response as JSON after both vision and text attempts');
 
-  return json({ cached: false, cachedAt, report });
+    // ── 4. Store result ─────────────────────────────────────────────────────
+    const cachedAt = new Date().toISOString();
+    await kv.put(cacheKey, JSON.stringify({
+      cachedAt,
+      report,
+      screensAnalyzed: crawlResult.screens.length,
+      visualAnalysis: screensFound > 0,
+    }));
+    await kv.delete(jobKey);
+
+  } catch (err) {
+    // Store error so frontend can surface it
+    await kv.put(jobKey, JSON.stringify({
+      status: 'error',
+      startedAt: new Date().toISOString(),
+      error: err.message,
+    }), { expirationTtl: 300 });
+  }
 }
