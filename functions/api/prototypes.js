@@ -20,7 +20,7 @@
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 const MAX_FILE_BYTES   = 5 * 1024 * 1024; // 5 MB raw (before base64)
-const ALLOWED_EXTS     = ["html", "js", "ts", "tsx", "jsx", "zip"];
+const ALLOWED_EXTS     = ["html", "js", "ts", "tsx", "jsx", "zip", "pdf", "jpg", "jpeg", "png", "gif", "webp", "svg"];
 const TEXT_EXTS        = new Set(["html","htm","css","js","ts","jsx","tsx","json","txt","md","svg","xml","yaml","yml","toml"]);
 
 const CORS = {
@@ -110,7 +110,7 @@ export async function onRequestPost({ request, env }) {
   try { body = await request.json(); }
   catch { return json({ error: "Invalid JSON body." }, 400); }
 
-  const { name, title, url, summary, fileContent, fileName, encoding = "utf8" } = body ?? {};
+  const { name, title, url, summary, fileContent, fileName, encoding = "utf8", mimeType } = body ?? {};
 
   // ── Required fields ────────────────────────────────────────────────────────
   const missing = [];
@@ -156,7 +156,7 @@ export async function onRequestPost({ request, env }) {
   if (hasUrl && url.trim().length > 500) return json({ error: "url must be ≤ 500 chars." }, 400);
 
   // ── Reject unexpected fields ───────────────────────────────────────────────
-  const allowed = new Set(["name","title","url","summary","fileContent","fileName","encoding"]);
+  const allowed = new Set(["name","title","url","summary","fileContent","fileName","encoding","mimeType","clientId"]);
   const extra = Object.keys(body).filter(k => !allowed.has(k));
   if (extra.length) return json({ error: `Unexpected fields: ${extra.join(", ")}.` }, 400);
 
@@ -171,7 +171,26 @@ export async function onRequestPost({ request, env }) {
 
   if (hasFile && !hasUrl) {
     const ext = fileName.trim().split(".").pop().toLowerCase();
+    const IMAGE_EXTS = ["jpg","jpeg","png","gif","webp","svg"];
+    const isBinaryMedia = ext === "pdf" || IMAGE_EXTS.includes(ext);
     let vercelFiles;
+
+    // Images and PDFs: skip Vercel, store in KV directly
+    if (isBinaryMedia) {
+      resolvedUrl = null;
+      sourceType  = "file";
+      prototype = {
+        id, name, title, summary,
+        url:         null,
+        resolvedUrl: null,
+        fileName:    fileName.trim(),
+        mimeType:    mimeType || (ext === "pdf" ? "application/pdf" : "image/" + ext),
+        fileContent: fileContent,
+        encoding:    "base64",
+        sourceType:  "file",
+        createdAt:   new Date().toISOString(),
+      };
+    } else
 
     try {
       if (ext === "zip") {
@@ -394,11 +413,23 @@ async function scoreLaura(prototype, fileContent, env) {
   // Crawls all discovered screens, takes screenshots, sends to Claude Vision.
   if (!env.ANTHROPIC_API_KEY) return null;
 
-  // ── 1. Crawl the prototype for all screens + screenshots ────────────────
+  // ── 1. Check if this is an image/PDF upload — use directly as vision input
+  const IMAGE_EXTS = ['jpg','jpeg','png','gif','webp','svg'];
+  const fileExt = (prototype.fileName || '').split('.').pop().toLowerCase();
+  const isImageUpload = IMAGE_EXTS.includes(fileExt);
+  const isPdfUpload   = fileExt === 'pdf';
+  const isBinaryMedia = isImageUpload || isPdfUpload;
+
+  // ── 2. Crawl the prototype for all screens + screenshots ────────────────
   const protoUrl = prototype.url || prototype.resolvedUrl || '';
   let crawlResult = { screens: [], textContent: '' };
 
-  if (protoUrl && !protoUrl.startsWith('/api/')) {
+  if (isBinaryMedia && fileContent) {
+    // Directly use the uploaded image as a vision screen
+    const mediaMime = prototype.mimeType || (isImageUpload ? 'image/' + fileExt : 'image/png');
+    const safeBase64 = fileContent.replace(/[^A-Za-z0-9+/=]/g, '');
+    crawlResult.screens = [{ url: prototype.fileName, label: prototype.fileName, base64: safeBase64, mimeType: mediaMime }];
+  } else if (protoUrl && !protoUrl.startsWith('/api/')) {
     try {
       crawlResult = await crawlPrototype(protoUrl, { fileContent: fileContent || '' });
     } catch { /* fall through to text-only */ }

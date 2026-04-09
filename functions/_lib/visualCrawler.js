@@ -151,7 +151,7 @@ export function buildVisionContent(screens, analysisInstruction) {
         type: 'image',
         source: {
           type: 'base64',
-          media_type: 'image/png',
+          media_type: screen.mimeType || 'image/png',
           data: screen.base64,
         },
       });
