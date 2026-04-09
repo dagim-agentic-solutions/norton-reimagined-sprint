@@ -643,6 +643,7 @@
           <li><a href="competitive-analysis.html" role="menuitem">Competitive Analysis</a></li>
           <li><a href="idea-workshop.html" role="menuitem">Ideation Wizard</a></li>
             <li><a href="idea-grouping.html" role="menuitem">Idea Grouping</a></li>
+            <li><a href="dependency-assessment.html" role="menuitem">Dependency Assessment</a></li>
         </ul>
       </li>
     </ul>
@@ -783,7 +784,7 @@
       <h3>Describe your concept</h3>
     </div>
     <p class="sec-hint">What does this do and what problem does it solve for Laura?</p>
-    <textarea class="cb-textarea" id="concept" rows="5" placeholder="e.g. A daily household security summary delivered each morning — no scanning required. Norton silently checks all 8 family devices overnight and shows Laura one calm status card when she opens the app."></textarea>
+    <textarea class="cb-textarea" id="concept" rows="5" placeholder="e.g. A personalized daily fitness brief delivered each morning — no setup required. Peloton quietly tracks John's weekly activity across bike, tread, and app sessions and surfaces one motivating card when he opens the app."></textarea>
   </div>
 
   <!-- 3. Capabilities -->
@@ -824,7 +825,7 @@
       <h3>How does AI show up?</h3>
     </div>
     <p class="sec-hint">What does the AI do that couldn't be done without it?</p>
-    <textarea class="cb-textarea" id="aiHook" rows="4" placeholder="e.g. AI correlates signals across all 8 devices and the family's known digital footprint to predict and block threats before anyone in the household encounters them — no manual scans, no alerts unless action is needed."></textarea>
+    <textarea class="cb-textarea" id="aiHook" rows="4" placeholder="e.g. AI analyzes John's cadence, heart rate trends, and class history to auto-schedule his next best workout and adjust difficulty in real time — no manual configuration, no guesswork about what to ride next."></textarea>
   </div>
 
   <!-- 5. User journey -->
@@ -833,8 +834,8 @@
       <span class="sec-num">5</span>
       <h3>Walk through the user journey</h3>
     </div>
-    <p class="sec-hint">How does Laura discover this, use it for the first time, and keep coming back? Step by step.</p>
-    <textarea class="cb-textarea" id="journey" rows="6" placeholder="e.g. Discovery: Laura sees a Norton email — 'Your family had a quiet week online.' She opens it, curious. First use: She taps through to a clean status card showing all 8 devices green. Sets up morning brief in 90 seconds. Retention: Every morning she gets one notification — 'All clear' or 'One thing to review.' She checks it like the weather."></textarea>
+    <p class="sec-hint">How does Laura discover this idea, use it for the first time, and keep coming back? Step by step.</p>
+    <textarea class="cb-textarea" id="journey" rows="6" placeholder="e.g. Discovery: John gets a Peloton push — 'You're 2 rides from your next streak milestone.' He taps it, curious. First use: He sees a personalized plan for the week already built around his schedule. Sets a goal in 60 seconds. Retention: Every Monday he gets one card — 'Here's your week.' He checks it like a to-do list."></textarea>
   </div>
 
   <!-- 6. Differentiators -->
@@ -854,7 +855,7 @@
       <h3>Why would Laura engage with this regularly?</h3>
     </div>
     <p class="sec-hint">What makes this essential — daily or weekly habit, not just useful once?</p>
-    <textarea class="cb-textarea" id="engagement" rows="4" placeholder="e.g. The morning brief creates a daily 'all clear' ritual — like checking the weather. Laura doesn't need to interact, but she notices when it's missing. The moment it catches something real, she becomes an evangelist."></textarea>
+    <textarea class="cb-textarea" id="engagement" rows="4" placeholder="e.g. The weekly plan creates a Sunday-night ritual — John previews his rides for the week. He doesn't need to think about it, but notices when it's gone. The moment it helps him hit a personal record, he tells everyone."></textarea>
   </div>
 
   <!-- 8. JTBDs -->
@@ -912,7 +913,7 @@
       <h3>Onboarding welcome carousel</h3>
     </div>
     <p class="sec-hint">What story needs to be told to welcome a new user? Why would someone download and use this app? Describe the narrative arc — what problem you open with, what promise you make, and how you end on a clear action. This will be used to generate the onboarding carousel screens.</p>
-    <textarea class="cb-textarea" id="onboardingStory" rows="5" placeholder="e.g. Open: 'Your family's digital life is more exposed than you think — and you're the one expected to handle it.' Promise: 'Norton now handles it for you — silently, completely, without asking you to become an IT expert.' Close: 'Set up in 60 seconds. We'll take it from here.' Each slide should feel calm and confident, not scary."></textarea>
+    <textarea class="cb-textarea" id="onboardingStory" rows="5" placeholder="e.g. Open: 'You bought the bike — but are you actually riding it the right way?' Promise: 'Peloton AI now builds your plan, tracks your form, and keeps you coming back — without you having to figure it out.' Close: 'Tell us your goal in 30 seconds. We handle the rest.' Each slide should feel energizing, not overwhelming."></textarea>
   </div>
 
   <!-- 13. First value moment (iOS only) -->
@@ -926,7 +927,7 @@
       <strong>Example:</strong> For a weather app, the first value moment is seeing tomorrow's forecast for your exact location within 10 seconds of opening — before you've created an account or adjusted any settings.<br><br>
       For your prototype: what is the single moment — ideally within the first 60 seconds of use — when Laura thinks "this is already helping me"?
     </p>
-    <textarea class="cb-textarea" id="firstValueMoment" rows="4" placeholder="e.g. Laura opens the app after a 60-second setup and immediately sees 'All 8 of your family's devices are clean and protected.' No scanning needed — it already checked. That's the moment she knows Norton is quietly working for her."></textarea>
+    <textarea class="cb-textarea" id="firstValueMoment" rows="4" placeholder="e.g. John opens the app after a 30-second goal setup and immediately sees 'Your first week plan is ready — 3 rides, 2 strength sessions, fits your calendar.' No planning needed — it's already done. That's the moment he knows Peloton is working for him."></textarea>
   </div>
 
   <!-- Norton Logo Toggle -->
@@ -1036,7 +1037,9 @@ const CAPABILITIES = [
   'Credit Monitoring', 'Financial Monitoring',
   'Content Feed', 'Daily Digest',
   'Safe Email & SMS',
-  'Trending Scams'
+  'Trending Scams',
+  'Identity Theft Restoration & Insurance',
+  'Advanced Identity Monitoring'
 ];
 
 // Descriptions for all regular capabilities
@@ -1060,7 +1063,9 @@ const CAP_DESCS = {
   'Daily Digest':                   'A once-a-day summary pushed to Laura covering everything Norton detected, blocked, or monitored overnight — so she always knows her household is safe with a single glance.'
 ,
   'Safe Email & SMS':               'AI-powered scam detection for emails and SMS messages — flags suspicious content before Laura opens it, powered by Norton Genie.',
-  'Trending Scams':                 'A real-time pulse of scams gaining momentum — surfaces emerging threats (AI voice clones, fake delivery texts, grandparent scams) so Laura knows what to watch for before her family encounters them.'
+  'Trending Scams':                 'A real-time pulse of scams gaining momentum — surfaces emerging threats (AI voice clones, fake delivery texts, grandparent scams) so Laura knows what to watch for before her family encounters them.',
+  'Identity Theft Restoration & Insurance': 'Full-service identity restoration support and financial reimbursement if Laura's identity is stolen — specialists handle the recovery process end-to-end so she doesn't have to.',
+  'Advanced Identity Monitoring':   'Continuous monitoring of SSN, credit, court records, change-of-address filings, and dark web data — alerts Laura the moment her identity information surfaces anywhere it shouldn't.'
 };
 
 // Featured capabilities that require a role selector when checked
