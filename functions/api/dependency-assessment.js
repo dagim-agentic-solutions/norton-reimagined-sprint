@@ -212,6 +212,11 @@ Return ONLY valid JSON, no prose, no markdown fences:
   "summary": "2-3 sentence plain-English summary of overall complexity"
 }`;
 
+  // Verify at least one LLM key is present before attempting
+  if (!env.OPENAI_API_KEY && !env.ANTHROPIC_API_KEY && !env.GEMINI_API_KEY) {
+    return json({ error: 'No LLM API keys configured. Open this page on the production URL: https://norton-reimagined-sprint.pages.dev' }, 503);
+  }
+
   // Text-only analysis — vision calls exceed CF Pages 30s CPU limit.
   // Text extraction (12k chars with button/heading hints) is fed to the LLM.
   let reportText;
