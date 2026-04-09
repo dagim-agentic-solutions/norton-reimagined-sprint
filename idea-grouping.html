@@ -1198,7 +1198,7 @@
       const vision = document.getElementById('ideaVision').value.trim();
       const laura = document.getElementById('ideaLaura').value.trim();
       if (!desc || !vision || !laura) {
-        const missing = [!desc && 'Description', !vision && 'How does this align to Norton's vision', !laura && 'What problems does this solve for Laura'].filter(Boolean);
+        const missing = [!desc && 'Description', !vision && 'How does this align to Norton\'s vision', !laura && 'What problems does this solve for Laura'].filter(Boolean);
         alert('Please fill in: ' + missing.join(', '));
         return;
       }
