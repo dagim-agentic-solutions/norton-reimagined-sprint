@@ -169,6 +169,7 @@ export async function onRequestPost({ request, env, ctx }) {
   let resolvedUrl = hasUrl ? url.trim() : null;
   let sourceType  = hasUrl ? "url" : "file";
 
+  let prototype;  // declared here so binary-media branch can assign before the main build block
   if (hasFile && !hasUrl) {
     const ext = fileName.trim().split(".").pop().toLowerCase();
     const IMAGE_EXTS = ["jpg","jpeg","png","gif","webp","svg"];
@@ -273,8 +274,8 @@ export async function onRequestPost({ request, env, ctx }) {
     sourceType = "vercel";
   }
 
-  // ── Build prototype object ─────────────────────────────────────────────────
-  let prototype = {
+  // ── Build prototype object (only reached for non-binary-media files) ─────────
+  prototype = {
     id,
     name:        name.trim(),
     title:       title.trim(),
