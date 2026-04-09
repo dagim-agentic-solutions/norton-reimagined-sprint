@@ -229,12 +229,38 @@ Return ONLY valid JSON, no prose, no markdown fences:
     return json({ error: `LLM error: ${err.message}` }, 502);
   }
 
-  let report;
-  try {
-    // Strip possible markdown fences just in case
-    const cleaned = reportText.replace(/^```json?\s*/i, '').replace(/```\s*$/, '').trim();
-    report = JSON.parse(cleaned);
-  } catch {
+  // ── Robust JSON extraction ────────────────────────────────────────────────
+  // Vision models often wrap output in prose or markdown — find the JSON block.
+  function extractJSON(raw) {
+    if (!raw) return null;
+    // 1. Strip markdown fences
+    let s = raw.replace(/^```json?\s*/im, '').replace(/```\s*$/m, '').trim();
+    // 2. Try direct parse
+    try { return JSON.parse(s); } catch {}
+    // 3. Find first { ... } block
+    const start = s.indexOf('{');
+    const end   = s.lastIndexOf('}');
+    if (start !== -1 && end > start) {
+      try { return JSON.parse(s.slice(start, end + 1)); } catch {}
+    }
+    return null;
+  }
+
+  let report = extractJSON(reportText);
+  if (!report) {
+    // Final fallback: re-run with text-only (no vision) to get clean JSON
+    try {
+      const fallbackText = await runLLM({
+        mode: 'execution',
+        system: systemPrompt + ' You MUST respond with ONLY a valid JSON object — no prose, no markdown, no explanation.',
+        messages: [{ role: 'user', content: userPrompt + '\n\nIMPORTANT: Return ONLY the raw JSON object. No prose before or after it.' }],
+        maxTokens: 2000,
+        env,
+      });
+      report = extractJSON(fallbackText);
+    } catch {}
+  }
+  if (!report) {
     return json({ error: 'Failed to parse LLM response as JSON', raw: reportText.slice(0, 500) }, 500);
   }
 
