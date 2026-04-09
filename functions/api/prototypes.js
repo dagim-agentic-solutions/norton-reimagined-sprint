@@ -195,7 +195,7 @@ export async function onRequestPost({ request, env }) {
       const lauraMediaResult = await scoreLaura(prototype, fileContent, env).catch(() => null);
       if (lauraMediaResult) Object.assign(prototype, lauraMediaResult);
       // Persist
-      try { await kv.put(\`proto:\${id}\`, JSON.stringify(prototype)); }
+      try { await kv.put(`proto:${id}`, JSON.stringify(prototype)); }
       catch { return json({ error: "Failed to save prototype. Please try again." }, 503); }
       try {
         const raw = await kv.get("index");
