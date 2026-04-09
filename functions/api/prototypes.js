@@ -175,12 +175,13 @@ export async function onRequestPost({ request, env }) {
     const isBinaryMedia = ext === "pdf" || IMAGE_EXTS.includes(ext);
     let vercelFiles;
 
-    // Images and PDFs: skip Vercel, store in KV directly
+    // Images and PDFs: skip Vercel entirely — build prototype and jump to persist
     if (isBinaryMedia) {
-      resolvedUrl = null;
-      sourceType  = "file";
       prototype = {
-        id, name, title, summary,
+        id,
+        name:        name.trim(),
+        title:       title.trim(),
+        summary:     summary.trim(),
         url:         null,
         resolvedUrl: null,
         fileName:    fileName.trim(),
@@ -188,9 +189,22 @@ export async function onRequestPost({ request, env }) {
         fileContent: fileContent,
         encoding:    "base64",
         sourceType:  "file",
-        createdAt:   new Date().toISOString(),
+        submittedAt: new Date().toISOString(),
       };
-    } else
+      // Score against Laura (non-fatal)
+      const lauraMediaResult = await scoreLaura(prototype, fileContent, env).catch(() => null);
+      if (lauraMediaResult) Object.assign(prototype, lauraMediaResult);
+      // Persist
+      try { await kv.put(\`proto:\${id}\`, JSON.stringify(prototype)); }
+      catch { return json({ error: "Failed to save prototype. Please try again." }, 503); }
+      try {
+        const raw = await kv.get("index");
+        const ids = raw ? JSON.parse(raw) : [];
+        ids.push(id);
+        await kv.put("index", JSON.stringify(ids));
+      } catch { /* non-fatal */ }
+      return json({ ok: true, prototype });
+    }
 
     try {
       if (ext === "zip") {
