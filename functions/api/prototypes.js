@@ -19,7 +19,7 @@
  */
 
 // ── Constants ─────────────────────────────────────────────────────────────────
-const MAX_FILE_BYTES   = 5 * 1024 * 1024; // 5 MB raw (before base64)
+const MAX_FILE_BYTES   = 10 * 1024 * 1024; // 10 MB raw (before base64)
 const ALLOWED_EXTS     = ["html", "js", "ts", "tsx", "jsx", "zip", "pdf", "jpg", "jpeg", "png", "gif", "webp", "svg"];
 const TEXT_EXTS        = new Set(["html","htm","css","js","ts","jsx","tsx","json","txt","md","svg","xml","yaml","yml","toml"]);
 
@@ -144,9 +144,6 @@ export async function onRequestPost({ request, env, ctx }) {
     if (approxBytes > MAX_FILE_BYTES) {
       return json({ error: `File exceeds the 5 MB limit.` }, 400);
     }
-    if (!env.VERCEL_TOKEN) {
-      return json({ error: "File deployments unavailable — VERCEL_TOKEN secret not set. Contact the sprint lead." }, 503);
-    }
   }
 
   // ── Length guards ──────────────────────────────────────────────────────────
@@ -222,6 +219,9 @@ export async function onRequestPost({ request, env, ctx }) {
       return json({ ok: true, prototype });
     }
 
+    if (!env.VERCEL_TOKEN) {
+      return json({ error: "File deployments unavailable — VERCEL_TOKEN secret not set. Contact the sprint lead." }, 503);
+    }
     try {
       if (ext === "zip") {
         const rawFiles = await parseZip(fileContent); // fileContent is base64
