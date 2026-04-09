@@ -994,14 +994,14 @@ async function loadPrototypes() {
             </a>
           </div>
           ${p.lauraScore != null ? `
-          <div class="score-reveal-wrap" id="score-wrap-${p.id}">
-            <button class="btn-show-score" onclick="revealScore('${p.id}')">Show Score</button>
-            <div class="laura-score" id="score-body-${p.id}" style="display:none;margin-top:0;padding:0;background:none;border:none;">
-              <div class="score-badge ${lauraClass(p.lauraVerdict)}">${p.lauraScore}</div>
-              <div>
-                <div class="score-verdict">${escapeHtml(p.lauraVerdict || '')}</div>
-                <div class="score-reco">${escapeHtml(p.lauraRecommendation || '')}</div>
-              </div>
+          <div class="laura-score" id="score-wrap-${p.id}">
+            <div>
+              <button class="btn-show-score" id="score-btn-${p.id}" data-id="${p.id}" onclick="revealScore(this.dataset.id)">Show Score</button>
+              <span class="score-badge ${lauraClass(p.lauraVerdict)}" id="score-num-${p.id}" style="display:none;">${p.lauraScore}</span>
+            </div>
+            <div>
+              <div class="score-verdict">${escapeHtml(p.lauraVerdict || '')}</div>
+              <div class="score-reco">${escapeHtml(p.lauraRecommendation || '')}</div>
             </div>
           </div>` : ''}
           <div class="vote-row" id="vr-${escapeAttr(p.id)}">
@@ -1925,11 +1925,10 @@ function lauraClass(verdict) {
 
 <script src="nav.js">
 function revealScore(id) {
-  const wrap = document.getElementById('score-wrap-' + id);
-  const body = document.getElementById('score-body-' + id);
-  const btn = wrap && wrap.querySelector('.btn-show-score');
+  const btn = document.getElementById('score-btn-' + id);
+  const num = document.getElementById('score-num-' + id);
   if (btn) btn.style.display = 'none';
-  if (body) body.style.display = 'flex';
+  if (num) num.style.display = 'inline';
 }
 </script>
 </body>
