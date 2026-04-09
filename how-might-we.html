@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Norton Reimagined Sprint · How Might We</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" type="image/svg+xml" href="assets/norton-checkmark.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/icon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/icon-16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/icon-180.png">
+  <link rel="manifest" href="assets/site.webmanifest">
+  <style>
+    :root {
+      --ink: #242424;
+      --yellow: #FFE800;
+      --paper: #F8F8F7;
+      --card: #FFFFFF;
+      --line: #E6E6E4;
+      --ink-soft: #5a5a5a;
+      --ink-softer: #8a8a8a;
+      --green: #22c55e;
+      --red: #ef4444;
+      --blue: #3b82f6;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Inter Tight', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--paper);
+      color: var(--ink);
+      margin: 0;
+      min-height: 100vh;
+    }
+    .page {
+      padding: 32px 24px 80px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    @media (max-width: 768px) { .page { padding: 24px 20px 64px; } }
+
+    /* ── Header ── */
+    .page-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 32px;
+      flex-wrap: wrap;
+    }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-weight: 700;
+      border-radius: 999px;
+      background: var(--ink);
+      color: var(--yellow);
+      padding: 4px 12px;
+      margin-bottom: 12px;
+    }
+    .page-header h1 {
+      font-size: clamp(28px, 5vw, 48px);
+      font-weight: 800;
+      margin: 0 0 8px;
+      line-height: 1.1;
+    }
+    .page-header p {
+      font-size: 16px;
+      color: var(--ink-soft);
+      margin: 0;
+      max-width: 480px;
+    }
+
+    /* ── Layout ── */
+    .main-layout {
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+    @media (max-width: 960px) { .main-layout { grid-template-columns: 1fr; } }
+
+    /* ── Left Panel ── */
+    .form-panel {
+      background: var(--card);
+      border: 1.5px solid var(--line);
+      border-radius: 16px;
+      padding: 24px;
+      position: sticky;
+      top: 80px;
+    }
+    .form-panel h2 {
+      font-size: 22px;
+      font-weight: 800;
+      margin: 0 0 6px;
+    }
+    .form-panel .subtitle {
+      font-size: 14px;
+      color: var(--ink-soft);
+      margin: 0 0 20px;
+      line-height: 1.5;
+    }
+    .form-group {
+      margin-bottom: 16px;
+    }
+    .form-group label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--ink-softer);
+      margin-bottom: 6px;
+    }
+    .form-group textarea,
+    .form-group input[type="text"] {
+      width: 100%;
+      font-family: inherit;
+      font-size: 14px;
+      padding: 10px 12px;
+      border: 1.5px solid var(--line);
+      border-radius: 8px;
+      background: var(--paper);
+      color: var(--ink);
+      resize: vertical;
+      transition: border-color 0.15s;
+    }
+    .form-group textarea:focus,
+    .form-group input[type="text"]:focus {
+      outline: none;
+      border-color: var(--ink);
+    }
+
+    /* Variant pills */
+    .variant-pills {
+      display: flex;
+      gap: 8px;
+    }
+    .variant-pill {
+      flex: 1;
+    }
+    .variant-pill input[type="radio"] {
+      display: none;
+    }
+    .variant-pill label {
+      display: block;
+      text-align: center;
+      padding: 7px 0;
+      border: 1.5px solid var(--line);
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--ink-softer);
+      cursor: pointer;
+      transition: all 0.15s;
+      text-transform: none;
+      letter-spacing: 0;
+    }
+    .variant-pill input[type="radio"]:checked + label {
+      background: var(--ink);
+      color: var(--yellow);
+      border-color: var(--ink);
+    }
+
+    /* Context accordion */
+    .context-toggle {
+      background: none;
+      border: none;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--ink-softer);
+      cursor: pointer;
+      padding: 0;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .context-toggle .chevron {
+      transition: transform 0.2s;
+      display: inline-block;
+    }
+    .context-toggle.open .chevron { transform: rotate(90deg); }
+    .context-fields {
+      display: none;
+    }
+    .context-fields.open {
+      display: block;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 700;
+      padding: 10px 18px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      transition: opacity 0.15s, transform 0.1s;
+    }
+    .btn:active { transform: scale(0.97); }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+    .btn-primary {
+      background: var(--ink);
+      color: var(--yellow);
+      width: 100%;
+      margin-top: 4px;
+    }
+    .btn-sm {
+      font-size: 13px;
+      padding: 6px 12px;
+    }
+    .btn-outline {
+      background: transparent;
+      border: 1.5px solid var(--line);
+      color: var(--ink);
+    }
+    .btn-danger-sm {
+      background: #fef2f2;
+      color: #dc2626;
+      border: 1px solid #fecaca;
+      font-size: 12px;
+      padding: 4px 9px;
+    }
+
+    /* ── Right panel ── */
+    .board-area {}
+    .board-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .board-header h2 {
+      font-size: 18px;
+      font-weight: 800;
+      margin: 0;
+    }
+    .count-badge {
+      background: var(--ink);
+      color: var(--yellow);
+      font-size: 12px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 999px;
+    }
+    .ws-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--ink-softer);
+      flex-shrink: 0;
+      margin-left: 2px;
+      transition: background 0.3s;
+    }
+    .ws-dot.connected { background: var(--green); }
+    .board-header-actions {
+      display: flex;
+      gap: 8px;
+      margin-left: auto;
+    }
+
+    /* ── HMW Cards ── */
+    .hmw-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .rank-controls {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+    .rank-btn {
+      background: none;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      width: 22px;
+      height: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 11px;
+      color: var(--ink-soft);
+      padding: 0;
+      transition: border-color .1s, color .1s;
+    }
+    .rank-btn:hover { border-color: var(--ink); color: var(--ink); }
+    .rank-btn:disabled { opacity: .2; cursor: default; }
+    .hmw-card {
+      padding-left: 46px;
+    }
+    .hmw-card.dragging-card { opacity: .4; }
+    .hmw-card.drag-over-card { border-color: var(--ink); box-shadow: 0 0 0 2px rgba(0,0,0,.08); }
+    .hmw-card {
+      background: var(--card);
+      border: 1.5px solid var(--line);
+      border-radius: 14px;
+      padding: 18px 18px 14px;
+      position: relative;
+      animation: card-in 0.3s ease;
+    }
+    @keyframes card-in {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .card-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-bottom: 10px;
+    }
+    .tag-pill {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 999px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .tag-trust { background: #dbeafe; color: #1d4ed8; }
+    .tag-emotion-focused { background: #f3e8ff; color: #7c3aed; }
+    .tag-engagement { background: #dcfce7; color: #15803d; }
+    .tag-protection { background: var(--ink); color: var(--yellow); }
+    .tag-default { background: var(--line); color: var(--ink-soft); }
+    .hmw-text {
+      font-size: 16px;
+      font-weight: 600;
+      line-height: 1.5;
+      margin-bottom: 8px;
+    }
+    .hmw-text .laura-bold { font-weight: 800; }
+    .hmw-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      margin-bottom: 12px;
+    }
+    .hmw-meta-item {
+      font-size: 12px;
+      color: var(--ink-softer);
+    }
+    .hmw-meta-item strong { color: var(--ink-soft); font-weight: 600; }
+    .card-divider {
+      border: none;
+      border-top: 1px solid var(--line);
+      margin: 10px 0;
+    }
+    .pain-point-row {
+      font-size: 12px;
+      color: var(--ink-softer);
+      line-height: 1.5;
+    }
+    .pain-point-row strong { color: var(--ink-soft); font-weight: 600; }
+    .pain-point-text {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      cursor: pointer;
+    }
+    .pain-point-text.expanded {
+      display: block;
+    }
+    .trash-btn {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+      color: var(--ink-softer);
+      padding: 3px 5px;
+      border-radius: 6px;
+      transition: background 0.15s, color 0.15s;
+      line-height: 1;
+    }
+    .trash-btn:hover { background: #fef2f2; color: #dc2626; }
+
+    /* Variants accordion */
+    .variants-toggle {
+      background: none;
+      border: none;
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--ink-softer);
+      cursor: pointer;
+      padding: 4px 0 0;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .variants-list {
+      display: none;
+      margin-top: 10px;
+      padding: 10px;
+      background: var(--paper);
+      border-radius: 8px;
+      border: 1px solid var(--line);
+    }
+    .variants-list.open { display: block; }
+    .variant-item {
+      font-size: 13px;
+      color: var(--ink-soft);
+      padding: 5px 0;
+      border-bottom: 1px solid var(--line);
+      line-height: 1.5;
+    }
+    .variant-item:last-child { border-bottom: none; }
+
+    /* Empty state */
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--ink-softer);
+    }
+    .empty-state .empty-icon { font-size: 48px; margin-bottom: 16px; }
+    .empty-state p { font-size: 15px; max-width: 280px; margin: 0 auto; line-height: 1.6; }
+
+    /* Spinner */
+    .spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255, 232, 0, 0.3);
+      border-top-color: var(--yellow);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      display: inline-block;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Toast */
+    #toast-container {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      pointer-events: none;
+    }
+    .toast {
+      background: var(--ink);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 10px 18px;
+      border-radius: 10px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+      animation: toast-in 0.2s ease;
+      pointer-events: auto;
+    }
+    .toast.success { background: #166534; }
+    .toast.error { background: #991b1b; }
+    @keyframes toast-in {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-brand">
+        <img src="assets/norton-logo.png" alt="Norton" class="nav-logo">
+        <span class="nav-sprint-label">Design Sprint</span>
+      </a>
+      <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+      <ul class="nav-links" id="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="laura.html">Laura</a></li>
+        <li><a href="where-is-norton.html">Where is Norton</a></li>
+        <li><a href="prototypes.html">Prototypes</a></li>
+        <li><a href="resources.html">Resources</a></li>
+        <li class="nav-dropdown">
+          <button class="nav-dropdown-btn" id="sprintToolsBtn" aria-expanded="false" aria-haspopup="true">
+            Sprint Tools <span class="nav-beta-pill">✦</span>
+          </button>
+          <ul class="nav-dropdown-menu" id="sprintToolsMenu" role="menu">
+            <li><a href="concept-builder.html" role="menuitem">Prototype Builder</a></li>
+            <li><a href="competitive-analysis.html" role="menuitem">Competitive Analysis</a></li>
+            <li><a href="idea-workshop.html" role="menuitem">Ideation Wizard</a></li>
+            <li><a href="idea-grouping.html" role="menuitem">Idea Grouping</a></li>
+            <li><a href="dependency-assessment.html" role="menuitem">Dependency Assessment</a></li>
+            <li><a href="how-might-we.html" role="menuitem" class="active">How Might We</a></li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="page">
+    <div class="page-header">
+      <div class="page-header-left">
+        <div class="eyebrow">AI Research Tool</div>
+        <h1>How Might We</h1>
+        <p>Transform customer pain points into actionable HMW statements — live for the whole team.</p>
+      </div>
+    </div>
+
+    <div class="main-layout">
+      <!-- Left Panel -->
+      <div class="form-panel">
+        <h2>How Might We</h2>
+        <p class="subtitle">Transform customer pain points into actionable HMW statements — live for the whole team.</p>
+
+        <div class="form-group">
+          <label for="painPointsInput">Pain Points <span style="color:#e63946">*</span></label>
+          <textarea id="painPointsInput" rows="8" placeholder="Enter one pain point per line.&#10;&#10;e.g. Laura feels overwhelmed by security alerts and doesn\'t know which ones actually matter."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Variants</label>
+          <div class="variant-pills">
+            <div class="variant-pill">
+              <input type="radio" name="variants" id="v1" value="1" checked>
+              <label for="v1">1</label>
+            </div>
+            <div class="variant-pill">
+              <input type="radio" name="variants" id="v2" value="2">
+              <label for="v2">2</label>
+            </div>
+            <div class="variant-pill">
+              <input type="radio" name="variants" id="v3" value="3">
+              <label for="v3">3</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <button class="context-toggle" id="contextToggle" type="button">
+            <span class="chevron">›</span> Add context
+          </button>
+          <div class="context-fields" id="contextFields">
+            <div class="form-group">
+              <label for="channelInput">Channel</label>
+              <input type="text" id="channelInput" placeholder="e.g. mobile app, support call">
+            </div>
+            <div class="form-group">
+              <label for="journeyStageInput">Journey Stage</label>
+              <input type="text" id="journeyStageInput" placeholder="e.g. onboarding, consideration">
+            </div>
+          </div>
+        </div>
+
+        <button class="btn btn-primary" id="generateBtn" disabled>
+          Generate HMW →
+        </button>
+      </div>
+
+      <!-- Right Panel -->
+      <div class="board-area">
+        <div class="board-header">
+          <h2>HMW Statements</h2>
+          <span class="count-badge" id="countBadge">0</span>
+          <div class="ws-dot" id="wsDot" title="WebSocket disconnected"></div>
+          <div class="board-header-actions">
+            <button class="btn btn-sm btn-outline" id="exportBtn">Export CSV</button>
+            <button class="btn btn-sm btn-danger-sm" id="clearBtn">Clear Board</button>
+          </div>
+        </div>
+
+        <div class="hmw-list" id="hmwList">
+          <div class="empty-state" id="emptyState">
+            <div class="empty-icon">💡</div>
+            <p>No HMW statements yet. Enter pain points on the left to get started.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast-container"></div>
+
+  <script>window.__HMW_WS_URL__ = "wss://hmw-hub.og-norton.workers.dev/ws/hmw";</script>
+  <script>
+    // ── State ──
+    let allItems = [];
+
+    // ── Nav ──
+    (function() {
+      const btn = document.getElementById('sprintToolsBtn');
+      const menu = document.getElementById('sprintToolsMenu');
+      if (!btn || !menu) return;
+      btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        const open = btn.getAttribute('aria-expanded') === 'true';
+        btn.setAttribute('aria-expanded', String(!open));
+        menu.classList.toggle('open', !open);
+      });
+      document.addEventListener('click', function() {
+        btn.setAttribute('aria-expanded', 'false');
+        menu.classList.remove('open');
+      });
+      const toggle = document.getElementById('nav-toggle');
+      const links = document.getElementById('nav-links');
+      if (toggle && links) {
+        toggle.addEventListener('click', function() {
+          const expanded = toggle.getAttribute('aria-expanded') === 'true';
+          toggle.setAttribute('aria-expanded', String(!expanded));
+          links.classList.toggle('open', !expanded);
+        });
+      }
+    })();
+
+    // ── Context toggle ──
+    document.getElementById('contextToggle').addEventListener('click', function() {
+      this.classList.toggle('open');
+      document.getElementById('contextFields').classList.toggle('open');
+    });
+
+    // ── Generate button enable/disable ──
+    const painInput = document.getElementById('painPointsInput');
+    const generateBtn = document.getElementById('generateBtn');
+    painInput.addEventListener('input', function() {
+      generateBtn.disabled = !this.value.trim();
+    });
+
+    // ── Toast ──
+    function toast(msg, type) {
+      const c = document.getElementById('toast-container');
+      const t = document.createElement('div');
+      t.className = 'toast' + (type ? ' ' + type : '');
+      t.textContent = msg;
+      c.appendChild(t);
+      setTimeout(() => t.remove(), 3500);
+    }
+
+    // ── Tag colour ──
+    function tagClass(tag) {
+      const map = {
+        'trust': 'tag-trust',
+        'emotion-focused': 'tag-emotion-focused',
+        'engagement': 'tag-engagement',
+        'protection': 'tag-protection',
+      };
+      return map[tag] || 'tag-default';
+    }
+
+    // ── Render ──
+    function updateCount() {
+      document.getElementById('countBadge').textContent = allItems.length;
+    }
+
+    function highlightLaura(text) {
+      return text.replace(/\bLaura\b/g, '<span class="laura-bold">Laura</span>');
+    }
+
+    function renderCard(item, prepend) {
+      const list = document.getElementById('hmwList');
+      const empty = document.getElementById('emptyState');
+      if (empty) empty.remove();
+
+      const card = document.createElement('div');
+      card.className = 'hmw-card';
+      card.dataset.id = item.id;
+
+      const tags = (item.tags || []).map(t =>
+        '<span class="tag-pill ' + tagClass(t) + '">' + t + '</span>'
+      ).join('');
+
+      const variantsHtml = item.variants && item.variants.length > 0 ? (
+        '<button class="variants-toggle" onclick="toggleVariants(this)">&#9656; Show ' + item.variants.length + ' variant' + (item.variants.length > 1 ? 's' : '') + '</button>' +
+        '<div class="variants-list">' +
+        item.variants.map(v => '<div class="variant-item">' + (typeof v === 'string' ? v : v.hmw_full || JSON.stringify(v)) + '</div>').join('') +
+        '</div>'
+      ) : '';
+
+      card.draggable = true;
+      card.addEventListener('dragstart', e => {
+        e.dataTransfer.setData('text/plain', item.id);
+        card.classList.add('dragging-card');
+      });
+      card.addEventListener('dragend', () => card.classList.remove('dragging-card'));
+      card.addEventListener('dragover', e => { e.preventDefault(); card.classList.add('drag-over-card'); });
+      card.addEventListener('dragleave', () => card.classList.remove('drag-over-card'));
+      card.addEventListener('drop', e => {
+        e.preventDefault();
+        card.classList.remove('drag-over-card');
+        const fromId = e.dataTransfer.getData('text/plain');
+        if (fromId && fromId !== item.id) reorderItems(fromId, item.id);
+      });
+
+      card.innerHTML =
+        '<div class="rank-controls" id="rank-' + item.id + '">' +
+          '<button class="rank-btn" onclick="moveCardUp(\'' + item.id + '\')" title="Move up">▲</button>' +
+          '<button class="rank-btn" onclick="moveCardDown(\'' + item.id + '\')" title="Move down">▼</button>' +
+        '</div>' +
+        '<button class="trash-btn" onclick="deleteItem(\'' + item.id + '\')" title="Delete">&#128465;</button>' +
+        '<div class="card-tags">' + tags + '</div>' +
+        '<div class="hmw-text">' + highlightLaura(item.hmwFull || '') + '</div>' +
+        '<div class="hmw-meta">' +
+          (item.situation ? '<div class="hmw-meta-item"><strong>when she\'s</strong> ' + item.situation + '</div>' : '') +
+          (item.outcome ? '<div class="hmw-meta-item"><strong>so that</strong> ' + item.outcome + '</div>' : '') +
+        '</div>' +
+        '<hr class="card-divider">' +
+        '<div class="pain-point-row">' +
+          '<strong>Pain point:</strong> ' +
+          '<span class="pain-point-text" onclick="this.classList.toggle(\'expanded\')">' + (item.painPoint || '') + '</span>' +
+        '</div>' +
+        variantsHtml;
+
+      if (prepend) {
+        list.insertBefore(card, list.firstChild);
+      } else {
+        list.appendChild(card);
+      }
+    }
+
+    function reorderItems(fromId, toId) {
+      const fromIdx = allItems.findIndex(i => i.id === fromId);
+      const toIdx   = allItems.findIndex(i => i.id === toId);
+      if (fromIdx === -1 || toIdx === -1) return;
+      const [moved] = allItems.splice(fromIdx, 1);
+      allItems.splice(toIdx, 0, moved);
+      rerenderList();
+    }
+
+    function moveCardUp(id) {
+      const idx = allItems.findIndex(i => i.id === id);
+      if (idx <= 0) return;
+      [allItems[idx - 1], allItems[idx]] = [allItems[idx], allItems[idx - 1]];
+      rerenderList();
+    }
+
+    function moveCardDown(id) {
+      const idx = allItems.findIndex(i => i.id === id);
+      if (idx === -1 || idx >= allItems.length - 1) return;
+      [allItems[idx], allItems[idx + 1]] = [allItems[idx + 1], allItems[idx]];
+      rerenderList();
+    }
+
+    function rerenderList() {
+      const list = document.getElementById('hmwList');
+      list.innerHTML = '';
+      if (allItems.length === 0) { showEmptyState(); return; }
+      allItems.forEach(item => renderCard(item, false));
+        updateRankButtons();
+      updateRankButtons();
+    }
+
+    function updateRankButtons() {
+      allItems.forEach((item, idx) => {
+        const wrap = document.getElementById('rank-' + item.id);
+        if (!wrap) return;
+        const [upBtn, downBtn] = wrap.querySelectorAll('.rank-btn');
+        if (upBtn)   upBtn.disabled   = idx === 0;
+        if (downBtn) downBtn.disabled = idx === allItems.length - 1;
+      });
+    }
+
+    function toggleVariants(btn) {
+      const list = btn.nextElementSibling;
+      list.classList.toggle('open');
+      const open = list.classList.contains('open');
+      const n = list.querySelectorAll('.variant-item').length;
+      btn.innerHTML = (open ? '&#9662; Hide' : '&#9656; Show') + ' ' + n + ' variant' + (n > 1 ? 's' : '');
+    }
+
+    function showEmptyState() {
+      const list = document.getElementById('hmwList');
+      if (list.querySelector('.hmw-card')) return;
+      if (!document.getElementById('emptyState')) {
+        const em = document.createElement('div');
+        em.className = 'empty-state';
+        em.id = 'emptyState';
+        em.innerHTML = '<div class="empty-icon">&#128161;</div><p>No HMW statements yet. Enter pain points on the left to get started.</p>';
+        list.appendChild(em);
+      }
+    }
+
+    // ── Load board ──
+    async function loadBoard() {
+      try {
+        const res = await fetch('/api/hmw');
+        const data = await res.json();
+        allItems = data.items || [];
+        const list = document.getElementById('hmwList');
+        list.innerHTML = '';
+        if (allItems.length === 0) {
+          showEmptyState();
+        } else {
+          allItems.forEach(item => renderCard(item, false));
+        }
+        updateCount();
+      } catch (e) {
+        toast('Failed to load board', 'error');
+      }
+    }
+
+    // ── Generate ──
+    generateBtn.addEventListener('click', async function() {
+      const text = painInput.value.trim();
+      if (!text) return;
+      const painPoints = text.split('\n').map(l => l.trim()).filter(Boolean);
+      const variants = parseInt(document.querySelector('input[name="variants"]:checked').value);
+      const channel = document.getElementById('channelInput').value.trim();
+      const journeyStage = document.getElementById('journeyStageInput').value.trim();
+
+      generateBtn.disabled = true;
+      generateBtn.innerHTML = '<span class="spinner"></span> Generating...';
+
+      try {
+        const res = await fetch('/api/hmw', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ painPoints, variants, channel, journeyStage }),
+        });
+        const data = await res.json();
+        if (!res.ok || !data.ok) throw new Error(data.error || 'Generation failed');
+
+        const newItems = data.items || [];
+        if (newItems.length === 0) {
+          toast('All generated items were duplicates', 'error');
+        } else {
+          newItems.forEach(item => {
+            allItems.unshift(item);
+            renderCard(item, true);
+          });
+          updateCount();
+          toast(newItems.length + ' HMW statement' + (newItems.length > 1 ? 's' : '') + ' added', 'success');
+        }
+      } catch (e) {
+        toast(e.message || 'Generation failed', 'error');
+      } finally {
+        generateBtn.disabled = false;
+        generateBtn.textContent = 'Generate HMW \u2192';
+        if (!painInput.value.trim()) generateBtn.disabled = true;
+      }
+    });
+
+    // ── Delete ──
+    async function deleteItem(id) {
+      // Optimistic
+      const card = document.querySelector('.hmw-card[data-id="' + id + '"]');
+      if (card) card.remove();
+      allItems = allItems.filter(i => i.id !== id);
+      updateCount();
+      if (allItems.length === 0) showEmptyState();
+
+      try {
+        await fetch('/api/hmw?id=' + id, { method: 'DELETE' });
+      } catch {
+        toast('Delete may not have saved', 'error');
+      }
+    }
+
+    // ── Clear board ──
+    document.getElementById('clearBtn').addEventListener('click', async function() {
+      if (!confirm('Clear all HMW statements? This cannot be undone.')) return;
+      const ids = [...allItems.map(i => i.id)];
+      allItems = [];
+      document.getElementById('hmwList').innerHTML = '';
+      showEmptyState();
+      updateCount();
+      for (const id of ids) {
+        try { await fetch('/api/hmw?id=' + id, { method: 'DELETE' }); } catch {}
+      }
+      toast('Board cleared', 'success');
+    });
+
+    // ── Export CSV ──
+    document.getElementById('exportBtn').addEventListener('click', function() {
+      if (allItems.length === 0) { toast('Nothing to export', 'error'); return; }
+      const header = ['hmw_full', 'do_feel_achieve', 'situation', 'outcome', 'tags', 'original_pain_point', 'createdAt'];
+      const rows = allItems.map(item => [
+        item.hmwFull,
+        item.doFeelAchieve,
+        item.situation,
+        item.outcome,
+        (item.tags || []).join('; '),
+        item.painPoint,
+        item.createdAt,
+      ].map(v => '"' + String(v || '').replace(/"/g, '""') + '"'));
+      const csv = [header.join(','), ...rows.map(r => r.join(','))].join('\n');
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'hmw-statements.csv';
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+
+    // ── WebSocket ──
+    (function connectWS() {
+      const wsUrl = window.__HMW_WS_URL__ || ('wss://' + location.host + '/ws/hmw');
+      const dot = document.getElementById('wsDot');
+      let ws;
+
+      function connect() {
+        ws = new WebSocket(wsUrl);
+        ws.onopen = function() {
+          dot.classList.add('connected');
+          dot.title = 'WebSocket connected';
+        };
+        ws.onclose = function() {
+          dot.classList.remove('connected');
+          dot.title = 'WebSocket disconnected';
+          setTimeout(connect, 4000);
+        };
+        ws.onerror = function() {
+          ws.close();
+        };
+        ws.onmessage = function(e) {
+          try {
+            const msg = JSON.parse(e.data);
+            if (msg.type === 'hmw:new' && Array.isArray(msg.items)) {
+              msg.items.forEach(function(item) {
+                if (!allItems.find(function(i) { return i.id === item.id; })) {
+                  allItems.unshift(item);
+                  renderCard(item, true);
+                  updateRankButtons();
+                }
+              });
+              updateCount();
+            }
+          } catch {}
+        };
+      }
+      connect();
+    })();
+
+    // ── Init ──
+    loadBoard();
+  </script>
+</body>
+</html>
