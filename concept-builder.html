@@ -218,10 +218,11 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: 8px;
+  align-items: stretch;
 }
 .cap-item {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 10px;
   padding: 10px 14px;
   border: 1.5px solid var(--line);
@@ -229,6 +230,8 @@
   cursor: pointer;
   transition: all .15s;
   user-select: none;
+  align-self: stretch;
+  min-height: 56px;
 }
 .cap-item:hover { border-color: var(--ink); }
 .cap-item.checked { background: var(--ink); border-color: var(--ink); color: #fff; }
