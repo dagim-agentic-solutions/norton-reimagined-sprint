@@ -212,39 +212,17 @@ Return ONLY valid JSON, no prose, no markdown fences:
   "summary": "2-3 sentence plain-English summary of overall complexity"
 }`;
 
+  // Text-only analysis — vision calls exceed CF Pages 30s CPU limit.
+  // Text extraction (12k chars with button/heading hints) is fed to the LLM.
   let reportText;
   try {
-    if (screensFound > 0 && env.ANTHROPIC_API_KEY) {
-      // Use Claude Vision with screenshots for thorough visual analysis
-      const visionInstruction = userPrompt + `\n\nYou are being shown ${crawlResult.screens.length} screenshot(s) of every screen in this prototype. Study EVERY screen carefully — identify all UI elements, features, integrations, and interactions visible. Base your dependency assessment on what you actually see.`;
-      const msgContent = buildVisionContent(crawlResult.screens, visionInstruction);
-      const res = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': env.ANTHROPIC_API_KEY,
-          'anthropic-version': '2023-06-01',
-        },
-        body: JSON.stringify({
-          model: 'claude-opus-4-5',
-          max_tokens: 2500,
-          system: systemPrompt + ' CRITICAL: Your entire response must be ONLY a raw JSON object. Do NOT use markdown fences, do NOT add any prose before or after the JSON.',
-          messages: [{ role: 'user', content: msgContent }],
-        }),
-      });
-      if (!res.ok) throw new Error(`Anthropic vision ${res.status}`);
-      const data = await res.json();
-      reportText = data?.content?.[0]?.text?.trim() || '';
-    } else {
-      // Fallback: text-only analysis via LLM router
-      reportText = await runLLM({
-        mode: 'execution',
-        system: systemPrompt,
-        messages: [{ role: 'user', content: userPrompt }],
-        maxTokens: 2000,
-        env,
-      });
-    }
+    reportText = await runLLM({
+      mode: 'execution',
+      system: systemPrompt + ' Return ONLY a raw JSON object — no markdown fences, no prose.',
+      messages: [{ role: 'user', content: userPrompt + '\n\nRespond with ONLY the JSON object. No markdown, no explanation.' }],
+      maxTokens: 2500,
+      env,
+    });
   } catch (err) {
     return json({ error: `LLM error: ${err.message}` }, 502);
   }
