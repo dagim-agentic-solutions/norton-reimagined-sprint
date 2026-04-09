@@ -36,6 +36,26 @@ function extractDeepText(html) {
 
 
 
+
+// ── Robust JSON extraction (module-level) ────────────────────────────────────
+function extractJSON(raw) {
+  if (!raw) return null;
+  // Strip markdown fences (multiline)
+  let s = raw.replace(/^```(?:json)?\s*/im, '').replace(/^```\s*$/im, '').trim();
+  // Try direct parse
+  try { return JSON.parse(s); } catch {}
+  // Find outermost { ... } block
+  let depth = 0, start = -1, end = -1;
+  for (let i = 0; i < s.length; i++) {
+    if (s[i] === '{') { if (depth === 0) start = i; depth++; }
+    else if (s[i] === '}') { depth--; if (depth === 0) { end = i; break; } }
+  }
+  if (start !== -1 && end > start) {
+    try { return JSON.parse(s.slice(start, end + 1)); } catch {}
+  }
+  return null;
+}
+
 const CORS = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
@@ -208,7 +228,7 @@ Return ONLY valid JSON, no prose, no markdown fences:
         body: JSON.stringify({
           model: 'claude-opus-4-5',
           max_tokens: 2500,
-          system: systemPrompt,
+          system: systemPrompt + ' CRITICAL: Your entire response must be ONLY a raw JSON object. Do NOT use markdown fences, do NOT add any prose before or after the JSON.',
           messages: [{ role: 'user', content: msgContent }],
         }),
       });
@@ -227,23 +247,6 @@ Return ONLY valid JSON, no prose, no markdown fences:
     }
   } catch (err) {
     return json({ error: `LLM error: ${err.message}` }, 502);
-  }
-
-  // ── Robust JSON extraction ────────────────────────────────────────────────
-  // Vision models often wrap output in prose or markdown — find the JSON block.
-  function extractJSON(raw) {
-    if (!raw) return null;
-    // 1. Strip markdown fences
-    let s = raw.replace(/^```json?\s*/im, '').replace(/```\s*$/m, '').trim();
-    // 2. Try direct parse
-    try { return JSON.parse(s); } catch {}
-    // 3. Find first { ... } block
-    const start = s.indexOf('{');
-    const end   = s.lastIndexOf('}');
-    if (start !== -1 && end > start) {
-      try { return JSON.parse(s.slice(start, end + 1)); } catch {}
-    }
-    return null;
   }
 
   let report = extractJSON(reportText);
