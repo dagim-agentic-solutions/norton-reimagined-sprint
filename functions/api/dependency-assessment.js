@@ -10,6 +10,7 @@
  */
 
 import { runLLM } from '../_lib/llmRouter.js';
+import { crawlPrototype, buildVisionContent } from '../_lib/visualCrawler.js';
 // ── Deep text extraction from HTML ─────────────────────────────────────────
 // Preserves button labels, headings, link text, aria-labels so the LLM sees
 // all screens and interactions in the prototype.
@@ -117,20 +118,18 @@ export async function onRequestPost({ request, env }) {
     ? proto.capabilities.join(', ')
     : (proto.capabilities || '');
 
-  // ── Deep-fetch prototype content ────────────────────────────────────────
-  let protoContent = '';
+  // ── Visual crawl + deep text extraction ─────────────────────────────────
   const protoUrl = proto.url || proto.resolvedUrl || '';
-  if (proto.fileContent && typeof proto.fileContent === 'string') {
-    protoContent = extractDeepText(proto.fileContent);
-  } else if (protoUrl && !protoUrl.startsWith('/api/')) {
+  let crawlResult = { screens: [], textContent: '' };
+  if (protoUrl && !protoUrl.startsWith('/api/')) {
     try {
-      const fetchRes = await fetch(protoUrl, {
-        headers: { 'User-Agent': 'NortonSprint-DepBot/1.0' },
-        signal: AbortSignal.timeout(12000),
-      });
-      if (fetchRes.ok) protoContent = extractDeepText(await fetchRes.text());
-    } catch { /* skip unreachable */ }
+      crawlResult = await crawlPrototype(protoUrl, { fileContent: proto.fileContent || '' });
+    } catch { /* fall through */ }
+  } else if (proto.fileContent) {
+    crawlResult.textContent = proto.fileContent;
   }
+  const protoContent = extractDeepText(crawlResult.textContent || proto.fileContent || '');
+  const screensFound = crawlResult.screens.filter(s => s.base64).length;
 
   const systemPrompt = `You are a technical dependency analyst for the Norton iOS app design sprint. Return ONLY valid JSON — no prose, no markdown fences.`;
 
@@ -193,13 +192,37 @@ Return ONLY valid JSON, no prose, no markdown fences:
 
   let reportText;
   try {
-    reportText = await runLLM({
-      mode: 'execution',
-      system: systemPrompt,
-      messages: [{ role: 'user', content: userPrompt }],
-      maxTokens: 2000,
-      env,
-    });
+    if (screensFound > 0 && env.ANTHROPIC_API_KEY) {
+      // Use Claude Vision with screenshots for thorough visual analysis
+      const visionInstruction = userPrompt + `\n\nYou are being shown ${crawlResult.screens.length} screenshot(s) of every screen in this prototype. Study EVERY screen carefully — identify all UI elements, features, integrations, and interactions visible. Base your dependency assessment on what you actually see.`;
+      const msgContent = buildVisionContent(crawlResult.screens, visionInstruction);
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': env.ANTHROPIC_API_KEY,
+          'anthropic-version': '2023-06-01',
+        },
+        body: JSON.stringify({
+          model: 'claude-opus-4-5',
+          max_tokens: 2500,
+          system: systemPrompt,
+          messages: [{ role: 'user', content: msgContent }],
+        }),
+      });
+      if (!res.ok) throw new Error(`Anthropic vision ${res.status}`);
+      const data = await res.json();
+      reportText = data?.content?.[0]?.text?.trim() || '';
+    } else {
+      // Fallback: text-only analysis via LLM router
+      reportText = await runLLM({
+        mode: 'execution',
+        system: systemPrompt,
+        messages: [{ role: 'user', content: userPrompt }],
+        maxTokens: 2000,
+        env,
+      });
+    }
   } catch (err) {
     return json({ error: `LLM error: ${err.message}` }, 502);
   }

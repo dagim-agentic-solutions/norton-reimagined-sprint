@@ -362,42 +362,42 @@ function extractDeepText(html) {
 }
 
 async function scoreLaura(prototype, fileContent, env) {
-  // Scores a prototype against Laura using deep text extraction across all screens.
+  // Scores a prototype against Laura using visual screenshots + deep text extraction.
+  // Crawls all discovered screens, takes screenshots, sends to Claude Vision.
   if (!env.ANTHROPIC_API_KEY) return null;
 
-  let extractedText = '';
+  // ── 1. Crawl the prototype for all screens + screenshots ────────────────
+  const protoUrl = prototype.url || prototype.resolvedUrl || '';
+  let crawlResult = { screens: [], textContent: '' };
 
-  // 1. For file uploads, extract text directly from the HTML/JS content
-  if (fileContent && typeof fileContent === 'string' && fileContent.trim().length > 0) {
-    extractedText = extractDeepText(fileContent);
-  }
-
-  // 2. For URL submissions, fetch and deep-extract the page
-  if (!extractedText && prototype.url && !prototype.url.startsWith('/api/')) {
+  if (protoUrl && !protoUrl.startsWith('/api/')) {
     try {
-      const res = await fetch(prototype.url, {
-        headers: { 'User-Agent': 'NortonSprint-LauraBot/1.0' },
-        signal: AbortSignal.timeout(12000),
-      });
-      if (res.ok) {
-        extractedText = extractDeepText(await res.text());
-      }
-    } catch { /* unreachable URL — skip */ }
+      crawlResult = await crawlPrototype(protoUrl, { fileContent: fileContent || '' });
+    } catch { /* fall through to text-only */ }
+  } else if (fileContent) {
+    // File upload — no URL to screenshot, use text extraction only
+    crawlResult.textContent = fileContent;
   }
 
-  // Build concept from what we have — even just title+summary is enough
-  const concept = [
+  // ── 2. Deep text extraction as fallback / supplement ───────────────────
+  const textFallback = extractDeepText(crawlResult.textContent || fileContent || '');
+
+  // ── 3. Build meta context ──────────────────────────────────────────────
+  const metaContext = [
     `Title: "${prototype.title}"`,
     `Submitted by: ${prototype.name}`,
     `Summary: ${prototype.summary}`,
-    extractedText ? `\nPrototype content (all screens, buttons, headings extracted):\n${extractedText}` : '',
+    textFallback ? `\nExtracted text from all screens:\n${textFallback}` : '',
   ].join('\n');
 
-  const prompt = `${LAURA_CONTEXT_SCORE}
+  const screensFound = crawlResult.screens.filter(s => s.base64).length;
+  const instruction = `${LAURA_CONTEXT_SCORE}
 
 ---
 PROTOTYPE TO EVALUATE:
-${concept}
+${metaContext}
+
+${screensFound > 0 ? `You are being shown ${crawlResult.screens.length} screenshot(s) of the prototype below. Study EVERY screen carefully — look at all the UI elements, buttons, labels, flows, and interactions visible. Use what you see to inform your assessment of how Laura would react.` : 'No screenshots were available. Use the extracted text above for your assessment.'}
 
 ---
 Respond with ONLY a valid JSON object — no prose, no markdown fences:
@@ -408,6 +408,11 @@ Respond with ONLY a valid JSON object — no prose, no markdown fences:
 }
 The verdict MUST match the score band: 90-100 → LOVES IT | 75-89 → LIKES IT | 55-74 → MEH | 35-54 → SKEPTICAL | 0-34 → REJECTS IT`;
 
+  // ── 4. Build message content (text + vision blocks) ─────────────────────
+  const msgContent = screensFound > 0
+    ? buildVisionContent(crawlResult.screens, instruction)
+    : instruction;
+
   try {
     const res = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -417,9 +422,9 @@ The verdict MUST match the score band: 90-100 → LOVES IT | 75-89 → LIKES IT 
         'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-5',
-        max_tokens: 300,
-        messages: [{ role: 'user', content: prompt }],
+        model: 'claude-opus-4-5',  // Vision-capable model
+        max_tokens: 400,
+        messages: [{ role: 'user', content: msgContent }],
       }),
     });
     if (!res.ok) return null;
