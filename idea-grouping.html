@@ -617,6 +617,8 @@
             <li><a href="competitive-analysis.html" role="menuitem">Competitive Analysis</a></li>
             <li><a href="idea-workshop.html" role="menuitem">Ideation Wizard</a></li>
             <li><a href="idea-grouping.html" role="menuitem" class="active">Idea Grouping</a></li>
+            <li><a href="dependency-assessment.html" role="menuitem">Dependency Assessment</a></li>
+            <li><a href="how-might-we.html" role="menuitem">How Might We</a></li>
           </ul>
         </li>
       </ul>
@@ -800,13 +802,24 @@
       inboxIdeas.forEach(idea => inboxCardsEl.appendChild(createIdeaCardEl(idea)));
       inboxCountEl.textContent = inboxIdeas.length + ' idea' + (inboxIdeas.length !== 1 ? 's' : '');
 
-      // Inbox drag-drop target
+      // Inbox drag-drop target — apply to whole inbox zone, not just cards list
+      const boardInboxEl = document.getElementById('boardInbox');
+      boardInboxEl.ondragover = e => { e.preventDefault(); inboxCardsEl.classList.add('drag-over'); };
+      boardInboxEl.ondragleave = e => {
+        if (!boardInboxEl.contains(e.relatedTarget)) inboxCardsEl.classList.remove('drag-over');
+      };
+      boardInboxEl.ondrop = e => {
+        e.preventDefault();
+        inboxCardsEl.classList.remove('drag-over');
+        const id = e.dataTransfer.getData('text/plain') || draggedIdeaId;
+        if (id) moveIdea(id, 'col-0');
+      };
       inboxCardsEl.ondragover = e => { e.preventDefault(); inboxCardsEl.classList.add('drag-over'); };
       inboxCardsEl.ondragleave = () => inboxCardsEl.classList.remove('drag-over');
       inboxCardsEl.ondrop = e => {
         e.preventDefault();
         inboxCardsEl.classList.remove('drag-over');
-        const id = e.dataTransfer.getData('text/plain');
+        const id = e.dataTransfer.getData('text/plain') || draggedIdeaId;
         if (id) moveIdea(id, 'col-0');
       };
 
@@ -959,6 +972,7 @@
         draggedIdeaId = idea.id;
         el.classList.add('dragging');
         e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', idea.id);
       });
       el.addEventListener('dragend', () => {
         el.classList.remove('dragging');
