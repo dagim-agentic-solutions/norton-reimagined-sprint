@@ -102,7 +102,7 @@ export async function onRequestDelete({ request, env }) {
 }
 
 // ── POST: submit a new prototype ──────────────────────────────────────────────
-export async function onRequestPost({ request, env }) {
+export async function onRequestPost({ request, env, ctx }) {
   const kv = env.PROTOTYPES_KV;
   if (!kv) return json({ error: "Datastore unavailable. Check KV binding." }, 503);
 
@@ -191,11 +191,16 @@ export async function onRequestPost({ request, env }) {
         sourceType:  "file",
         submittedAt: new Date().toISOString(),
       };
-      // Score against Laura (non-fatal)
-      const lauraMediaResult = await scoreLaura(prototype, fileContent, env).catch(() => null);
-      if (lauraMediaResult) Object.assign(prototype, lauraMediaResult);
-      // Persist
-      try { await kv.put(`proto:${id}`, JSON.stringify(prototype)); }
+      // For large binary files (>1MB base64), store fileContent separately in KV
+      // to keep the main prototype record small
+      const protoToStore = { ...prototype };
+      if (fileContent && fileContent.length > 500_000) {
+        await kv.put(`file:${id}`, fileContent).catch(() => {});
+        protoToStore.fileContent = null; // don't embed in main record
+        protoToStore.fileStoredSeparately = true;
+      }
+      // Persist immediately (Laura scoring runs in background)
+      try { await kv.put(`proto:${id}`, JSON.stringify(protoToStore)); }
       catch { return json({ error: "Failed to save prototype. Please try again." }, 503); }
       try {
         const raw = await kv.get("index");
@@ -203,6 +208,16 @@ export async function onRequestPost({ request, env }) {
         ids.push(id);
         await kv.put("index", JSON.stringify(ids));
       } catch { /* non-fatal */ }
+      // Score against Laura in background (non-blocking — vision call can be slow)
+      if (ctx) ctx.waitUntil((async () => {
+        try {
+          const lauraResult = await scoreLaura(prototype, fileContent, env);
+          if (lauraResult) {
+            const updated = { ...prototype, ...lauraResult };
+            await kv.put(`proto:${id}`, JSON.stringify(updated));
+          }
+        } catch {}
+      })());
       return json({ ok: true, prototype });
     }
 
