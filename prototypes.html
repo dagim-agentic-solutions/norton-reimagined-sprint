@@ -325,6 +325,12 @@
   }
   .proto-menu button:last-child { border-bottom: none; }
   .proto-menu button:hover { background: var(--paper); }
+  .proto-menu button:disabled {
+    opacity: .6;
+    cursor: not-allowed;
+    background: none;
+  }
+  .proto-menu button.clone-menu-btn.error { color: #c2410c; }
   .proto-menu button.danger { color: #c01a1a; }
   .proto-menu button.danger:hover { background: #fde8e8; }
 
@@ -974,6 +980,7 @@ async function loadPrototypes() {
     list.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
 
     _protoList = list; // cache for clone prompt
+    resetCloneJobs();
     const protoIds = list.map(p => p.id);
     container.innerHTML = '<div class="proto-grid">' + list.map(p => {
 
@@ -1017,7 +1024,7 @@ async function loadPrototypes() {
               <span>⋯</span> More
             </button>
             <div class="proto-menu" id="pm-${escapeAttr(p.id)}">
-              <button onclick="openCloneModal('${escapeAttr(p.id)}');toggleProtoMenu('${escapeAttr(p.id)}')">↗ Clone in Claude</button>
+              <button class="clone-menu-btn" data-clone-id="${escapeAttr(p.id)}" onclick="handleCloneClick('${escapeAttr(p.id)}', this)" disabled>Analyzing…</button>
               <button onclick="openDeckModal('${escapeAttr(p.id)}','${escapeAttr(p.title || '')}','${escapeAttr(p.summary || '')}','${escapeAttr(p.url || '')}');toggleProtoMenu('${escapeAttr(p.id)}')">✦ Generate Pitch Deck</button>
               <button class="danger" onclick="deletePrototype('${escapeAttr(p.id)}', this.closest('.proto'))">✕ Delete prototype</button>
             </div>
@@ -1041,6 +1048,7 @@ async function loadPrototypes() {
           </div>
         </div>`;
     }).join('') + '</div>';
+    initCloneAnalysisQueue(list);
 
     // Load comment counts and vote data for all cards
     loadAllCommentCounts(protoIds);
@@ -1690,151 +1698,118 @@ document.addEventListener('click', function(e) {
 // ── Clone in Claude ────────────────────────────────────────────────────────────
 let _clonePromptText = '';
 let _cloneProtoTitle = '';
+const _cloneJobs = new Map();
+const _cloneQueue = [];
+let _cloneActive = 0;
 
-const NORTON_DESIGN_SYSTEM = `
-## Norton Reimagined — Design System (apply exactly)
-
-### Typography
-- Font: **Inter Tight** only (import via Google Fonts)
-- Weights: 400, 500, 600, 700, 800
-- Hero headlines: weight 800, tracking −0.03em
-- Body: weight 400–500, line-height 1.45–1.5
-- Labels: weight 700, letter-spacing 0.10–0.14em, UPPERCASE
-
-### Color Palette (CSS variables)
-\`\`\`css
---ink:       #242424;   /* primary text, dark surfaces */
---yellow:    #FFE800;   /* accent, CTA, highlights */
---paper:     #F8F8F7;   /* page background */
---card:      #FFFFFF;   /* elevated surfaces */
---line:      #E6E6E4;   /* borders, dividers */
---ink-soft:  #5a5a5a;   /* secondary text */
---ink-softer:#8a8a8a;   /* tertiary */
-\`\`\`
-
-### Border Radius
-- 999px → pill buttons, tags, badges
-- 8px   → cards, inputs, standard containers
-- 6px   → small elements, code blocks
-
-### Component Patterns
-- Nav: dark (#242424) background, sticky/fixed
-- Primary CTA: yellow pill, ink text, weight 700–800
-- Eyebrow labels: ink bg, yellow text, pill, 11px uppercase
-- Cards: white bg, 1px #E6E6E4 border, 8px radius
-- Padding: 26–28px card internal, 56px desktop page
-
-### QA Checklist (apply before outputting)
-- All screens fully scrollable — no overflow:hidden trapping content
-- No text clipped or touching container edges
-- All interactive elements have visible hover/tap states
-- Color contrast WCAG AA minimum
-- Realistic placeholder data — no Lorem ipsum
-`;
-
-const LAURA_PERSONA_BRIEF = `
-## Laura, the Outsourcer — Target Persona
-
-Laura is the guardian of her household's digital life — but she doesn't want the job. She wants a trusted expert to quietly handle it in the background, the way insurance or utilities do.
-
-**Who she is:** 35–55, working parent, 5–10 devices across family, burnt out being the family IT person.
-
-**Her 4 Jobs To Be Done:**
-1. Protect the whole household with as little admin as possible
-2. Block threats before anyone clicks
-3. Keep her kids safe online with simple controls
-4. Tell her what to do in plain language when something goes wrong
-
-**Designs FOR her:** Outcomes not mechanics. "You're protected" status. Calm, assured tone. Single clear CTAs.
-
-**She rejects:** Dashboards of toggles, jargon, gamification, anything that adds to her mental load.
-`;
-
-function buildClonePrompt(proto) {
-  const lauraContext = proto.lauraScore != null ? `
-## Laura's Verdict on This Prototype
-- **Score:** ${proto.lauraScore}/100 — ${proto.lauraVerdict || 'N/A'}
-- **Recommendation:** ${proto.lauraRecommendation || 'N/A'}
-` : '';
-
-  const urlContext = proto.url ? `
-## Live Prototype URL
-${proto.url}
-
-**Important:** Open this URL and read the full HTML source carefully before reproducing it. Your reproduction must match the original to the smallest detail — every section, copy line, interaction, color, layout, and component.
-` : '';
-
-  return `# Clone + Extend: "${proto.title}"
-> Sprint: Norton Reimagined Design Sprint — Tiger Team
-> Original author: ${proto.author || 'Anonymous'}
-> Task: Reproduce this prototype faithfully, then extend it based on my instructions.
-
----
-
-## Your Task
-
-You are a Senior Product Designer and Frontend Developer specialising in consumer security and privacy products. I want to clone an existing prototype and extend it with new ideas.
-
-**Step 1:** Reproduce the prototype at the URL below with complete fidelity — every section, every line of copy, every interaction, every visual detail. Output a single self-contained HTML file (inline CSS + JS, no external dependencies except Google Fonts).
-
-**Step 2:** Once you've reproduced it, stop and ask me: *"I've reproduced '${proto.title}' faithfully. What would you like to add, change, or extend?"*
-
-**Step 3:** Implement my requested changes on top of the reproduction.
-
----
-
-## Prototype Details
-
-**Title:** ${proto.title}
-**Summary:** ${proto.summary || '(no summary provided)'}
-${urlContext}${lauraContext}
-
----
-
-${LAURA_PERSONA_BRIEF}
-
----
-
-${NORTON_DESIGN_SYSTEM}
-
----
-
-## Technical Requirements
-
-- Single self-contained HTML file
-- Responsive (mobile-first, breakpoints at 640px and 1024px)  
-- No external JavaScript dependencies
-- Inline CSS and JS only
-- Use Inter Tight via Google Fonts link
-- Fully accessible (semantic HTML, alt text, focus states)
-- Apply the Norton Reimagined design system exactly as specified above
-
----
-
-## What Makes a Good Clone
-
-A faithful clone means:
-- Every section reproduced in order
-- All copy and microcopy matches exactly
-- Color palette, typography, spacing all match the design system
-- Interactive elements (tabs, accordions, modals, CTAs) all work
-- No placeholder content — same realistic data as the original
-- The user should not be able to tell it's a reproduction
-
----
-
-Begin by opening the URL above and reproducing it now. Do not ask clarifying questions first — just build it, then ask what to extend.`;
+function resetCloneJobs() {
+  _cloneJobs.clear();
+  _cloneQueue.length = 0;
+  _cloneActive = 0;
 }
 
-function openCloneModal(protoId) {
-  const proto = _protoList.find(p => p.id === protoId);
-  if (!proto) { alert('Prototype data not loaded yet — try again in a moment.'); return; }
+function initCloneAnalysisQueue(list) {
+  list.forEach(enqueueCloneJob);
+  pumpCloneQueue();
+}
 
+function enqueueCloneJob(proto) {
+  if (!proto || _cloneJobs.has(proto.id)) return;
+  if (!proto.url && proto.sourceType !== 'file') {
+    _cloneJobs.set(proto.id, { status: 'unavailable' });
+    updateCloneButton(proto.id);
+    return;
+  }
+  _cloneJobs.set(proto.id, { status: 'queued' });
+  _cloneQueue.push(proto);
+  updateCloneButton(proto.id);
+}
+
+function pumpCloneQueue() {
+  const MAX_CONCURRENT = 2;
+  while (_cloneActive < MAX_CONCURRENT && _cloneQueue.length) {
+    const proto = _cloneQueue.shift();
+    if (!proto) continue;
+    _cloneActive++;
+    runCloneJob(proto).finally(() => {
+      _cloneActive--;
+      pumpCloneQueue();
+    });
+  }
+}
+
+async function runCloneJob(proto) {
+  _cloneJobs.set(proto.id, { status: 'loading' });
+  updateCloneButton(proto.id);
+  try {
+    const res = await fetch(`/api/prototypes/${encodeURIComponent(proto.id)}/clone`);
+    const data = await res.json();
+    if (!res.ok || !data.ok) throw new Error(data.error || `Error ${res.status}`);
+    _cloneJobs.set(proto.id, { status: 'ready', prompt: data.prompt, generatedAt: data.generatedAt });
+  } catch (err) {
+    console.error('Clone analysis failed', err);
+    _cloneJobs.set(proto.id, { status: 'error', error: err.message });
+  }
+  updateCloneButton(proto.id);
+}
+
+function updateCloneButton(protoId) {
+  document.querySelectorAll('[data-clone-id]').forEach(btn => {
+    if (btn.getAttribute('data-clone-id') !== protoId) return;
+    const job = _cloneJobs.get(protoId);
+    btn.classList.remove('error');
+    btn.disabled = true;
+    if (!job || job.status === 'queued' || job.status === 'loading') {
+      btn.textContent = 'Analyzing…';
+    } else if (job.status === 'ready') {
+      btn.disabled = false;
+      btn.textContent = '↗ Clone in Claude';
+    } else if (job.status === 'error') {
+      btn.disabled = false;
+      btn.classList.add('error');
+      btn.textContent = 'Retry analysis';
+    } else if (job.status === 'unavailable') {
+      btn.textContent = 'Clone unavailable';
+    }
+  });
+}
+
+function handleCloneClick(protoId, btn) {
+  const job = _cloneJobs.get(protoId);
+  if (!job || job.status === 'queued' || job.status === 'loading') {
+    alert('Analyzing this prototype — please wait a moment.');
+    return;
+  }
+  if (job.status === 'error') {
+    const proto = _protoList.find(p => p.id === protoId);
+    if (proto) {
+      _cloneJobs.set(protoId, { status: 'queued' });
+      _cloneQueue.push(proto);
+      pumpCloneQueue();
+      updateCloneButton(protoId);
+    }
+    alert('Analysis failed earlier. Retrying now — please try again in a moment.');
+    return;
+  }
+  if (job.status === 'unavailable') {
+    alert('This prototype does not have a live URL to analyze yet.');
+    return;
+  }
+  toggleProtoMenu(protoId);
+  openCloneModal(protoId);
+}
+function openCloneModal(protoId) {
+  const job = _cloneJobs.get(protoId);
+  if (!job || job.status !== 'ready') {
+    alert('Clone prompt is still generating.');
+    return;
+  }
+  const proto = _protoList.find(p => p.id === protoId) || {};
   _cloneProtoTitle = proto.title || 'prototype';
-  _clonePromptText = buildClonePrompt(proto);
+  _clonePromptText = job.prompt || '';
 
   const box = document.getElementById('clonePromptBox');
-  box.textContent = _clonePromptText;
+  box.textContent = _clonePromptText || 'Prompt unavailable.';
 
   const btn = document.getElementById('cloneCopyBtn');
   btn.textContent = 'Copy Prompt';
