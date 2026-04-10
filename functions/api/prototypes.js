@@ -244,22 +244,25 @@ export async function onRequestPost({ request, env, ctx }) {
           return f;
         });
       } else {
-        // Single HTML or JS file — always serve at root as index.html
+        // Single HTML / JS / JSX file — serve at root as index.html
         const ext = fileName.trim().split(".").pop().toLowerCase();
         let deployContent = fileContent;
-        // Inject Norton favicon into HTML files
-        if (ext === "html" && encoding !== "base64") {
-          const iconTags = '<link rel="icon" type="image/svg+xml" href="https://norton-reimagined-sprint.pages.dev/assets/norton-checkmark.svg"><link rel="apple-touch-icon" sizes="180x180" href="https://norton-reimagined-sprint.pages.dev/assets/icon-180.png">';
-          if (deployContent.includes("</head>")) {
-            deployContent = deployContent.replace("</head>", iconTags + "</head>");
-          } else if (deployContent.includes("<head>")) {
-            deployContent = deployContent.replace("<head>", "<head>" + iconTags);
+        let deployEncoding = encoding === "base64" ? "base64" : "utf-8";
+        const iconTags = '<link rel="icon" type="image/svg+xml" href="https://norton-reimagined-sprint.pages.dev/assets/norton-checkmark.svg"><link rel="apple-touch-icon" sizes="180x180" href="https://norton-reimagined-sprint.pages.dev/assets/icon-180.png">';
+        if (ext === 'jsx' || ext === 'tsx') {
+          deployContent = wrapJsxPrototype(deployContent, { encoding, isTsx: ext === 'tsx' });
+          deployEncoding = 'utf-8';
+        } else if (ext === 'html' && encoding !== 'base64') {
+          if (deployContent.includes('</head>')) {
+            deployContent = deployContent.replace('</head>', iconTags + '</head>');
+          } else if (deployContent.includes('<head>')) {
+            deployContent = deployContent.replace('<head>', '<head>' + iconTags);
           }
         }
         vercelFiles = [{
           file: ext === "js" ? "index.js" : "index.html",
           data: deployContent,
-          encoding: encoding === "base64" ? "base64" : "utf-8",
+          encoding: deployEncoding,
         }];
       }
     } catch (err) {
@@ -732,3 +735,79 @@ async function deployToVercel(files, projectName, token) {
 
   return `https://${deployData.url}`;
 }
+
+
+function wrapJsxPrototype(rawContent, { encoding = 'utf-8', isTsx = false }) {
+  const source = encoding === 'base64' ? base64ToUtf8(rawContent) : rawContent;
+  const stripped = sanitizeJsxSource(source);
+  const needsAutoRender = !/ReactDOM\./.test(stripped);
+  const componentName = needsAutoRender ? guessComponentName(stripped) : null;
+  const autoRender = needsAutoRender && componentName;
+  let finalSource = stripped;
+  if (autoRender) {
+    finalSource += `
+const __root = ReactDOM.createRoot(document.getElementById('root'));
+__root.render(<${componentName} />);
+`;
+  }
+  const safeSource = finalSource.replace(/<\/script>/gi, '<\/script>').trim();
+  const presets = isTsx ? 'env,react,typescript' : 'env,react';
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Prototype</title>
+  <link rel="icon" type="image/svg+xml" href="https://norton-reimagined-sprint.pages.dev/assets/norton-checkmark.svg">
+  <link rel="apple-touch-icon" sizes="180x180" href="https://norton-reimagined-sprint.pages.dev/assets/icon-180.png">
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    html, body { margin:0; padding:0; background:#F8F8F7; font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; min-height:100vh; }
+    #root { min-height:100vh; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel" data-presets="${presets}">
+    const { useState, useEffect, useMemo, useRef, useCallback, useReducer, useContext } = React;
+${safeSource}
+  </script>
+</body>
+</html>`;
+}
+
+function sanitizeJsxSource(src) {
+  let out = src.replace(/
+/g, '
+');
+  out = out.replace(/import\s+[^;]+?['"][^'"]+['"];?\s*/g, '');
+  out = out.replace(/export\s+default\s+function\s+/g, 'function ');
+  out = out.replace(/export\s+default\s+class\s+/g, 'class ');
+  out = out.replace(/export\s+default\s+/g, '');
+  out = out.replace(/export\s+const\s+/g, 'const ');
+  out = out.replace(/export\s+function\s+/g, 'function ');
+  out = out.replace(/export\s+class\s+/g, 'class ');
+  out = out.replace(/export\s+\{[^}]+\};?/g, '');
+  return out;
+}
+
+function guessComponentName(source) {
+  const fn = source.match(/function\s+([A-Z][A-Za-z0-9_]*)\s*\(/);
+  if (fn) return fn[1];
+  const constMatch = source.match(/const\s+([A-Z][A-Za-z0-9_]*)\s*=\s*(?:\(|function|class)/);
+  if (constMatch) return constMatch[1];
+  const classMatch = source.match(/class\s+([A-Z][A-Za-z0-9_]*)\s+extends\s+React/);
+  if (classMatch) return classMatch[1];
+  return null;
+}
+
+function base64ToUtf8(b64) {
+  const binary = atob(b64);
+  const bytes = Uint8Array.from(binary, ch => ch.charCodeAt(0));
+  const decoder = new TextDecoder('utf-8');
+  return decoder.decode(bytes);
+}
+
