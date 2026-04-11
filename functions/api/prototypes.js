@@ -127,8 +127,14 @@ export async function onRequestPost({ request, env, ctx }) {
 
   // ── URL validation ─────────────────────────────────────────────────────────
   if (hasUrl) {
-    try { new URL(url.trim()); }
-    catch { return json({ error: "Invalid URL format. Must include https://." }, 400); }
+    try {
+      const parsed = new URL(url.trim());
+      if (parsed.protocol !== 'https:') {
+        return json({ error: 'URL must start with https:// (use the file upload option for local files).' }, 400);
+      }
+    } catch {
+      return json({ error: 'Invalid URL format. Must include https://.' }, 400);
+    }
   }
 
   // ── File validation ────────────────────────────────────────────────────────
@@ -780,10 +786,9 @@ ${safeSource}
 }
 
 function sanitizeJsxSource(src) {
-  let out = src.replace(/
-/g, '
-');
-  out = out.replace(/import\s+[^;]+?['"][^'"]+['"];?\s*/g, '');
+  let out = src.replace(/\r\n/g, '\n');
+  out = out.replace(/\r/g, '\n');
+  out = out.replace(/import\s+[^;]+?['"'][^'"']+['"'];?\s*/g, '');
   out = out.replace(/export\s+default\s+function\s+/g, 'function ');
   out = out.replace(/export\s+default\s+class\s+/g, 'class ');
   out = out.replace(/export\s+default\s+/g, '');
@@ -793,6 +798,7 @@ function sanitizeJsxSource(src) {
   out = out.replace(/export\s+\{[^}]+\};?/g, '');
   return out;
 }
+
 
 function guessComponentName(source) {
   const fn = source.match(/function\s+([A-Z][A-Za-z0-9_]*)\s*\(/);
