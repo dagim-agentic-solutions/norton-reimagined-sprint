@@ -1132,11 +1132,18 @@ async function submitPrototype() {
     return;
   }
 
-  // URL format check
+  // URL format check (auto-prepend https:// if missing)
+  let normalizedUrl = url;
   if (hasUrl) {
-    try { new URL(url); } catch {
+    if (!/^https?:\/\//i.test(normalizedUrl)) {
+      normalizedUrl = 'https://' + normalizedUrl;
+    }
+    try {
+      const parsed = new URL(normalizedUrl);
+      if (parsed.protocol !== 'https:') throw new Error();
+    } catch {
       msgEl.className  = 'form-msg error';
-      msgEl.textContent = 'Please enter a valid URL (including https://).';
+      msgEl.textContent = 'Please enter a valid https:// URL or upload a file.';
       return;
     }
   }
@@ -1145,8 +1152,7 @@ async function submitPrototype() {
   const payload = { name, title, summary };
 
   if (hasUrl) {
-    // URL wins
-    payload.url = url;
+    payload.url = normalizedUrl;
   } else {
     // Read file — ZIP as base64, HTML/JS as utf8 text
     try {
