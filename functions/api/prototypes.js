@@ -126,9 +126,14 @@ export async function onRequestPost({ request, env, ctx }) {
   if (missing.length) return json({ error: `Missing required fields: ${missing.join(", ")}.` }, 400);
 
   // ── URL validation ─────────────────────────────────────────────────────────
+  let normalizedUrl = null;
   if (hasUrl) {
+    normalizedUrl = url.trim();
+    if (!/^https?:\/\//i.test(normalizedUrl)) {
+      normalizedUrl = 'https://' + normalizedUrl;
+    }
     try {
-      const parsed = new URL(url.trim());
+      const parsed = new URL(normalizedUrl);
       if (parsed.protocol !== 'https:') {
         return json({ error: 'URL must start with https:// (use the file upload option for local files).' }, 400);
       }
@@ -156,7 +161,7 @@ export async function onRequestPost({ request, env, ctx }) {
   if (name.trim().length    > 100) return json({ error: "name must be ≤ 100 chars." }, 400);
   if (title.trim().length   > 150) return json({ error: "title must be ≤ 150 chars." }, 400);
   if (summary.trim().length > 500) return json({ error: "summary must be ≤ 500 chars." }, 400);
-  if (hasUrl && url.trim().length > 500) return json({ error: "url must be ≤ 500 chars." }, 400);
+  if (hasUrl && normalizedUrl && normalizedUrl.length > 500) return json({ error: "url must be ≤ 500 chars." }, 400);
 
   // ── Reject unexpected fields ───────────────────────────────────────────────
   const allowed = new Set(["name","title","url","summary","fileContent","fileName","encoding","mimeType","clientId"]);
@@ -169,7 +174,7 @@ export async function onRequestPost({ request, env, ctx }) {
   const vercelProject = `norton-proto-${shortId}`;
 
   // ── Deploy file to Vercel (if no URL provided) ─────────────────────────────
-  let resolvedUrl = hasUrl ? url.trim() : null;
+  let resolvedUrl = hasUrl ? (normalizedUrl || url.trim()) : null;
   let sourceType  = hasUrl ? "url" : "file";
 
   let prototype;  // declared here so binary-media branch can assign before the main build block
@@ -288,7 +293,7 @@ export async function onRequestPost({ request, env, ctx }) {
     id,
     name:        name.trim(),
     title:       title.trim(),
-    url:         resolvedUrl,
+    url:         resolvedUrl || normalizedUrl,
     summary:     summary.trim(),
     submittedAt: new Date().toISOString(),
     sourceType,
