@@ -987,6 +987,9 @@ async function loadPrototypes() {
       const date = p.createdAt
         ? new Date(p.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })
         : '';
+      const openUrl = p.sourceType === 'file'
+        ? `/api/prototypes/${encodeURIComponent(p.id)}/file`
+        : (p.url || '');
       return `
         <div class="proto">
           <div class="proto-meta">
@@ -996,7 +999,7 @@ async function loadPrototypes() {
           <h3>${escapeHtml(p.title || 'Untitled')}</h3>
           <p class="desc">${escapeHtml(p.summary || '')}</p>
           <div class="link-row">
-            <a href="${escapeAttr(p.url)}" target="_blank" rel="noopener">
+            <a href="${escapeAttr(openUrl || '#')}" target="_blank" rel="noopener">
               ${p.sourceType === 'file' ? `View file (${escapeHtml(p.fileName || 'uploaded')})` : 'Open prototype'} <span class="arrow">→</span>
             </a>
           </div>
