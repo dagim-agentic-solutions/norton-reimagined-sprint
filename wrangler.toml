@@ -2,7 +2,9 @@ name = "norton-reimagined-sprint"
 pages_build_output_dir = "."
 
 [vars]
+SPRINTBOX_ADMIN_KEY = "dc502b8b5ddb598c11aca751392ae4370d8ccda8528ab825"
 IDEA_GROUPING_WS_URL = "https://idea-grouping-hub.og-norton.workers.dev"
+HMW_WS_URL = "https://hmw-hub.og-norton.workers.dev"
 
 [[kv_namespaces]]
 binding = "PROTOTYPES_KV"

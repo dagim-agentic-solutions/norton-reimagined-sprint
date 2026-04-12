@@ -952,13 +952,19 @@
 // ===== Prototype list: calls /api/prototypes on same origin =====
 
 const API_URL = '/api/prototypes';
+const ADMIN_KEY = 'dc502b8b5ddb598c11aca751392ae4370d8ccda8528ab825';
+function adminFetch(url, init = {}) {
+  const headers = new Headers(init.headers || {});
+  if (!headers.has('x-admin-key')) headers.set('x-admin-key', ADMIN_KEY);
+  return fetch(url, { ...init, headers });
+}
 
 async function loadPrototypes() {
   const container = document.getElementById('listContainer');
   const countEl = document.getElementById('count');
 
   try {
-    const res = await fetch(API_URL);
+    const res = await adminFetch(API_URL);
     if (!res.ok) throw new Error(`${res.status}`);
     const data = await res.json();
     const list = data.prototypes || [];
@@ -1202,7 +1208,7 @@ async function submitPrototype() {
   }
 
   try {
-    const res = await fetch(API_URL, {
+    const res = await adminFetch(API_URL, {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
       body:    JSON.stringify(payload),
@@ -1263,7 +1269,7 @@ async function deletePrototype(id, el) {
   // el can be a button or the .proto card — close any open menu
   document.querySelectorAll('.proto-menu.open').forEach(m => m.classList.remove('open'));
   try {
-    const res = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+    const res = await adminFetch(`${API_URL}/${id}`, { method: 'DELETE' });
     if (!res.ok) throw new Error(`Server error ${res.status}`);
     await loadPrototypes();
   } catch (e) {
@@ -1287,7 +1293,7 @@ async function loadComments(protoId) {
   const list  = document.getElementById(`cl-${protoId}`);
   const count = document.getElementById(`cc-${protoId}`);
   try {
-    const res  = await fetch(`${COMMENTS_API}?protoId=${encodeURIComponent(protoId)}`);
+    const res  = await adminFetch(`${COMMENTS_API}?protoId=${encodeURIComponent(protoId)}`);
     const data = await res.json();
     const comments = data.comments || [];
     _loadedComments[protoId] = comments;
@@ -1378,7 +1384,7 @@ async function postComment(protoId) {
 
   btn.disabled = true; btn.textContent = 'Posting…';
   try {
-    const res  = await fetch(COMMENTS_API, {
+    const res  = await adminFetch(COMMENTS_API, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ protoId, author, text }),
@@ -1398,7 +1404,7 @@ async function postComment(protoId) {
 async function deleteComment(commentId, protoId) {
   if (!confirm('Delete this note?')) return;
   try {
-    const res = await fetch(COMMENTS_API, {
+    const res = await adminFetch(COMMENTS_API, {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ protoId, commentId }),
@@ -1417,7 +1423,7 @@ async function loadAllCommentCounts(protoIds) {
     const count = document.getElementById(`cc-${id}`);
     if (!count) return;
     try {
-      const res  = await fetch(`${COMMENTS_API}?protoId=${encodeURIComponent(id)}`);
+      const res  = await adminFetch(`${COMMENTS_API}?protoId=${encodeURIComponent(id)}`);
       const data = await res.json();
       count.textContent = (data.comments || []).length;
     } catch { count.textContent = '0'; }
@@ -1442,7 +1448,7 @@ let _protoList   = []; // cached prototype list for clone prompt generation
 
 async function loadVotes(protoIds) {
   try {
-    const res  = await fetch(VOTES_API);
+    const res  = await adminFetch(VOTES_API);
     const data = await res.json();
     _globalVotes = data.votes || {};
   } catch { _globalVotes = {}; }
@@ -1490,7 +1496,7 @@ async function castVote(protoId) {
   if (btn) { btn.disabled = true; btn.innerHTML = `<span class="v-icon">⏳</span>`; }
 
   try {
-    const res  = await fetch(VOTES_API, {
+    const res  = await adminFetch(VOTES_API, {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
       body:    JSON.stringify({ protoId }),
@@ -1515,7 +1521,7 @@ async function castVote(protoId) {
 async function resetAllVotes() {
   if (!confirm('Reset ALL votes across ALL prototypes? This cannot be undone.')) return;
   try {
-    const res = await fetch(VOTES_API, { method: 'DELETE' });
+    const res = await adminFetch(VOTES_API, { method: 'DELETE' });
     if (!res.ok) throw new Error(`Server error ${res.status}`);
     _globalVotes = {};
     saveSessionVotes([]); // also clear this user's session votes
@@ -1529,7 +1535,7 @@ async function resetAllVotes() {
 async function openResults() {
   // Fetch fresh vote data
   try {
-    const res  = await fetch(VOTES_API);
+    const res  = await adminFetch(VOTES_API);
     const data = await res.json();
     _globalVotes = data.votes || {};
   } catch {}
@@ -1537,7 +1543,7 @@ async function openResults() {
   // Get prototype list for titles/urls
   let protoList = [];
   try {
-    const res  = await fetch(API_URL);
+    const res  = await adminFetch(API_URL);
     const data = await res.json();
     protoList = data.prototypes || [];
   } catch {}
@@ -1617,7 +1623,7 @@ async function submitDeck() {
   // Step 1: start generation — returns generationId immediately
   let generationId;
   try {
-    const res = await fetch('/api/generate-deck', {
+    const res = await adminFetch('/api/generate-deck', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -1658,7 +1664,7 @@ async function submitDeck() {
       const pollUrl = '/api/generate-deck?id=' + encodeURIComponent(generationId) +
         '&protoId=' + encodeURIComponent(_deckProto.id) +
         '&title=' + encodeURIComponent(_deckProto.title);
-      const pollRes = await fetch(pollUrl);
+      const pollRes = await adminFetch(pollUrl);
       const pollData = await pollRes.json();
       if (pollData.status === 'completed' && pollData.gammaUrl) {
         statusEl.textContent = '';
@@ -1751,7 +1757,7 @@ async function runCloneJob(proto) {
   _cloneJobs.set(proto.id, { status: 'loading' });
   updateCloneButton(proto.id);
   try {
-    const res = await fetch(`/api/prototypes/${encodeURIComponent(proto.id)}/clone`);
+    const res = await adminFetch(`/api/prototypes/${encodeURIComponent(proto.id)}/clone`);
     const data = await res.json();
     if (!res.ok || !data.ok) throw new Error(data.error || `Error ${res.status}`);
     _cloneJobs.set(proto.id, { status: 'ready', prompt: data.prompt, generatedAt: data.generatedAt });
