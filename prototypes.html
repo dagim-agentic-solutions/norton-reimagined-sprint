@@ -948,16 +948,13 @@
   <span>Shared Build Log · Tiger Team</span>
 </div>
 
+<script src="admin.js"></script>
 <script>
 // ===== Prototype list: calls /api/prototypes on same origin =====
 
 const API_URL = '/api/prototypes';
-const ADMIN_KEY = 'dc502b8b5ddb598c11aca751392ae4370d8ccda8528ab825';
-function adminFetch(url, init = {}) {
-  const headers = new Headers(init.headers || {});
-  if (!headers.has('x-admin-key')) headers.set('x-admin-key', ADMIN_KEY);
-  return fetch(url, { ...init, headers });
-}
+const adminFetch = window.adminAuth.fetch;
+const clearAdminKey = window.adminAuth.clear;
 
 async function loadPrototypes() {
   const container = document.getElementById('listContainer');

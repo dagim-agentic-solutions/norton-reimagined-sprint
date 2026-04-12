@@ -402,8 +402,10 @@
     </section>
   </main>
 
+  <script src="admin.js"></script>
   <script src="nav.js"></script>
   <script>
+    const adminFetch = window.adminAuth.fetch;
     const protoSelect = document.getElementById('protoSelect');
     const analyzeBtn  = document.getElementById('analyzeBtn');
     const loadingState = document.getElementById('loadingState');
@@ -416,7 +418,7 @@
     // ── Load prototypes ──────────────────────────────────────────────────────
     async function loadPrototypes() {
       try {
-        const res = await fetch('/api/prototypes');
+        const res = await adminFetch('/api/prototypes');
         const data = await res.json();
         const list = Array.isArray(data) ? data : (data.prototypes || []);
         protoSelect.innerHTML = '';
@@ -453,7 +455,7 @@
 
       try {
         // Kick off analysis (returns immediately with status: pending or done)
-        const postRes = await fetch('/api/dependency-assessment', {
+        const postRes = await adminFetch('/api/dependency-assessment', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ protoId, ...(force ? { force: true } : {}) }),
@@ -474,7 +476,7 @@
           dots = (dots + 1) % 4;
           if (loadingMsg) loadingMsg.textContent = 'Running visual analysis' + '.'.repeat(dots + 1) + ' (this may take up to 60s)';
           try {
-            const pollRes = await fetch(`/api/dependency-assessment?protoId=${encodeURIComponent(protoId)}`);
+            const pollRes = await adminFetch(`/api/dependency-assessment?protoId=${encodeURIComponent(protoId)}`);
             const pollData = await pollRes.json();
             if (pollData.status === 'done') {
               clearInterval(pollInterval);

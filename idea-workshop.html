@@ -840,7 +840,7 @@
       btn.textContent = '✦ Thinking…';
 
       try {
-        const res = await fetch('/api/idea-workshop', {
+        const res = await adminFetch('/api/idea-workshop', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -910,7 +910,7 @@
         _followupQuestions.map((q, i) => '- ' + q + '\n  → ' + answers[i]).join('\n');
 
       try {
-        const res = await fetch('/api/idea-workshop', {
+        const res = await adminFetch('/api/idea-workshop', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({

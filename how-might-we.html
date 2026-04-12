@@ -792,7 +792,7 @@
     // ── Load board ──
     async function loadBoard() {
       try {
-        const res = await fetch('/api/hmw');
+        const res = await adminFetch('/api/hmw');
         const data = await res.json();
         allItems = data.items || [];
         const list = document.getElementById('hmwList');
@@ -822,7 +822,7 @@
       const myClientId = Math.random().toString(36).slice(2);
 
       try {
-        const res = await fetch('/api/hmw', {
+        const res = await adminFetch('/api/hmw', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ painPoints, variants, channel, journeyStage, clientId: myClientId }),
@@ -877,7 +877,7 @@
       if (allItems.length === 0) showEmptyState();
 
       try {
-        await fetch('/api/hmw?id=' + id, { method: 'DELETE' });
+        await adminFetch('/api/hmw?id=' + id, { method: 'DELETE' });
       } catch {
         toast('Delete may not have saved', 'error');
       }
@@ -892,7 +892,7 @@
       showEmptyState();
       updateCount();
       for (const id of ids) {
-        try { await fetch('/api/hmw?id=' + id, { method: 'DELETE' }); } catch {}
+        try { await adminFetch('/api/hmw?id=' + id, { method: 'DELETE' }); } catch {}
       }
       toast('Board cleared', 'success');
     });
