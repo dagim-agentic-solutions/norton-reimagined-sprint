@@ -15,6 +15,7 @@
  */
 
 import { runLLM } from '../_lib/llmRouter.js';
+import { ensureAdmin } from '../_lib/adminAuth.js';
 import { crawlPrototype, buildVisionContent } from '../_lib/visualCrawler.js';
 
 // ── Deep text extraction ──────────────────────────────────────────────────────
@@ -67,12 +68,22 @@ function json(data, status = 200) {
   });
 }
 
+function guard(request, env) {
+  const auth = ensureAdmin(request, env);
+  if (!auth.ok) {
+    return json({ error: auth.error || 'Unauthorized' }, auth.status || 401);
+  }
+  return null;
+}
+
 export async function onRequestOptions() {
   return new Response(null, { status: 204, headers: CORS });
 }
 
 // ── GET: poll for result ──────────────────────────────────────────────────────
 export async function onRequestGet({ request, env }) {
+  const denied = guard(request, env);
+  if (denied) return denied;
   const kv = env.PROTOTYPES_KV;
   if (!kv) return json({ error: 'KV unavailable' }, 503);
 
@@ -100,6 +111,8 @@ export async function onRequestGet({ request, env }) {
 
 // ── POST: kick off analysis ───────────────────────────────────────────────────
 export async function onRequestPost({ request, env, ctx }) {
+  const denied = guard(request, env);
+  if (denied) return denied;
   const kv = env.PROTOTYPES_KV;
   if (!kv) return json({ error: 'KV unavailable' }, 503);
 

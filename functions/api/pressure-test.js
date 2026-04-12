@@ -1,4 +1,5 @@
 import { runLLM } from "../_lib/llmRouter";
+import { ensureAdmin } from "../_lib/adminAuth.js";
 
 /**
  * POST /api/pressure-test
@@ -162,6 +163,17 @@ function corsHeaders() {
   };
 }
 
+function guard(request, env) {
+  const auth = ensureAdmin(request, env);
+  if (!auth.ok) {
+    return new Response(JSON.stringify({ error: auth.error || 'Unauthorized' }), {
+      status: auth.status || 401,
+      headers: { 'Content-Type': 'application/json', ...corsHeaders() },
+    });
+  }
+  return null;
+}
+
 // ─── Preflight ────────────────────────────────────────────────────────────────
 export async function onRequestOptions() {
   return new Response(null, { status: 204, headers: corsHeaders() });
@@ -169,6 +181,8 @@ export async function onRequestOptions() {
 
 // ─── Main handler ─────────────────────────────────────────────────────────────
 export async function onRequestPost({ request, env }) {
+  const denied = guard(request, env);
+  if (denied) return denied;
   const headers = { "Content-Type": "application/json", ...corsHeaders() };
 
   // 1. Parse body

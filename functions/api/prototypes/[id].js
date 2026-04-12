@@ -3,6 +3,8 @@
  * Removes a prototype from KV index + data.
  */
 
+import { ensureAdmin } from '../../_lib/adminAuth.js';
+
 const CORS = {
   "Access-Control-Allow-Origin":  "*",
   "Access-Control-Allow-Methods": "DELETE, PATCH, OPTIONS",
@@ -16,11 +18,21 @@ function json(data, status = 200) {
   });
 }
 
+function guard(request, env) {
+  const auth = ensureAdmin(request, env);
+  if (!auth.ok) {
+    return json({ error: auth.error || 'Unauthorized' }, auth.status || 401);
+  }
+  return null;
+}
+
 export async function onRequestOptions() {
   return new Response(null, { status: 204, headers: CORS });
 }
 
-export async function onRequestDelete({ params, env }) {
+export async function onRequestDelete({ request, params, env }) {
+  const denied = guard(request, env);
+  if (denied) return denied;
   const kv = env.PROTOTYPES_KV;
   if (!kv) return json({ error: "Datastore unavailable." }, 503);
 
@@ -105,6 +117,8 @@ SCORING (0–100): 90-100 → LOVES IT | 75-89 → LIKES IT | 55-74 → MEH | 35
 `;
 
 export async function onRequestPatch({ params, request, env }) {
+  const denied = guard(request, env);
+  if (denied) return denied;
   const kv = env.PROTOTYPES_KV;
   if (!kv) return json({ error: 'Datastore unavailable.' }, 503);
 

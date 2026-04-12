@@ -19,6 +19,8 @@
  */
 
 // ── Constants ─────────────────────────────────────────────────────────────────
+import { ensureAdmin } from '../_lib/adminAuth.js';
+
 const MAX_FILE_BYTES   = 10 * 1024 * 1024; // 10 MB raw (before base64)
 const ALLOWED_EXTS     = ["html", "js", "ts", "tsx", "jsx", "zip", "pdf", "jpg", "jpeg", "png", "gif", "webp", "svg"];
 const TEXT_EXTS        = new Set(["html","htm","css","js","ts","jsx","tsx","json","txt","md","svg","xml","yaml","yml","toml"]);
@@ -36,13 +38,23 @@ function json(data, status = 200) {
   });
 }
 
+function guard(request, env) {
+  const auth = ensureAdmin(request, env);
+  if (!auth.ok) {
+    return json({ error: auth.error || 'Unauthorized' }, auth.status || 401);
+  }
+  return null;
+}
+
 // ── Preflight ─────────────────────────────────────────────────────────────────
 export async function onRequestOptions() {
   return new Response(null, { status: 204, headers: CORS });
 }
 
 // ── GET: list all prototypes ──────────────────────────────────────────────────
-export async function onRequestGet({ env }) {
+export async function onRequestGet({ request, env }) {
+  const denied = guard(request, env);
+  if (denied) return denied;
   const kv = env.PROTOTYPES_KV;
   if (!kv) return json({ error: "Datastore unavailable. Check KV binding." }, 503);
 
@@ -73,6 +85,8 @@ export async function onRequestGet({ env }) {
 
 // ── DELETE: remove a prototype ────────────────────────────────────────────────
 export async function onRequestDelete({ request, env }) {
+  const denied = guard(request, env);
+  if (denied) return denied;
   const kv = env.PROTOTYPES_KV;
   if (!kv) return json({ error: "Datastore unavailable." }, 503);
 
@@ -103,6 +117,8 @@ export async function onRequestDelete({ request, env }) {
 
 // ── POST: submit a new prototype ──────────────────────────────────────────────
 export async function onRequestPost({ request, env, ctx }) {
+  const denied = guard(request, env);
+  if (denied) return denied;
   const kv = env.PROTOTYPES_KV;
   if (!kv) return json({ error: "Datastore unavailable. Check KV binding." }, 503);
 

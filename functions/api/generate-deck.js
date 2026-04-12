@@ -1,3 +1,5 @@
+import { ensureAdmin } from "../_lib/adminAuth.js";
+
 /**
  * /api/generate-deck
  *
@@ -128,12 +130,25 @@ function corsHeaders() {
   };
 }
 
+function guard(request, env) {
+  const auth = ensureAdmin(request, env);
+  if (!auth.ok) {
+    return new Response(JSON.stringify({ error: auth.error || 'Unauthorized' }), {
+      status: auth.status || 401,
+      headers: { 'Content-Type': 'application/json', ...corsHeaders() },
+    });
+  }
+  return null;
+}
+
 export async function onRequestOptions() {
   return new Response(null, { status: 204, headers: corsHeaders() });
 }
 
 // ── GET: single poll for status ───────────────────────────────────────────────
 export async function onRequestGet({ request, env }) {
+  const denied = guard(request, env);
+  if (denied) return denied;
   const headers = { "Content-Type": "application/json", ...corsHeaders() };
   const url = new URL(request.url);
   const id = url.searchParams.get("id");
@@ -170,6 +185,8 @@ export async function onRequestGet({ request, env }) {
 
 // ── POST: validate password + start generation ────────────────────────────────
 export async function onRequestPost({ request, env }) {
+  const denied = guard(request, env);
+  if (denied) return denied;
   const headers = { "Content-Type": "application/json", ...corsHeaders() };
 
   let body;
