@@ -83,37 +83,43 @@ function extractDeepText(html) {
 }
 
 const LAURA_CONTEXT_RESCORE = `
-You are evaluating a product prototype against TWO lenses simultaneously:
-(1) Laura — the target persona
-(2) Norton's three business objectives
+You are evaluating a product prototype with extreme rigour. Most sprint concepts are too incremental. Your default stance is SKEPTICAL — a prototype must actively earn a high score.
 
-Your final 0–100 score is a weighted composite:
-  - 50% Laura (does she love it, use it regularly, find it effortless?)
-  - 25% Engagement (does it shift Norton from set-and-forget to a tool Laura returns to daily/weekly?)
-  - 15% Growth (does it give Norton a credible edge vs. Apple Security, Google One, LifeLock, Aura, standalone scam apps?)
-  - 10% Protection Heritage (does it preserve Norton's identity as the gold standard in protection?)
+STRICT weighted composite:
+  - 40% Engagement Reality: Would Laura genuinely return weekly/daily on her own?
+  - 25% Differentiation: What can only Norton ship? Could Apple/Google/Aura copy it in 12 months?
+  - 20% Persona Fit: Does this match Laura's actual life and mental model?
+  - 10% Market Splash: Would non-subscribers hear about this and switch?
+  - 5% Protection Heritage: Does it feel like the next Norton chapter, not a random pivot?
 
-LAURA IN ONE LINE: She is the guardian of her household's digital life — but she doesn't want the job. She wants a trusted expert to quietly handle it in the background, the way insurance or utilities do.
+THE SECURITY-APP TRUTH:
+- Laura never opens antivirus on purpose. If no proactive value is delivered, cap engagement at 35.
+- "AI protection" is table stakes. Don't reward it unless it changes behaviour.
+- Dashboards are not value. They are the status quo.
+- Only give high marks if the concept creates a ritual Laura wants (morning digest, family confidence, etc.)
+
+LAURA IN ONE LINE: Reluctant guardian of her household's digital life. Doesn't want the job. Wants a trusted expert to handle it invisibly.
 
 WHO SHE IS:
-- 35–55, working parent, full household (partner + kids), 5–10 devices across family
-- Mass-market premium income, comfortable paying for quality protection
-- Tech-comfortable but not "IT people" — adopts tools that reduce effort and anxiety
-- Carries the mental load of keeping family safe and is burnt out being the household IT person
+- 35–55, working parent, 5–10 devices, mass-market premium income
+- Tech-comfortable but not "IT people"
+- Mental load: exhausted from being the family IT desk
+- Wants automation, calm, and a single source of truth
 
 HER 4 JOBS TO BE DONE:
-1. Protect my whole household with as little admin from me as possible
-2. Block threats before we click (scams, dodgy sites, sketchy downloads)
-3. Keep my kids safe online with simple, trustworthy controls
-4. Tell me what to do when something looks wrong, in plain language
+1. Protect the whole household with zero admin
+2. Block threats before they hit
+3. Keep kids safe with trustworthy controls
+4. Tell her plainly what happened and what (if anything) she must do
 
-BUSINESS OBJECTIVE: ENGAGEMENT — Norton must shift from set-and-forget to a product Laura actively opens daily/weekly. Does this prototype give her a natural recurring reason to return?
+BRAND LEADER ADVANTAGE: Norton can shift mental models if the concept is bold AND believable. Reward ideas that reframe protection entirely (family digital wellness, digital infrastructure) while staying credible.
 
-BUSINESS OBJECTIVE: GROWTH — Does this give Norton a clear "why Norton vs. anything else"? Is it defensible against Apple, Google, LifeLock, and standalone apps?
-
-BUSINESS OBJECTIVE: PROTECTION HERITAGE — Does this still feel like Norton at its best — the next chapter of 30 years of protection — rather than a random pivot to fintech or social media?
-
-SCORING (0–100): 90-100 → LOVES IT | 75-89 → LIKES IT | 55-74 → MEH | 35-54 → SKEPTICAL | 0-34 → REJECTS IT
+SCORING CALIBRATION (rarely give >70):
+- 85–100 LOVES IT: Revolutionary on every lens
+- 70–84 LIKES IT: Very strong, defensible, habit-forming
+- 50–69 MEH: Solid but incremental
+- 30–49 SKEPTICAL: Fundamental gaps
+- 0–29 REJECTS IT: Fails persona or business objectives
 `;
 
 export async function onRequestPatch({ params, request, env }) {
@@ -164,24 +170,34 @@ ${metaContext}
 
 ${screensFound > 0 ? `You are being shown ${crawlResult.screens.length} screenshot(s) of the prototype. Study EVERY screen carefully.` : 'No screenshots available — use extracted text above.'}
 
+Before scoring, answer for yourself:
+1. Why would Laura open this next Tuesday morning when no alert fired?
+2. What prevents Apple/Google/Aura from copying this inside a year?
+3. Does this create a "Norton just reinvented ____" headline?
+
 ---
 Respond with ONLY a valid JSON object — no prose, no markdown fences:
 {
-  "score": <integer 0-100>,
+  "score": <integer 0-100, strict weighted composite>,
   "verdict": "<LOVES IT | LIKES IT | MEH | SKEPTICAL | REJECTS IT>",
-  "recommendation": "<2-3 sentences — what Laura thinks AND how well it serves Norton's engagement/growth/heritage objectives>",
-  "engagementScore": <integer 0-100, how well it drives recurring use>,
-  "growthScore": <integer 0-100, how well it positions Norton competitively>,
-  "heritageScore": <integer 0-100, how well it honours Norton's protection identity>
+  "recommendation": "<3-4 sentences: what Laura thinks, what would make her return weekly, and whether Norton actually wins>",
+  "engagementScore": <integer 0-100>,
+  "differentiationScore": <integer 0-100>,
+  "growthScore": <integer 0-100>,
+  "heritageScore": <integer 0-100>,
+  "personaFitScore": <integer 0-100>,
+  "engagementChallenge": "<why Laura would/wouldn't open weekly>",
+  "competitorGap": "<who copies this fastest>",
+  "wouldLauraOpenWeekly": <true | false>
 }
-Verdict bands: 90-100 → LOVES IT | 75-89 → LIKES IT | 55-74 → MEH | 35-54 → SKEPTICAL | 0-34 → REJECTS IT`;
+Verdict bands: 85-100 → LOVES IT | 70-84 → LIKES IT | 50-69 → MEH | 30-49 → SKEPTICAL | 0-29 → REJECTS IT`;
 
   const msgContent = screensFound > 0 ? buildVisionContent(crawlResult.screens, instruction) : instruction;
 
   const res = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'x-api-key': env.ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01' },
-    body: JSON.stringify({ model: 'claude-opus-4-5', max_tokens: 400, messages: [{ role: 'user', content: msgContent }] }),
+    body: JSON.stringify({ model: 'claude-opus-4-5', max_tokens: 800, messages: [{ role: 'user', content: msgContent }] }),
   });
   if (!res.ok) return json({ error: `Anthropic error ${res.status}` }, 502);
 
