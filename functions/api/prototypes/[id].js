@@ -92,7 +92,7 @@ STRICT weighted composite:
   - 10% Market Splash: Would non-subscribers hear about this and switch?
   - 5% Protection Heritage: Does it feel like the next Norton chapter, not a random pivot?
 
-Concept reminder: you’re reviewing sprint concepts, not production apps. If the ritual and moat are clearly described, score the potential assuming they execute it well—even if every pixel isn’t drawn yet.
+Concept reminder: you’re reviewing sprint concepts, not production apps. If the ritual and moat are clearly described, score the potential assuming they execute it well—even if every pixel isn’t drawn yet. Still keep the bar honest: only go above 70 when BOTH the ritual and the moat feel concrete and defensible.
 
 THE SECURITY-APP TRUTH:
 - Laura never opens antivirus on purpose. If no proactive value is delivered, cap engagement at 35.
@@ -122,6 +122,7 @@ SCORING CALIBRATION (concept-stage):
 - 50–69 MEH: Promising but one key piece is still fuzzy
 - 30–49 SKEPTICAL: Interesting feature, not yet a product
 - 0–29 REJECTS IT: Misses Laura or Norton entirely
+Only use the 70s when both the ritual and the defensible wedge are concrete; if either is still abstract, cap the score in the mid-60s.
 `;
 
 export async function onRequestPatch({ params, request, env }) {

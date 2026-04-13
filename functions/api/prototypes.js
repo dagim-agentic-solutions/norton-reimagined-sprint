@@ -357,7 +357,7 @@ Your final 0–100 score is a STRICT weighted composite:
   - 10% MARKET SPLASH: Would this make headlines? Drive trial? Create a "wait, Norton does that now?" moment?
   - 5% PROTECTION HERITAGE: Does it still feel like the next chapter of Norton — not a random pivot?
 
-Concept reminder: you’re reviewing sprint concepts, not finished products. If the prototype clearly describes a believable ritual or moat—even if every screen isn’t built yet—credit the potential. Score what the team is aiming for when fully executed, not just the pixels you see today.
+Concept reminder: you’re reviewing sprint concepts, not finished products. If the prototype clearly describes a believable ritual or moat—even if every screen isn’t built yet—credit the potential. Score what the team is aiming for when fully executed, not just the pixels you see today. **But keep the bar honest:** do not award 70+ unless BOTH the ritual and the defensible wedge are articulated in a concrete, believable way.
 
 ════════════════════════════════════════════
 THE BRUTAL TRUTH ABOUT SECURITY APPS
@@ -441,7 +441,7 @@ SCORING CALIBRATION — CONCEPT-STAGE LENS
 - 40–54: Interesting feature set but missing the big idea — feels incremental or copyable.
 - 0–39: Misses Laura entirely or undermines Norton’s brand.
 
-Because we’re reviewing concepts, it’s okay to reward ambition. If a team clearly articulates how the ritual and wedge will work (even if you don’t see every screen), use the 70s. Reserve sub‑50 scores for concepts that don’t yet answer the core questions.
+Because we’re reviewing concepts, it’s okay to reward ambition. Use the 70s only when the ritual AND the moat feel concrete; if either piece is still fuzzy, cap the score in the mid‑60s. Reserve sub‑50 scores for concepts that don’t yet answer the core questions.
 
 Verdict MUST match score band exactly:
 - 85–100 → LOVES IT
