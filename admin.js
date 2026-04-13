@@ -37,15 +37,27 @@
     return loadCachedKey() || promptForKey();
   }
 
-  async function adminFetch(url, init = {}, retry = true) {
-    const key = await ensureKey();
-    const headers = new Headers(init.headers || {});
-    headers.set('x-admin-key', key);
-    const response = await fetch(url, { ...init, headers });
-    if ((response.status === 401 || response.status === 403) && retry) {
+  async function adminFetch(url, init = {}, allowRetry = true) {
+    const attempt = async (key) => {
+      const headers = new Headers(init.headers || {});
+      if (key) headers.set('x-admin-key', key);
+      return fetch(url, { ...init, headers });
+    };
+
+    let key = loadCachedKey();
+    let response = await attempt(key);
+
+    if ((response.status === 401 || response.status === 403) && allowRetry) {
+      // First failure — prompt for a key and retry once
       clearKey();
-      return adminFetch(url, init, false);
+      const freshKey = await promptForKey();
+      response = await attempt(freshKey);
+      if (response.status === 401 || response.status === 403) {
+        // Key invalid — clear cache so next call starts clean
+        clearKey();
+      }
     }
+
     return response;
   }
 
