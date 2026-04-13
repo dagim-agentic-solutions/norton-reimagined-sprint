@@ -53,8 +53,7 @@ export async function onRequestOptions() {
 
 // ── GET: list all prototypes ──────────────────────────────────────────────────
 export async function onRequestGet({ request, env }) {
-  const denied = guard(request, env);
-  if (denied) return denied;
+  // Read-only access should be public; admin key only required for mutations.
   const kv = env.PROTOTYPES_KV;
   if (!kv) return json({ error: "Datastore unavailable. Check KV binding." }, 503);
 
