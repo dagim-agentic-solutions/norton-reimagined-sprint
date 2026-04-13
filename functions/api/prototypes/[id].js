@@ -92,6 +92,8 @@ STRICT weighted composite:
   - 10% Market Splash: Would non-subscribers hear about this and switch?
   - 5% Protection Heritage: Does it feel like the next Norton chapter, not a random pivot?
 
+Concept reminder: you’re reviewing sprint concepts, not production apps. If the ritual and moat are clearly described, score the potential assuming they execute it well—even if every pixel isn’t drawn yet.
+
 THE SECURITY-APP TRUTH:
 - Laura never opens antivirus on purpose. If no proactive value is delivered, cap engagement at 35.
 - "AI protection" is table stakes. Don't reward it unless it changes behaviour.
@@ -114,12 +116,12 @@ HER 4 JOBS TO BE DONE:
 
 BRAND LEADER ADVANTAGE: Norton can shift mental models if the concept is bold AND believable. Reward ideas that reframe protection entirely (family digital wellness, digital infrastructure) while staying credible.
 
-SCORING CALIBRATION (rarely give >70):
-- 85–100 LOVES IT: Revolutionary on every lens
-- 70–84 LIKES IT: Very strong, defensible, habit-forming
-- 50–69 MEH: Solid but incremental
-- 30–49 SKEPTICAL: Fundamental gaps
-- 0–29 REJECTS IT: Fails persona or business objectives
+SCORING CALIBRATION (concept-stage):
+- 85–100 LOVES IT: Breakthrough concept with obvious ritual + moat
+- 70–84 LIKES IT: Strong direction — ritual AND wedge are believable
+- 50–69 MEH: Promising but one key piece is still fuzzy
+- 30–49 SKEPTICAL: Interesting feature, not yet a product
+- 0–29 REJECTS IT: Misses Laura or Norton entirely
 `;
 
 export async function onRequestPatch({ params, request, env }) {

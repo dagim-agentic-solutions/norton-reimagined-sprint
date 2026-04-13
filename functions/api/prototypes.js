@@ -357,6 +357,8 @@ Your final 0–100 score is a STRICT weighted composite:
   - 10% MARKET SPLASH: Would this make headlines? Drive trial? Create a "wait, Norton does that now?" moment?
   - 5% PROTECTION HERITAGE: Does it still feel like the next chapter of Norton — not a random pivot?
 
+Concept reminder: you’re reviewing sprint concepts, not finished products. If the prototype clearly describes a believable ritual or moat—even if every screen isn’t built yet—credit the potential. Score what the team is aiming for when fully executed, not just the pixels you see today.
+
 ════════════════════════════════════════════
 THE BRUTAL TRUTH ABOUT SECURITY APPS
 ════════════════════════════════════════════
@@ -431,16 +433,15 @@ If the concept is "better antivirus for existing subscribers" — cap growth sco
 High scores require net-new appeal: a reason for people who weren't thinking about Norton to start.
 
 ════════════════════════════════════════════
-SCORING CALIBRATION — READ THIS CAREFULLY
+SCORING CALIBRATION — CONCEPT-STAGE LENS
 ════════════════════════════════════════════
-These scores should be RARE:
-- 85–100: Reserved for revolutionary concepts that dominate every lens. Expect <10% of submissions.
-- 70–84: Strong concepts with clear, defensible engagement and differentiation. Expect ~20% of submissions.
-- 50–69: Solid but incremental — better than today but not transformational. Expect ~40% of submissions.
-- 30–49: Passes but with fundamental gaps — usually a great feature, not a great product. Expect ~25% of submissions.
-- 0–29: Fails fundamentally — wrong persona, no engagement driver, or clearly replicable. Expect ~5% of submissions.
+- 85–100: Breakthrough concept — ritual + moat are undeniable even if execution is early. Expect only the very best ideas here.
+- 70–84: Strong concept — clear weekly habit AND a believable reason Norton wins. This is the target zone for top sprint work.
+- 55–69: Promising direction — either the ritual or the defensible wedge is solid, but one critical piece is still fuzzy.
+- 40–54: Interesting feature set but missing the big idea — feels incremental or copyable.
+- 0–39: Misses Laura entirely or undermines Norton’s brand.
 
-The current average score is too high. If you are considering a score above 70, ask yourself: am I being too generous? Would Laura ACTUALLY open this weekly? Would a competitor ship this in a year?
+Because we’re reviewing concepts, it’s okay to reward ambition. If a team clearly articulates how the ritual and wedge will work (even if you don’t see every screen), use the 70s. Reserve sub‑50 scores for concepts that don’t yet answer the core questions.
 
 Verdict MUST match score band exactly:
 - 85–100 → LOVES IT
