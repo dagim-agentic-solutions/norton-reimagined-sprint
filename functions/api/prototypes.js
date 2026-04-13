@@ -349,70 +349,106 @@ export async function onRequestPost({ request, env, ctx }) {
 // ═══════════════════════════════════════════════════════════════════════════════
 
 const LAURA_CONTEXT_SCORE = `
-You are evaluating a product prototype against TWO lenses simultaneously:
-(1) Laura — the target persona
-(2) Norton's three business objectives
+You are evaluating a product prototype with extreme rigour. Most prototypes in design sprints are too safe, too incremental, or too niche to earn high scores. Your default posture is SKEPTICAL — a prototype must actively prove it deserves a high score, not just pass a checklist.
 
-Your final 0–100 score is a weighted composite:
-  - 50% Laura (does she love it, use it regularly, find it effortless?)
-  - 25% Business Objective: Engagement (does it shift Norton from set-and-forget to a tool Laura returns to daily/weekly?)
-  - 15% Business Objective: Growth (does it give Norton a credible edge in the competitive landscape vs. Apple Security, Google One, standalone scam apps, LifeLock?)
-  - 10% Business Objective: Protection Heritage (does it preserve and honour Norton's 30-year identity as the gold standard in protection — not a pivot away from security?)
+Your final 0–100 score is a STRICT weighted composite:
+  - 40% ENGAGEMENT REALITY: Does Laura genuinely return to this weekly or daily — not because she has to, but because she wants to? Does it earn real estate on her home screen?
+  - 25% DIFFERENTIATION: What can ONLY Norton ship? What does this do that Apple Security, Google One, Aura, Genie, or 1Password cannot copy within 12 months?
+  - 20% LAURA PERSONA FIT: Does this fit how she actually lives — effortless, default-on, calm, household-framed?
+  - 10% MARKET SPLASH: Would this make headlines? Drive trial? Create a "wait, Norton does that now?" moment?
+  - 5% PROTECTION HERITAGE: Does it still feel like the next chapter of Norton — not a random pivot?
+
+════════════════════════════════════════════
+THE BRUTAL TRUTH ABOUT SECURITY APPS
+════════════════════════════════════════════
+CORE CHALLENGE: Pure security apps do not create daily engagement for normal people. Think honestly:
+
+- When did Laura last open her antivirus app ON PURPOSE (not from a notification)?
+- "AI-powered protection" is now table stakes — Apple, Google, and Microsoft ship it free.
+- A calmer alert UI is incremental, not transformational. It reduces pain but does not build habit.
+- Background protection is the MINIMUM expected — Laura does not return to a product that just "keeps running quietly."
+- UNLESS the concept fundamentally shifts what Laura gets out of opening the app (utility, insight, family connection, peace of mind as a FEELING not a feature), a security-focused idea will score low on engagement.
+
+WHEN SECURITY CAN SCORE HIGH:
+- If the concept reframes protection as something valuable beyond threat-blocking (e.g., a family wellness hub, a digital life manager, a trust layer for AI interactions)
+- If it gives Laura daily pull — a reason to check in like she checks email or weather
+- If it does something Laura cannot get anywhere else at any price
+- If it uses Norton's brand authority to reshape how Laura THINKS about digital safety (mental model shift)
 
 ════════════════════════════════════════════
 LENS 1 — LAURA, THE OUTSOURCER
 ════════════════════════════════════════════
-LAURA IN ONE LINE: She is the guardian of her household's digital life — but
-she doesn't want the job. She wants a trusted expert to quietly handle it in
-the background, the way insurance or utilities do.
+LAURA IN ONE LINE: She is the reluctant guardian of her household's digital life. She does not want the job. She wants a trusted expert to handle it invisibly — like insurance or utilities — but she is deeply burnt out on apps that demand her attention without giving her anything back.
 
 WHO SHE IS:
-- 35–55, working parent, full household (partner + kids), 5–10 devices across family
-- Mass-market premium income, comfortable paying for quality protection
+- 35–55, working parent, full household (partner + kids), 5–10 devices
 - Tech-comfortable but not "IT people" — adopts tools that reduce effort and anxiety
-- "Unknowledgeable" mindset — not curious about how cyber works, just wants it to work
-- Sees cyber safety as basic life admin, like insurance or utilities
-- Carries the mental load of keeping family safe and is burnt out being the household IT person
+- "Unknowledgeable" mindset: not curious about how cyber works, just wants it to work
+- Sees security as basic life admin. Already pays for Norton. Rarely opens it.
+- Her real pain: mental load, not threat level. She worries in the abstract, not in response to specific risks.
 
 HER 4 JOBS TO BE DONE:
-1. Protect my whole household with as little admin from me as possible
-2. Block threats before we click (scams, dodgy sites, sketchy downloads)
-3. Keep my kids safe online with simple, trustworthy controls
-4. Tell me what to do when something looks wrong, in plain language
+1. Protect my whole household with zero admin from me
+2. Block threats before we click — scams, dodgy sites, risky downloads
+3. Keep my kids safe with simple, trustworthy controls
+4. Tell me what to do when something looks wrong, in plain English
 
-WHAT "PEACE OF MIND" MEANS TO HER — THE 4Ps:
-- PROACTIVE: Tell her the result. Don't ask her to run scans or flip toggles.
-- PROGRESSIVE: Go beyond viruses — catch AI scams, deepfakes, new threats.
-- PRINCIPLED: Transparent from day one. No dark-pattern upsells.
-- PERVASIVE: Everywhere, all at once. One provider, every device, every family member.
+THE ENGAGEMENT PROBLEM — BE HONEST ABOUT IT:
+Security does not build habit. Laura does not "check her protection score" in the morning.
+She checks weather, news, messages, calendar, banking. NOT her antivirus.
+The ONLY way a security app earns daily use is if it gives her something she genuinely wants:
+- Useful household intelligence (beyond threats)
+- Family coordination or peace of mind as a DAILY ritual
+- Something new she discovers every time she opens it
+Ask this question first: "Why would Laura open this tomorrow morning when no threat has fired?"
+If you cannot answer that clearly, cap the engagement score at 35.
 
-WHAT SHE LOVES: Default-on protection, household framing, calm assured tone, zero config.
-WHAT SHE REJECTS: Dashboards of toggles, jargon, gamification, dark patterns, added admin.
+WHAT SHE LOVES: Default-on everything, household framing, calm tone, zero config, pleasant surprises.
+WHAT SHE REJECTS: Dashboards of toggles, jargon, gamification, upsells, anything that requires her to DO something she does not understand.
 
-════════════════════════════════════════════
-LENS 2 — NORTON'S BUSINESS OBJECTIVES
-════════════════════════════════════════════
-
-OBJECTIVE A — ENGAGEMENT (weight: 25%)
-Norton's strategic shift: move from a "set it and forget it" security utility to a product Laura actively opens and values regularly (daily or weekly). A high-scoring prototype creates natural, recurring reasons for Laura to return — not because she has to, but because she wants to.
-Ask: Does this prototype give Laura a reason to open Norton tomorrow? Next week? Does it build habit or ritual? Or is it still a background process she never thinks about?
-
-OBJECTIVE B — GROWTH & COMPETITIVE EDGE (weight: 15%)
-Norton competes with Apple's built-in security, Google One, identity-focused players (LifeLock, Aura, Lifelock), standalone scam apps (Robokiller, Genie), and password managers (1Password). A high-scoring prototype gives Norton a clear "why Norton vs. anything else" — either through breadth (one app for everything), trust (30-year brand), or a category Norton can own that competitors can't easily replicate.
-Ask: Does this prototype help Norton win in the market? Does it differentiate meaningfully? Could a competitor easily copy it in 12 months?
-
-OBJECTIVE C — PROTECTION HERITAGE (weight: 10%)
-Norton's brand equity is built on 30 years of being the most trusted name in protection. The reimagined product must evolve Norton — not abandon it. It should feel like the next logical chapter of the protection story, not a random pivot.
-Ask: Does this prototype still feel like Norton at its best? Does it reinforce the idea that Norton = protection, now for the modern threat landscape? Or does it drift into territory that feels un-Norton (fintech, social media, entertainment)?
+BRAND LEADER ADVANTAGE — WHEN IT APPLIES:
+Like Nike reframing athletics, Headspace reframing mental health, or Apple reframing privacy — Norton has the brand authority to shift Laura's mental model of what "digital safety" means. A concept that reimagines the category entirely (not just a better antivirus) can score high on this dimension. Give credit for bold brand moves that feel credible for Norton's heritage even if they go far beyond traditional security.
 
 ════════════════════════════════════════════
-COMPOSITE SCORING GUIDE (0–100)
+LENS 2 — DIFFERENTIATION CHALLENGE
 ════════════════════════════════════════════
-- 90–100 LOVES IT: Exceptional on all lenses — Laura loves it, it drives habit, it's competitively defensible, and it's unmistakably Norton.
-- 75–89 LIKES IT: Strong on most lenses — clear value for Laura and business, minor gaps.
-- 55–74 MEH: Passes on some lenses but has real weaknesses — either Laura won't use it regularly, or business impact is unclear.
-- 35–54 SKEPTICAL: Significant concerns on 2+ lenses — either Laura rejects it or it undermines business objectives.
-- 0–34 REJECTS IT: Fails fundamentally — wrong persona, damages the brand, or has no competitive merit.
+Before scoring differentiation, mentally check this list:
+- Apple builds free security, scam detection, and Screen Time into iOS — could this just be "use Screen Time better"?
+- Google One bundles VPN + identity monitoring for $3/month — is this just that?
+- Aura and LifeLock already do identity + family monitoring — is this just that with a Norton logo?
+- Genie and Robokiller already do AI scam detection standalone — is this just that?
+- 1Password and Dashlane already do password + family vaults — is this just that?
+
+If the answer to ANY of those is "yes, basically" — cap differentiation score at 40.
+Norton earns a high differentiation score ONLY if it does something structurally unique: a category it can own, data or trust relationships competitors cannot replicate, or a combination of capabilities that only Norton's scale + brand enables.
+
+════════════════════════════════════════════
+LENS 3 — MARKET SPLASH & GROWTH
+════════════════════════════════════════════
+Ask: Would a journalist write "Norton just became a _____ company"?
+Ask: Would a non-subscriber hear about this and consider switching FROM Apple/Google for it?
+Ask: Does this open a new acquisition channel or strengthen retention in a way that's visible?
+If the concept is "better antivirus for existing subscribers" — cap growth score at 30.
+High scores require net-new appeal: a reason for people who weren't thinking about Norton to start.
+
+════════════════════════════════════════════
+SCORING CALIBRATION — READ THIS CAREFULLY
+════════════════════════════════════════════
+These scores should be RARE:
+- 85–100: Reserved for revolutionary concepts that dominate every lens. Expect <10% of submissions.
+- 70–84: Strong concepts with clear, defensible engagement and differentiation. Expect ~20% of submissions.
+- 50–69: Solid but incremental — better than today but not transformational. Expect ~40% of submissions.
+- 30–49: Passes but with fundamental gaps — usually a great feature, not a great product. Expect ~25% of submissions.
+- 0–29: Fails fundamentally — wrong persona, no engagement driver, or clearly replicable. Expect ~5% of submissions.
+
+The current average score is too high. If you are considering a score above 70, ask yourself: am I being too generous? Would Laura ACTUALLY open this weekly? Would a competitor ship this in a year?
+
+Verdict MUST match score band exactly:
+- 85–100 → LOVES IT
+- 70–84 → LIKES IT
+- 50–69 → MEH
+- 30–49 → SKEPTICAL
+- 0–29 → REJECTS IT
 `;
 
 async function screenshotUrl(url) {
@@ -525,19 +561,31 @@ async function scoreLaura(prototype, fileContent, env) {
 PROTOTYPE TO EVALUATE:
 ${metaContext}
 
-${screensFound > 0 ? `You are being shown ${crawlResult.screens.length} screenshot(s) of the prototype below. Study EVERY screen carefully — look at all the UI elements, buttons, labels, flows, and interactions visible. Use what you see to inform your assessment of how Laura would react.` : 'No screenshots were available. Use the extracted text above for your assessment.'}
+${screensFound > 0 ? `You are being shown ${crawlResult.screens.length} screenshot(s) of the prototype below. Study EVERY screen carefully — look at all the UI elements, buttons, labels, flows, and interactions visible. Use what you see to inform your assessment of how Laura would react. Pay attention to: what the app asks Laura to DO, what it gives her in return, how often she would realistically return to it.` : 'No screenshots were available. Use the extracted text above for your assessment.'}
+
+BEFORE scoring, answer these questions internally:
+1. Why would Laura open this app tomorrow morning when no security alert has fired?
+2. What does this do that Apple Screen Time + Google One + Aura combined cannot?
+3. Is this a 10x improvement or a 10% improvement on what exists?
+4. Would a non-Norton subscriber hear about this and switch?
+5. Does this concept change how Laura THINKS about digital safety, or just make the current experience slightly better?
 
 ---
 Respond with ONLY a valid JSON object — no prose, no markdown fences:
 {
-  "score": <integer 0-100, weighted composite across all lenses>,
+  "score": <integer 0-100, strict weighted composite — calibrated so 70+ is genuinely exceptional>,
   "verdict": "<LOVES IT | LIKES IT | MEH | SKEPTICAL | REJECTS IT>",
-  "recommendation": "<2-3 sentences covering both Laura's reaction AND how well the concept serves Norton's engagement, growth, and heritage objectives>",
-  "engagementScore": <integer 0-100, does it drive regular use vs. set-and-forget?>,
-  "growthScore": <integer 0-100, does it give Norton a defensible competitive edge?>,
-  "heritageScore": <integer 0-100, does it honour Norton's protection identity?>
+  "recommendation": "<3-4 sentences: What is this concept's fatal flaw OR breakthrough insight? Be specific about why Laura would or would not return weekly. Call out the competitors it does NOT beat.>",
+  "engagementScore": <integer 0-100 — honest answer to: would Laura open this weekly on her own initiative?>,
+  "differentiationScore": <integer 0-100 — what only Norton can ship; penalise if Apple/Google/Aura could copy in 12 months>,
+  "growthScore": <integer 0-100 — would a non-subscriber hear about this and switch? Would it make headlines?>,
+  "heritageScore": <integer 0-100 — does it feel like the next chapter of Norton, not a random pivot?>,
+  "personaFitScore": <integer 0-100 — how well does it fit Laura's actual daily life and mental model?>,
+  "engagementChallenge": "<1-2 sentences: honest answer to 'why would Laura open this weekly when no alert fires?'>",
+  "competitorGap": "<1 sentence: what competitor could most easily replicate this and how soon?>",
+  "wouldLauraOpenWeekly": <true | false>
 }
-The verdict MUST match the score band: 90-100 → LOVES IT | 75-89 → LIKES IT | 55-74 → MEH | 35-54 → SKEPTICAL | 0-34 → REJECTS IT`;
+Verdict MUST match score band exactly: 85-100 → LOVES IT | 70-84 → LIKES IT | 50-69 → MEH | 30-49 → SKEPTICAL | 0-29 → REJECTS IT`;
 
   // ── 4. Build message content (text + vision blocks) ─────────────────────
   const msgContent = screensFound > 0
@@ -553,8 +601,8 @@ The verdict MUST match the score band: 90-100 → LOVES IT | 75-89 → LIKES IT 
         'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
-        model: 'claude-opus-4-5',  // Vision-capable model
-        max_tokens: 400,
+        model: 'claude-opus-4-5',  // Vision-capable model; highest reasoning quality for scoring
+        max_tokens: 800,
         messages: [{ role: 'user', content: msgContent }],
       }),
     });
@@ -563,12 +611,17 @@ The verdict MUST match the score band: 90-100 → LOVES IT | 75-89 → LIKES IT 
     const raw = (data?.content?.[0]?.text ?? '').replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '').trim();
     const result = JSON.parse(raw);
     return {
-      lauraScore:           result.score           ?? null,
-      lauraVerdict:         result.verdict          ?? null,
-      lauraRecommendation:  result.recommendation   ?? null,
-      lauraEngagementScore: result.engagementScore  ?? null,
-      lauraGrowthScore:     result.growthScore      ?? null,
-      lauraHeritageScore:   result.heritageScore    ?? null,
+      lauraScore:               result.score                ?? null,
+      lauraVerdict:             result.verdict              ?? null,
+      lauraRecommendation:      result.recommendation       ?? null,
+      lauraEngagementScore:     result.engagementScore      ?? null,
+      lauraDifferentiationScore:result.differentiationScore ?? null,
+      lauraGrowthScore:         result.growthScore          ?? null,
+      lauraHeritageScore:       result.heritageScore        ?? null,
+      lauraPersonaFitScore:     result.personaFitScore      ?? null,
+      lauraEngagementChallenge: result.engagementChallenge  ?? null,
+      lauraCompetitorGap:       result.competitorGap        ?? null,
+      lauraWouldOpenWeekly:     result.wouldLauraOpenWeekly ?? null,
     };
   } catch {
     return null;
