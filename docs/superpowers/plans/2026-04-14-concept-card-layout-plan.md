@@ -33,6 +33,7 @@
 - Modify: `concept-card.html` (same `<style>` block)
 
 - [ ] In the `.submitted-card` rule, add `width: 100%;` and `max-width: none;` (right after the existing padding/background styles) so each card stretches across the container.
+- [ ] Extend the `.submitted-card .card-preview-wrapper .concept-card` rule so the nested concept card preview goes full bleed inside the tile (set `max-width: none; width: 100%; margin: 0;`).
 - [ ] Remove grid-specific styling from `.empty-state`. Replace the block with something like:
   ```css
   .empty-state {
