@@ -319,6 +319,24 @@
     }
     .submitted-card header strong { font-size: 16px; }
     .submitted-card small { color: var(--ink-softer); font-size: 12px; }
+    .submitted-card .card-meta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .submitted-card .delete-btn {
+      border: none;
+      background: transparent;
+      color: #dc2626;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 0;
+    }
+    .submitted-card .delete-btn:hover,
+    .submitted-card .delete-btn:focus {
+      text-decoration: underline;
+    }
     .submitted-card .card-preview-wrapper {
       border-radius: 16px;
       overflow: hidden;
@@ -513,6 +531,7 @@
       let socket = null;
       let wsRetries = 0;
       let pollTimer = null;
+      const deletingIds = new Set();
 
       const defaults = {
         participant: 'Anonymous',
@@ -648,6 +667,20 @@
         submittedContainer.innerHTML = fragments.join('');
       }
 
+      function removeCardLocally(id) {
+        if (!id) return;
+        const next = submittedCards.filter(card => card.id !== id);
+        if (next.length === submittedCards.length) return;
+        submittedCards = next;
+        renderSubmitted();
+      }
+
+      function restoreCard(card) {
+        if (!card) return;
+        submittedCards.unshift(card);
+        renderSubmitted();
+      }
+
       function buildSubmittedCard(card) {
         const date = card.createdAt ? new Date(card.createdAt) : null;
         const timestamp = date ? date.toLocaleString() : '';
@@ -664,7 +697,10 @@
               <strong>${escapeHtml(card.headline || 'Untitled concept')}</strong>
               <div><small>by ${escapeHtml(card.participant || 'Anonymous')}</small></div>
             </div>
-            ${timestamp ? `<small>${timestamp}</small>` : ''}
+            <div class="card-meta">
+              ${timestamp ? `<small>${timestamp}</small>` : ''}
+              <button type="button" class="delete-btn" data-action="delete" data-id="${card.id}">Delete</button>
+            </div>
           </header>
           <div class="card-preview-wrapper">
             <div class="concept-card">
@@ -692,15 +728,39 @@
         const btn = e.target.closest('button[data-action]');
         if (!btn) return;
         const id = btn.dataset.id;
+        if (btn.dataset.action === 'delete') {
+          deleteCard(id);
+          return;
+        }
         const cardData = submittedCards.find(c => c.id === id);
         if (!cardData) return;
         const wrapper = document.querySelector(`#card-${id} .concept-card`);
         if (!wrapper) return;
         if (btn.dataset.action === 'jpg') {
           downloadElementAsJpg(wrapper, `concept-card-${id}.jpg`);
-        } else {
+        } else if (btn.dataset.action === 'html') {
           downloadCardHtml(wrapper.outerHTML, `concept-card-${id}.html`);
         }
+      }
+
+      async function deleteCard(id) {
+        if (!id || deletingIds.has(id)) return;
+        const card = submittedCards.find(c => c.id === id);
+        deletingIds.add(id);
+        if (card) removeCardLocally(id);
+        try {
+          const res = await fetch(`${API_URL}?slug=${SLUG}&id=${id}`, { method: 'DELETE' });
+          if (!res.ok) throw new Error('Delete failed');
+        } catch (err) {
+          console.error(err);
+          deletingIds.delete(id);
+          if (card) {
+            restoreCard(card);
+          }
+          showStatus('Unable to delete right now. Try again in a moment.', 'error');
+          return;
+        }
+        deletingIds.delete(id);
       }
 
       async function downloadElementAsJpg(el, filename) {
@@ -758,6 +818,12 @@
             const evt = JSON.parse(e.data);
             if (evt.type === 'concept-card:created') {
               addCardToList(evt.payload);
+            } else if (evt.type === 'concept-card:deleted') {
+              const deletedId = evt.payload && evt.payload.id;
+              if (deletedId) {
+                deletingIds.delete(deletedId);
+                removeCardLocally(deletedId);
+              }
             }
           } catch {}
         });

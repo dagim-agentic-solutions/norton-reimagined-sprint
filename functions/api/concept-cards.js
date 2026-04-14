@@ -1,6 +1,6 @@
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+  'Access-Control-Allow-Methods': 'GET, POST, DELETE, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type',
 };
 
@@ -80,4 +80,30 @@ export async function onRequestPost({ env, request }) {
   }
 
   return json({ ok: true, card });
+}
+
+export async function onRequestDelete({ env, request }) {
+  const url = new URL(request.url);
+  const slug = (url.searchParams.get('slug') || 'norton').toLowerCase();
+  const id = url.searchParams.get('id');
+  if (!id) return json({ error: 'Missing id' }, 400);
+
+  const cards = await getCards(env.PROTOTYPES_KV, slug);
+  const next = cards.filter((card) => card.id !== id);
+  if (next.length !== cards.length) {
+    await saveCards(env.PROTOTYPES_KV, slug, next);
+  } else {
+    // Nothing to delete; still respond success
+    await saveCards(env.PROTOTYPES_KV, slug, next);
+  }
+
+  if (env.CONCEPT_CARD_BROADCAST_URL) {
+    fetch(env.CONCEPT_CARD_BROADCAST_URL, {
+      method: 'POST',
+      headers: JSON_H,
+      body: JSON.stringify({ type: 'concept-card:deleted', payload: { id, slug } }),
+    }).catch(() => {});
+  }
+
+  return json({ ok: true, id });
 }
