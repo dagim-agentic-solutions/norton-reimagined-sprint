@@ -61,6 +61,7 @@
     return response;
   }
 
+  window.adminFetch = adminFetch;
   window.adminAuth = {
     fetch: adminFetch,
     clear: clearKey,
