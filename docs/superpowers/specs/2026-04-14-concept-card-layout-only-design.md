@@ -16,6 +16,7 @@
 - Force each `.submitted-card` to stretch across the container:
   - `width: 100%; max-width: none;` while preserving the existing internal padding/shadows.
   - Maintain current background/border styles so cards still look like the Norton-branded panel.
+- Expand the nested `.concept-card` preview inside each submitted tile so it fills the tile width (`max-width: none; width: 100%; margin: 0;`) to avoid leftover black space.
 - Keep the rest of the Concept 1-Pager layout intact (form, preview, hero) — only the submitted-cards wrapper/card widths change.
 
 ## Testing Notes
