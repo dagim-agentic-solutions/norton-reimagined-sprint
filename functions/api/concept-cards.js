@@ -1,4 +1,10 @@
-const JSON_H = { 'Content-Type': 'application/json' };
+const CORS_HEADERS = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type',
+};
+
+const JSON_H = { 'Content-Type': 'application/json', ...CORS_HEADERS };
 const KEY = slug => `concept-cards:${slug}`;
 const MAX_CARDS = 200;
 
@@ -14,6 +20,10 @@ async function saveCards(kv, slug, cards) {
 
 function json(body, status = 200) {
   return new Response(JSON.stringify(body), { status, headers: JSON_H });
+}
+
+export async function onRequestOptions() {
+  return new Response(null, { status: 204, headers: CORS_HEADERS });
 }
 
 export async function onRequestGet({ env, request }) {
