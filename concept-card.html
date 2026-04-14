@@ -500,7 +500,7 @@
   
 <script>
     (function () {
-      const API_BASE = (window.location.hostname.includes('norton-reimagined-sprint.pages.dev') || window.location.hostname.includes('localhost')) ? window.location.origin : 'https://norton-reimagined-sprint.pages.dev';
+      const API_BASE = window.location.hostname.includes('localhost') ? window.location.origin : 'https://norton-reimagined-sprint.pages.dev';
       const API_URL = `${API_BASE}/api/concept-cards`;
       const SLUG = 'norton';
       const WS_URL = 'wss://concept-card-hub.og-norton.workers.dev/ws/concept-cards';
