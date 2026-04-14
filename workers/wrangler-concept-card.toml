@@ -1,0 +1,12 @@
+name = "concept-card-hub"
+main = "concept-card-hub.js"
+compatibility_date = "2024-01-01"
+account_id = "b85888bb413b91d0f981711a51b90f5f"
+
+[[durable_objects.bindings]]
+name = "CONCEPT_CARD_HUB"
+class_name = "ConceptCardHub"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["ConceptCardHub"]

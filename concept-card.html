@@ -273,6 +273,67 @@
       border-top: 1px solid rgba(255,255,255,0.08);
     }
 
+    .submitted-section {
+      margin-top: 56px;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 28px;
+    }
+    .submitted-section .section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+    .eyebrow.small {
+      font-size: 10px;
+      padding: 3px 10px;
+    }
+    .submitted-section h2 { font-size: 26px; font-weight: 800; margin: 6px 0; }
+    .submitted-section p { margin: 0; color: var(--ink-soft); }
+    .submitted-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 20px;
+    }
+    .submitted-card {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 18px;
+      background: #fdfdfc;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .submitted-card header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+    .submitted-card header strong { font-size: 16px; }
+    .submitted-card small { color: var(--ink-softer); font-size: 12px; }
+    .submitted-card .card-preview-wrapper {
+      border-radius: 16px;
+      overflow: hidden;
+      background: #121212;
+    }
+    .submitted-card .card-preview-wrapper .concept-card { box-shadow: none; border-radius: 0; }
+    .submitted-card .card-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .submitted-card .card-actions button { flex: 1 0 120px; }
+    .empty-state {
+      grid-column: 1 / -1;
+      text-align: center;
+      color: var(--ink-soft);
+      padding: 24px 0;
+    }
     .helper-text {
       font-size: 13px;
       color: var(--ink-soft);
@@ -329,6 +390,10 @@
         <h2>Edit concept card</h2>
         <p>Write in Laura’s language. Keep it concrete, visual, calm.</p>
         <div class="form-grid">
+          <div>
+            <label for="participant">Participant / team</label>
+            <input type="text" id="participant" name="participant" placeholder="e.g. Team Alpha or Jordan W." maxlength="80">
+          </div>
           <div class="two">
             <div>
               <label for="headline">Headline</label>
@@ -373,10 +438,12 @@
           </div>
         </div>
         <div class="btn-row">
-          <button type="button" class="primary-btn" id="previewBtn">Preview Card</button>
+          <button type="button" class="primary-btn" id="submitCard">Submit card to sprint</button>
+          <button type="button" class="secondary-btn" id="previewBtn">Preview card</button>
           <button type="button" class="secondary-btn" id="downloadJpg">Download JPEG</button>
           <button type="button" class="secondary-btn" id="downloadHtml">Download HTML</button>
         </div>
+        <p class="helper-text" id="formStatus"></p>
       </form>
 
       <div class="preview-panel">
@@ -413,12 +480,58 @@
         </div>
       </div>
     </div>
+
+    <section class="submitted-section">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow small">Live feed</div>
+          <h2>Submitted concept cards</h2>
+          <p>Updates in real time as participants hit “Submit card”.</p>
+        </div>
+        <button type="button" class="secondary-btn" id="refreshCards">Refresh list</button>
+      </div>
+      <div id="submittedCards" class="submitted-grid">
+        <div class="empty-state">No concept cards have been submitted yet.</div>
+      </div>
+    </section>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-  <script>
-    (function() {
-      const form = document.getElementById('conceptForm');
+  
+<script>
+    (function () {
+      const API_URL = '/api/concept-cards';
+      const SLUG = 'norton';
+      const WS_URL = 'wss://concept-card-hub.og-norton.workers.dev/ws/concept-cards';
+      const previewCard = document.getElementById('conceptCard');
+      const submittedContainer = document.getElementById('submittedCards');
+      const formStatus = document.getElementById('formStatus');
+      let submittedCards = [];
+      let socket = null;
+      let wsRetries = 0;
+      let pollTimer = null;
+
+      const defaults = {
+        participant: 'Anonymous',
+        headline: 'Your headline goes here',
+        subheadline: 'One sentence that explains what Norton becomes and why Laura should care.',
+        benefit1Title: 'Benefit one',
+        benefit1Desc: 'One sentence in Laura's language about how this solves her problem.',
+        benefit2Title: 'Benefit two',
+        benefit2Desc: 'One sentence in Laura's language about how this solves her problem.',
+        benefit3Title: 'Benefit three',
+        benefit3Desc: 'One sentence in Laura's language about how this solves her problem.',
+        howItWorks: 'One sentence that explains how this works in plain language — no jargon, no technical detail.',
+        proofPoint: 'A trust statement: why Laura should believe Norton can deliver this.'
+      };
+
+      function fieldValue(id) {
+        const el = document.getElementById(id);
+        if (!el) return defaults[id] || '';
+        const val = el.value.trim();
+        return val || defaults[id] || '';
+      }
+
       const preview = {
         headline: document.getElementById('previewHeadline'),
         subheadline: document.getElementById('previewSubheadline'),
@@ -432,42 +545,28 @@
         proof: document.getElementById('previewProofPoint'),
       };
 
-      const defaults = {
-        headline: 'Your headline goes here',
-        subheadline: 'One sentence that explains what Norton becomes and why Laura should care.',
-        benefit1Title: 'Benefit one',
-        benefit1Desc: 'One sentence in Laura\'s language about how this solves her problem.',
-        benefit2Title: 'Benefit two',
-        benefit2Desc: 'One sentence in Laura\'s language about how this solves her problem.',
-        benefit3Title: 'Benefit three',
-        benefit3Desc: 'One sentence in Laura\'s language about how this solves her problem.',
-        howItWorks: 'One sentence that explains how this works in plain language — no jargon, no technical detail.',
-        proofPoint: 'A trust statement: why Laura should believe Norton can deliver this.'
-      };
-
-      function value(id) {
-        const el = document.getElementById(id);
-        return el.value.trim() || defaults[id];
-      }
-
       function renderPreview() {
-        preview.headline.textContent = value('headline');
-        preview.subheadline.textContent = value('subheadline');
-        preview.b1Title.textContent = value('benefit1Title');
-        preview.b1Desc.textContent = value('benefit1Desc');
-        preview.b2Title.textContent = value('benefit2Title');
-        preview.b2Desc.textContent = value('benefit2Desc');
-        preview.b3Title.textContent = value('benefit3Title');
-        preview.b3Desc.textContent = value('benefit3Desc');
-        preview.how.textContent = value('howItWorks');
-        preview.proof.textContent = value('proofPoint');
+        preview.headline.textContent = fieldValue('headline');
+        preview.subheadline.textContent = fieldValue('subheadline');
+        preview.b1Title.textContent = fieldValue('benefit1Title');
+        preview.b1Desc.textContent = fieldValue('benefit1Desc');
+        preview.b2Title.textContent = fieldValue('benefit2Title');
+        preview.b2Desc.textContent = fieldValue('benefit2Desc');
+        preview.b3Title.textContent = fieldValue('benefit3Title');
+        preview.b3Desc.textContent = fieldValue('benefit3Desc');
+        preview.how.textContent = fieldValue('howItWorks');
+        preview.proof.textContent = fieldValue('proofPoint');
       }
 
-      const inputs = form.querySelectorAll('input, textarea');
-      inputs.forEach(function(el) {
-        if (el.value.trim() === '' && defaults[el.id]) {
-          el.value = '';
-        }
+      function getBenefitsFromForm() {
+        return [
+          { title: fieldValue('benefit1Title'), description: fieldValue('benefit1Desc') },
+          { title: fieldValue('benefit2Title'), description: fieldValue('benefit2Desc') },
+          { title: fieldValue('benefit3Title'), description: fieldValue('benefit3Desc') },
+        ];
+      }
+
+      document.querySelectorAll('#conceptForm input, #conceptForm textarea').forEach(el => {
         el.addEventListener('input', renderPreview);
       });
       renderPreview();
@@ -475,37 +574,213 @@
       document.getElementById('previewBtn').addEventListener('click', function(e) {
         e.preventDefault();
         renderPreview();
-        document.getElementById('conceptCard').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        previewCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
       });
 
-      document.getElementById('downloadJpg').addEventListener('click', async function() {
-        renderPreview();
-        const card = document.getElementById('conceptCard');
-        const canvas = await html2canvas(card, { backgroundColor: null, scale: 2 });
-        canvas.toBlob(function(blob) {
-          const link = document.createElement('a');
-          link.href = URL.createObjectURL(blob);
-          link.download = 'norton-concept-card.jpg';
-          link.click();
-        }, 'image/jpeg', 0.95);
+      document.getElementById('downloadJpg').addEventListener('click', function() {
+        downloadElementAsJpg(previewCard, 'norton-concept-card.jpg');
       });
-
       document.getElementById('downloadHtml').addEventListener('click', function() {
-        renderPreview();
-        const cardHtml = document.getElementById('conceptCard').outerHTML;
-        const htmlDoc = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&display=swap" rel="stylesheet"><style>body{background:#f4f4f1;padding:40px;font-family:'Inter Tight',sans-serif;} ${getCardStyles()}</style></head><body>${cardHtml}</body></html>`;
-        const blob = new Blob([htmlDoc], { type: 'text/html' });
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.download = 'norton-concept-card.html';
-        link.click();
+        const cardHtml = previewCard.outerHTML;
+        downloadCardHtml(cardHtml, 'norton-concept-card.html');
       });
 
-      function getCardStyles() {
-        return `:root{--yellow:#FFE800;} .concept-card{max-width:720px;margin:0 auto;border-radius:24px;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,0.12);} .concept-card .card-header{background:#0d0d0d;padding:18px 28px;border-bottom:4px solid var(--yellow);} .concept-card .hero{background:#f1f1ef;padding:32px 36px;color:#1c1c1c;} .concept-card .hero h3{margin:0 0 8px;font-size:30px;font-weight:800;} .concept-card .hero p{margin:0;font-size:17px;color:#4b4b4b;} .concept-card .benefits{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:18px;padding:28px 36px;background:#ffffff;} .concept-card .benefit-title{text-transform:uppercase;font-weight:700;letter-spacing:0.08em;font-size:13px;margin:0 0 8px;position:relative;padding-left:18px;} .concept-card .benefit-title::before{content:'';position:absolute;left:0;top:6px;width:10px;height:3px;background:#FFE800;border-radius:999px;} .concept-card .benefits p{margin:0;font-size:14px;color:#5a5a5a;line-height:1.5;} .concept-card .how-it-works{display:flex;flex-direction:column;gap:6px;padding:26px 36px;background:#f5f5f5;border-top:1px solid rgba(0,0,0,0.05);} .concept-card .how-it-works h4{font-size:14px;letter-spacing:0.2em;text-transform:uppercase;color:#6f6f6f;margin:0;} .concept-card .how-it-works p{margin:0;font-size:15px;color:#1c1c1c;} .concept-card .trust-bar{background:#0f0f0f;color:#f5f5f5;padding:16px 36px;font-size:14px;border-top:1px solid rgba(255,255,255,0.08);}`;
+      document.getElementById('submitCard').addEventListener('click', submitCard);
+      document.getElementById('refreshCards').addEventListener('click', fetchCards);
+      submittedContainer.addEventListener('click', handleSubmittedClick);
+
+      async function submitCard() {
+        renderPreview();
+        showStatus('Submitting…', 'info');
+        const payload = {
+          slug: SLUG,
+          participant: document.getElementById('participant').value.trim() || defaults.participant,
+          headline: fieldValue('headline'),
+          subheadline: fieldValue('subheadline'),
+          benefits: getBenefitsFromForm(),
+          howItWorks: fieldValue('howItWorks'),
+          proofPoint: fieldValue('proofPoint'),
+        };
+        try {
+          const res = await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+          });
+          if (!res.ok) throw new Error('Request failed');
+          const data = await res.json();
+          if (data?.card) addCardToList(data.card);
+          showStatus('Card submitted — scroll down to see it in the feed.', 'success');
+        } catch (err) {
+          console.error(err);
+          showStatus('Unable to submit right now. Try again in a moment.', 'error');
+        }
       }
 
-      // Nav dropdown + hamburger
+      function showStatus(msg, type) {
+        if (!formStatus) return;
+        formStatus.textContent = msg;
+        const colors = { success: '#15803d', error: '#dc2626', info: '#2563eb' };
+        formStatus.style.color = colors[type] || '#2563eb';
+      }
+
+      async function fetchCards() {
+        try {
+          const res = await fetch(`${API_URL}?slug=${SLUG}`);
+          if (!res.ok) throw new Error('bad status');
+          const data = await res.json();
+          submittedCards = (data.cards || []).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+          renderSubmitted();
+        } catch (err) {
+          console.error(err);
+        }
+      }
+
+      function renderSubmitted() {
+        if (!submittedCards.length) {
+          submittedContainer.innerHTML = '<div class="empty-state">No concept cards have been submitted yet.</div>';
+          return;
+        }
+        const fragments = submittedCards.map(card => buildSubmittedCard(card));
+        submittedContainer.innerHTML = fragments.join('');
+      }
+
+      function buildSubmittedCard(card) {
+        const date = card.createdAt ? new Date(card.createdAt) : null;
+        const timestamp = date ? date.toLocaleString() : '';
+        const benefits = (card.benefits || []).filter(b => b.title || b.description);
+        const benefitHtml = benefits.length ? benefits.map(b => `
+          <div>
+            <p class="benefit-title">${escapeHtml(b.title || '')}</p>
+            <p>${escapeHtml(b.description || '')}</p>
+          </div>`).join('') : '<div><p class="benefit-title">Benefit</p><p>No details provided.</p></div>';
+        return `
+        <article class="submitted-card" id="card-${card.id}">
+          <header>
+            <div>
+              <strong>${escapeHtml(card.headline || 'Untitled concept')}</strong>
+              <div><small>by ${escapeHtml(card.participant || 'Anonymous')}</small></div>
+            </div>
+            ${timestamp ? `<small>${timestamp}</small>` : ''}
+          </header>
+          <div class="card-preview-wrapper">
+            <div class="concept-card">
+              <div class="card-header"><img src="assets/norton-logo.png" alt="Norton"></div>
+              <div class="hero">
+                <h3>${escapeHtml(card.headline || '')}</h3>
+                <p>${escapeHtml(card.subheadline || '')}</p>
+              </div>
+              <div class="benefits">${benefitHtml}</div>
+              <div class="how-it-works">
+                <h4>How it works</h4>
+                <p>${escapeHtml(card.howItWorks || '')}</p>
+              </div>
+              <div class="trust-bar">${escapeHtml(card.proofPoint || '')}</div>
+            </div>
+          </div>
+          <div class="card-actions">
+            <button type="button" class="secondary-btn" data-action="jpg" data-id="${card.id}">Download JPEG</button>
+            <button type="button" class="secondary-btn" data-action="html" data-id="${card.id}">Download HTML</button>
+          </div>
+        </article>`;
+      }
+
+      function handleSubmittedClick(e) {
+        const btn = e.target.closest('button[data-action]');
+        if (!btn) return;
+        const id = btn.dataset.id;
+        const cardData = submittedCards.find(c => c.id === id);
+        if (!cardData) return;
+        const wrapper = document.querySelector(`#card-${id} .concept-card`);
+        if (!wrapper) return;
+        if (btn.dataset.action === 'jpg') {
+          downloadElementAsJpg(wrapper, `concept-card-${id}.jpg`);
+        } else {
+          downloadCardHtml(wrapper.outerHTML, `concept-card-${id}.html`);
+        }
+      }
+
+      async function downloadElementAsJpg(el, filename) {
+        if (typeof html2canvas === 'undefined') return;
+        const canvas = await html2canvas(el, { backgroundColor: null, scale: 2 });
+        canvas.toBlob(function(blob) {
+          if (!blob) return;
+          const link = document.createElement('a');
+          link.href = URL.createObjectURL(blob);
+          link.download = filename;
+          link.click();
+        }, 'image/jpeg', 0.95);
+      }
+
+      function downloadCardHtml(html, filename) {
+        const template = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&display=swap" rel="stylesheet"><style>body{background:#f4f4f1;padding:40px;font-family:'Inter Tight',sans-serif;} ${getCardStyles()}</style></head><body>${html}</body></html>`;
+        const blob = new Blob([template], { type: 'text/html' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = filename;
+        link.click();
+      }
+
+      function escapeHtml(str) {
+        return String(str || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+      }
+
+      function getCardStyles() {
+        return ':root{--yellow:#FFE800;} .concept-card{max-width:720px;margin:0 auto;border-radius:24px;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,0.12);} .concept-card .card-header{background:#0d0d0d;padding:18px 28px;border-bottom:4px solid var(--yellow);} .concept-card .hero{background:#f1f1ef;padding:32px 36px;color:#1c1c1c;} .concept-card .hero h3{margin:0 0 8px;font-size:30px;font-weight:800;} .concept-card .hero p{margin:0;font-size:17px;color:#4b4b4b;} .concept-card .benefits{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:18px;padding:28px 36px;background:#ffffff;} .concept-card .benefit-title{text-transform:uppercase;font-weight:700;letter-spacing:0.08em;font-size:13px;margin:0 0 8px;position:relative;padding-left:18px;} .concept-card .benefit-title::before{content:'';position:absolute;left:0;top:6px;width:10px;height:3px;background:#FFE800;border-radius:999px;} .concept-card .benefits p{margin:0;font-size:14px;color:#5a5a5a;line-height:1.5;} .concept-card .how-it-works{display:flex;flex-direction:column;gap:6px;padding:26px 36px;background:#f5f5f5;border-top:1px solid rgba(0,0,0,0.05);} .concept-card .how-it-works h4{font-size:14px;letter-spacing:0.2em;text-transform:uppercase;color:#6f6f6f;margin:0;} .concept-card .how-it-works p{margin:0;font-size:15px;color:#1c1c1c;} .concept-card .trust-bar{background:#0f0f0f;color:#f5f5f5;padding:16px 36px;font-size:14px;border-top:1px solid rgba(255,255,255,0.08);}';
+      }
+
+      function addCardToList(card) {
+        if (!card || submittedCards.find(c => c.id === card.id)) return;
+        submittedCards.unshift(card);
+        renderSubmitted();
+      }
+
+      function connectFeed() {
+        if (socket) return;
+        try {
+          socket = new WebSocket(WS_URL);
+        } catch {
+          scheduleReconnect();
+          return;
+        }
+        socket.addEventListener('open', () => {
+          wsRetries = 0;
+          if (pollTimer) {
+            clearInterval(pollTimer);
+            pollTimer = null;
+          }
+        });
+        socket.addEventListener('message', e => {
+          try {
+            const evt = JSON.parse(e.data);
+            if (evt.type === 'concept-card:created') {
+              addCardToList(evt.payload);
+            }
+          } catch {}
+        });
+        socket.addEventListener('close', () => {
+          socket = null;
+          scheduleReconnect();
+        });
+        socket.addEventListener('error', () => {
+          socket = null;
+        });
+      }
+
+      function scheduleReconnect() {
+        if (pollTimer) return;
+        if (wsRetries >= 5) {
+          pollTimer = setInterval(fetchCards, 15000);
+          return;
+        }
+        const delay = Math.min(1000 * Math.pow(2, wsRetries), 30000);
+        wsRetries++;
+        setTimeout(connectFeed, delay);
+      }
+
+      fetchCards();
+      connectFeed();
+
       (function() {
         const btn = document.getElementById('sprintToolsBtn');
         const menu = document.getElementById('sprintToolsMenu');
@@ -532,6 +807,7 @@
         }
       })();
     })();
+  </script>
   </script>
 </body>
 </html>
