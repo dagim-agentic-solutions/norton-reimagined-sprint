@@ -1,52 +1,57 @@
 [
   {
-    "title": "Concept Builder — Beta Tool",
+    "title": "Concept 1-Pager",
+    "summary": "Fill-in form that renders a Norton-branded concept card and exports it as JPEG or standalone HTML for participant handoff.",
+    "url": "/concept-card.html"
+  },
+  {
+    "title": "Concept Builder \u2014 Beta Tool",
     "summary": "Structured form that generates production-ready Claude prompts for landing pages or iOS prototypes.",
     "url": "/concept-builder.html"
   },
   {
-    "title": "Concept Builder — Capabilities",
+    "title": "Concept Builder \u2014 Capabilities",
     "summary": "Multi-select Norton capabilities (including NeoClaw and Norton Genie) with role selectors to show how each feature appears.",
     "url": "/concept-builder.html#capGrid"
   },
   {
-    "title": "Concept Builder — Jobs To Be Done",
+    "title": "Concept Builder \u2014 Jobs To Be Done",
     "summary": "Priority-ordered JTBD rows that enforce the When/I want/So I can format and feed directly into the Claude prompt.",
     "url": "/concept-builder.html#jtbdRows"
   },
   {
-    "title": "Concept Builder — Voice & Tone",
+    "title": "Concept Builder \u2014 Voice & Tone",
     "summary": "Six curated voice profiles (Quiet Guardian, Trusted Advisor, etc.) to keep copy consistent without prompt engineering.",
     "url": "/concept-builder.html#toneGrid"
   },
   {
-    "title": "Where is Norton — SKU Lineup",
-    "summary": "Breakdown of CSP 1–6 plans, pricing, unit mix, and why CSP3 (Deluxe/Premium) is the sprint's primary target.",
+    "title": "Where is Norton \u2014 SKU Lineup",
+    "summary": "Breakdown of CSP 1\u20136 plans, pricing, unit mix, and why CSP3 (Deluxe/Premium) is the sprint's primary target.",
     "url": "/where-is-norton.html#sku-lineup"
   },
   {
-    "title": "Where is Norton — Competitive Context",
+    "title": "Where is Norton \u2014 Competitive Context",
     "summary": "Brand health rankings and the four competitive lanes Norton must answer: Big Tech, specialists, challengers, embedded.",
     "url": "/where-is-norton.html#competitive-context"
   },
   {
-    "title": "Competitive Analysis — Overview",
-    "summary": "Beta dashboard of competitor fit scores, threat lanes, feature matrix, and Norton’s unfair advantages.",
+    "title": "Competitive Analysis \u2014 Overview",
+    "summary": "Beta dashboard of competitor fit scores, threat lanes, feature matrix, and Norton\u2019s unfair advantages.",
     "url": "/competitive-analysis.html"
   },
   {
-    "title": "Competitive Analysis — Feature Matrix",
+    "title": "Competitive Analysis \u2014 Feature Matrix",
     "summary": "Side-by-side comparison of capabilities (identity, AI scam detection, parental controls) across Norton, McAfee, NordVPN, Aura, etc.",
     "url": "/competitive-analysis.html#feature-matrix"
   },
   {
-    "title": "Resources — Research & Insights",
+    "title": "Resources \u2014 Research & Insights",
     "summary": "Centralized research decks, JTBD studies, and supporting artifacts for sprint participants.",
     "url": "/resources.html#research"
   },
   {
     "title": "Laura Persona",
-    "summary": "Full persona sheet for Laura the Outsourcer — motivations, anxieties, behaviors, and design principles.",
+    "summary": "Full persona sheet for Laura the Outsourcer \u2014 motivations, anxieties, behaviors, and design principles.",
     "url": "/laura.html"
   }
 ]

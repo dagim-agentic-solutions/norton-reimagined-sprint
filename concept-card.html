@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Norton Reimagined Sprint · Concept 1-Pager</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" type="image/svg+xml" href="assets/norton-checkmark.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/icon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/icon-16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/icon-180.png">
+  <link rel="manifest" href="assets/site.webmanifest">
+  <style>
+    :root {
+      --ink: #242424;
+      --yellow: #FFE800;
+      --paper: #F8F8F7;
+      --card: #FFFFFF;
+      --line: #E6E6E4;
+      --ink-soft: #5A5A5A;
+      --ink-softer: #8A8A8A;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Inter Tight', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--paper);
+      color: var(--ink);
+      margin: 0;
+      min-height: 100vh;
+    }
+    .page { max-width: 1280px; margin: 0 auto; padding: 32px 24px 80px; }
+    @media (max-width: 768px) { .page { padding: 24px 20px 64px; } }
+
+    .page-header {
+      margin-bottom: 32px;
+    }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      font-weight: 700;
+      text-transform: uppercase;
+      border-radius: 999px;
+      background: var(--ink);
+      color: var(--yellow);
+      padding: 4px 12px;
+      margin-bottom: 12px;
+    }
+    .page-header h1 {
+      font-size: clamp(30px, 5vw, 54px);
+      font-weight: 800;
+      margin: 0 0 10px;
+    }
+    .page-header p {
+      font-size: 17px;
+      color: var(--ink-soft);
+      max-width: 640px;
+      margin: 0;
+      line-height: 1.5;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(320px, 420px) minmax(0, 1fr);
+      gap: 28px;
+      align-items: flex-start;
+    }
+    @media (max-width: 1100px) { .layout { grid-template-columns: 1fr; } }
+
+    .card-form {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 24px;
+      position: sticky;
+      top: 72px;
+    }
+    .card-form h2 {
+      font-size: 22px;
+      font-weight: 800;
+      margin: 0 0 6px;
+    }
+    .card-form p {
+      font-size: 15px;
+      color: var(--ink-soft);
+      margin: 0 0 18px;
+      line-height: 1.5;
+    }
+    .form-grid {
+      display: grid;
+      gap: 16px;
+    }
+    .form-grid .two {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap: 12px;
+    }
+    .form-grid .three {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0,1fr));
+      gap: 12px;
+    }
+    @media (max-width: 600px) {
+      .form-grid .two, .form-grid .three { grid-template-columns: 1fr; }
+    }
+    label {
+      display: block;
+      font-size: 12px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      font-weight: 700;
+      margin-bottom: 6px;
+      color: var(--ink-softer);
+    }
+    input[type="text"], textarea {
+      width: 100%;
+      border-radius: 10px;
+      border: 1.5px solid var(--line);
+      padding: 12px 14px;
+      font-family: inherit;
+      font-size: 15px;
+      color: var(--ink);
+      background: #fff;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      resize: vertical;
+      min-height: 48px;
+    }
+    textarea { min-height: 72px; }
+    input:focus, textarea:focus {
+      border-color: var(--ink);
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(36,36,36,0.08);
+    }
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    button.primary-btn {
+      background: var(--yellow);
+      color: var(--ink);
+      border: none;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 15px;
+      padding: 12px 22px;
+      cursor: pointer;
+      transition: transform 0.1s ease, box-shadow 0.1s ease;
+    }
+    button.secondary-btn {
+      background: #fff;
+      color: var(--ink);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      font-weight: 600;
+      font-size: 14px;
+      padding: 10px 20px;
+      cursor: pointer;
+      transition: border-color 0.15s;
+    }
+    button.primary-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(0,0,0,0.15); }
+    button.secondary-btn:hover { border-color: var(--ink); }
+
+    .preview-panel {
+      background: transparent;
+      border-radius: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+    .preview-panel h2 {
+      font-size: 22px;
+      font-weight: 800;
+      margin: 0;
+    }
+
+    .concept-card {
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.12);
+      background: #121212;
+      max-width: 720px;
+    }
+    .concept-card .card-header {
+      background: #0d0d0d;
+      padding: 18px 28px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 4px solid var(--yellow);
+    }
+    .concept-card .card-header img {
+      height: 24px;
+      width: auto;
+    }
+    .concept-card .hero {
+      background: #f1f1ef;
+      padding: 32px 36px;
+      color: #1c1c1c;
+    }
+    .concept-card .hero h3 {
+      margin: 0 0 8px;
+      font-size: 30px;
+      font-weight: 800;
+    }
+    .concept-card .hero p {
+      margin: 0;
+      font-size: 17px;
+      color: #4b4b4b;
+    }
+    .concept-card .benefits {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 18px;
+      padding: 28px 36px;
+      background: #ffffff;
+    }
+    .concept-card .benefit-title {
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      font-size: 13px;
+      margin: 0 0 8px;
+      position: relative;
+      padding-left: 18px;
+    }
+    .concept-card .benefit-title::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 6px;
+      width: 10px;
+      height: 3px;
+      background: var(--yellow);
+      border-radius: 999px;
+    }
+    .concept-card .benefits p {
+      margin: 0;
+      font-size: 14px;
+      color: var(--ink-soft);
+      line-height: 1.5;
+    }
+    .concept-card .how-it-works {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 26px 36px;
+      background: #f5f5f5;
+      border-top: 1px solid rgba(0,0,0,0.05);
+    }
+    .concept-card .how-it-works h4 {
+      font-size: 14px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #6f6f6f;
+      margin: 0;
+    }
+    .concept-card .how-it-works p {
+      margin: 0;
+      font-size: 15px;
+      color: #1c1c1c;
+    }
+    .concept-card .trust-bar {
+      background: #0f0f0f;
+      color: #f5f5f5;
+      padding: 16px 36px;
+      font-size: 14px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .helper-text {
+      font-size: 13px;
+      color: var(--ink-soft);
+      margin-top: -6px;
+      margin-bottom: 12px;
+    }
+  </style>
+</head>
+<body>
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-brand">
+        <img src="assets/norton-logo.png" alt="Norton" class="nav-logo">
+        <span class="nav-sprint-label">Design Sprint</span>
+      </a>
+      <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <ul class="nav-links" id="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="laura.html">Laura</a></li>
+        <li><a href="where-is-norton.html">Where is Norton</a></li>
+        <li><a href="prototypes.html">Prototypes</a></li>
+        <li><a href="resources.html">Resources</a></li>
+        <li class="nav-dropdown">
+          <button class="nav-dropdown-btn" id="sprintToolsBtn" aria-expanded="false" aria-haspopup="true">
+            Sprint Tools <span class="nav-beta-pill">✦</span>
+          </button>
+          <ul class="nav-dropdown-menu" id="sprintToolsMenu" role="menu">
+            <li><a href="competitive-analysis.html" role="menuitem">Competitive Analysis</a></li>
+            <li><a href="how-might-we.html" role="menuitem">How Might We</a></li>
+            <li><a href="idea-workshop.html" role="menuitem">Ideation Wizard</a></li>
+            <li><a href="idea-grouping.html" role="menuitem">Idea Grouping</a></li>
+            <li><a href="concept-builder.html" role="menuitem">Prototype Builder</a></li>
+            <li><a href="dependency-assessment.html" role="menuitem">Dependency Assessment</a></li>
+            <li><a href="concept-card.html" role="menuitem">Concept 1-Pager</a></li>
+            <li><a href="concept-card.html" role="menuitem" class="active">Concept 1-Pager</a></li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="page">
+    <div class="page-header">
+      <div class="eyebrow">Rapid concept packaging</div>
+      <h1>Concept 1-Pager</h1>
+      <p>Capture a single concept in Norton’s one-pager format. Fill in the fields, preview the card, then export a polished JPEG or HTML snippet for sharing.</p>
+    </div>
+
+    <div class="layout">
+      <form class="card-form" id="conceptForm">
+        <h2>Edit concept card</h2>
+        <p>Write in Laura’s language. Keep it concrete, visual, calm.</p>
+        <div class="form-grid">
+          <div class="two">
+            <div>
+              <label for="headline">Headline</label>
+              <input type="text" id="headline" name="headline" placeholder="Your headline goes here" maxlength="120" required>
+            </div>
+            <div>
+              <label for="subheadline">Subheadline</label>
+              <textarea id="subheadline" name="subheadline" placeholder="One sentence that explains what Norton becomes and why Laura should care." maxlength="200"></textarea>
+            </div>
+          </div>
+
+          <div class="three">
+            <div>
+              <label for="benefit1Title">Benefit 1 title</label>
+              <input type="text" id="benefit1Title" placeholder="Benefit one" maxlength="60">
+              <label for="benefit1Desc">Description</label>
+              <textarea id="benefit1Desc" placeholder="One sentence in Laura's language about how this solves her problem." maxlength="180"></textarea>
+            </div>
+            <div>
+              <label for="benefit2Title">Benefit 2 title</label>
+              <input type="text" id="benefit2Title" placeholder="Benefit two" maxlength="60">
+              <label for="benefit2Desc">Description</label>
+              <textarea id="benefit2Desc" placeholder="One sentence in Laura's language about how this solves her problem." maxlength="180"></textarea>
+            </div>
+            <div>
+              <label for="benefit3Title">Benefit 3 title</label>
+              <input type="text" id="benefit3Title" placeholder="Benefit three" maxlength="60">
+              <label for="benefit3Desc">Description</label>
+              <textarea id="benefit3Desc" placeholder="One sentence in Laura's language about how this solves her problem." maxlength="180"></textarea>
+            </div>
+          </div>
+
+          <div class="two">
+            <div>
+              <label for="howItWorks">How it works</label>
+              <textarea id="howItWorks" placeholder="One sentence that explains how this works in plain language — no jargon, no technical detail." maxlength="220"></textarea>
+            </div>
+            <div>
+              <label for="proofPoint">Trust / proof point</label>
+              <textarea id="proofPoint" placeholder="A trust statement: why Laura should believe Norton can deliver this." maxlength="220"></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="btn-row">
+          <button type="button" class="primary-btn" id="previewBtn">Preview Card</button>
+          <button type="button" class="secondary-btn" id="downloadJpg">Download JPEG</button>
+          <button type="button" class="secondary-btn" id="downloadHtml">Download HTML</button>
+        </div>
+      </form>
+
+      <div class="preview-panel">
+        <h2>Live preview</h2>
+        <div class="concept-card" id="conceptCard">
+          <div class="card-header">
+            <img src="assets/norton-logo.png" alt="Norton">
+          </div>
+          <div class="hero">
+            <h3 id="previewHeadline">Your headline goes here</h3>
+            <p id="previewSubheadline">One sentence that explains what Norton becomes and why Laura should care.</p>
+          </div>
+          <div class="benefits">
+            <div>
+              <p class="benefit-title" id="previewBenefit1Title">Benefit one</p>
+              <p id="previewBenefit1Desc">One sentence in Laura's language about how this solves her problem.</p>
+            </div>
+            <div>
+              <p class="benefit-title" id="previewBenefit2Title">Benefit two</p>
+              <p id="previewBenefit2Desc">One sentence in Laura's language about how this solves her problem.</p>
+            </div>
+            <div>
+              <p class="benefit-title" id="previewBenefit3Title">Benefit three</p>
+              <p id="previewBenefit3Desc">One sentence in Laura's language about how this solves her problem.</p>
+            </div>
+          </div>
+          <div class="how-it-works">
+            <h4>How it works</h4>
+            <p id="previewHowItWorks">One sentence that explains how this works in plain language — no jargon, no technical detail.</p>
+          </div>
+          <div class="trust-bar" id="previewProofPoint">
+            A trust statement: why Laura should believe Norton can deliver this.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" integrity="sha256-i7ViqnhkkCm1cW0wwkyKADVY6jwxKFkcQ9Iiia0yHi0=" crossorigin="anonymous"></script>
+  <script>
+    (function() {
+      const form = document.getElementById('conceptForm');
+      const preview = {
+        headline: document.getElementById('previewHeadline'),
+        subheadline: document.getElementById('previewSubheadline'),
+        b1Title: document.getElementById('previewBenefit1Title'),
+        b1Desc: document.getElementById('previewBenefit1Desc'),
+        b2Title: document.getElementById('previewBenefit2Title'),
+        b2Desc: document.getElementById('previewBenefit2Desc'),
+        b3Title: document.getElementById('previewBenefit3Title'),
+        b3Desc: document.getElementById('previewBenefit3Desc'),
+        how: document.getElementById('previewHowItWorks'),
+        proof: document.getElementById('previewProofPoint'),
+      };
+
+      const defaults = {
+        headline: 'Your headline goes here',
+        subheadline: 'One sentence that explains what Norton becomes and why Laura should care.',
+        benefit1Title: 'Benefit one',
+        benefit1Desc: 'One sentence in Laura\'s language about how this solves her problem.',
+        benefit2Title: 'Benefit two',
+        benefit2Desc: 'One sentence in Laura\'s language about how this solves her problem.',
+        benefit3Title: 'Benefit three',
+        benefit3Desc: 'One sentence in Laura\'s language about how this solves her problem.',
+        howItWorks: 'One sentence that explains how this works in plain language — no jargon, no technical detail.',
+        proofPoint: 'A trust statement: why Laura should believe Norton can deliver this.'
+      };
+
+      function value(id) {
+        const el = document.getElementById(id);
+        return el.value.trim() || defaults[id];
+      }
+
+      function renderPreview() {
+        preview.headline.textContent = value('headline');
+        preview.subheadline.textContent = value('subheadline');
+        preview.b1Title.textContent = value('benefit1Title');
+        preview.b1Desc.textContent = value('benefit1Desc');
+        preview.b2Title.textContent = value('benefit2Title');
+        preview.b2Desc.textContent = value('benefit2Desc');
+        preview.b3Title.textContent = value('benefit3Title');
+        preview.b3Desc.textContent = value('benefit3Desc');
+        preview.how.textContent = value('howItWorks');
+        preview.proof.textContent = value('proofPoint');
+      }
+
+      const inputs = form.querySelectorAll('input, textarea');
+      inputs.forEach(function(el) {
+        if (el.value.trim() === '' && defaults[el.id]) {
+          el.value = '';
+        }
+        el.addEventListener('input', renderPreview);
+      });
+      renderPreview();
+
+      document.getElementById('previewBtn').addEventListener('click', function(e) {
+        e.preventDefault();
+        renderPreview();
+        document.getElementById('conceptCard').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      });
+
+      document.getElementById('downloadJpg').addEventListener('click', async function() {
+        renderPreview();
+        const card = document.getElementById('conceptCard');
+        const canvas = await html2canvas(card, { backgroundColor: null, scale: 2 });
+        canvas.toBlob(function(blob) {
+          const link = document.createElement('a');
+          link.href = URL.createObjectURL(blob);
+          link.download = 'norton-concept-card.jpg';
+          link.click();
+        }, 'image/jpeg', 0.95);
+      });
+
+      document.getElementById('downloadHtml').addEventListener('click', function() {
+        renderPreview();
+        const cardHtml = document.getElementById('conceptCard').outerHTML;
+        const htmlDoc = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&display=swap" rel="stylesheet"><style>body{background:#f4f4f1;padding:40px;font-family:'Inter Tight',sans-serif;} ${getCardStyles()}</style></head><body>${cardHtml}</body></html>`;
+        const blob = new Blob([htmlDoc], { type: 'text/html' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'norton-concept-card.html';
+        link.click();
+      });
+
+      function getCardStyles() {
+        return `:root{--yellow:#FFE800;} .concept-card{max-width:720px;margin:0 auto;border-radius:24px;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,0.12);} .concept-card .card-header{background:#0d0d0d;padding:18px 28px;border-bottom:4px solid var(--yellow);} .concept-card .hero{background:#f1f1ef;padding:32px 36px;color:#1c1c1c;} .concept-card .hero h3{margin:0 0 8px;font-size:30px;font-weight:800;} .concept-card .hero p{margin:0;font-size:17px;color:#4b4b4b;} .concept-card .benefits{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:18px;padding:28px 36px;background:#ffffff;} .concept-card .benefit-title{text-transform:uppercase;font-weight:700;letter-spacing:0.08em;font-size:13px;margin:0 0 8px;position:relative;padding-left:18px;} .concept-card .benefit-title::before{content:'';position:absolute;left:0;top:6px;width:10px;height:3px;background:#FFE800;border-radius:999px;} .concept-card .benefits p{margin:0;font-size:14px;color:#5a5a5a;line-height:1.5;} .concept-card .how-it-works{display:flex;flex-direction:column;gap:6px;padding:26px 36px;background:#f5f5f5;border-top:1px solid rgba(0,0,0,0.05);} .concept-card .how-it-works h4{font-size:14px;letter-spacing:0.2em;text-transform:uppercase;color:#6f6f6f;margin:0;} .concept-card .how-it-works p{margin:0;font-size:15px;color:#1c1c1c;} .concept-card .trust-bar{background:#0f0f0f;color:#f5f5f5;padding:16px 36px;font-size:14px;border-top:1px solid rgba(255,255,255,0.08);}`;
+      }
+
+      // Nav dropdown + hamburger
+      (function() {
+        const btn = document.getElementById('sprintToolsBtn');
+        const menu = document.getElementById('sprintToolsMenu');
+        if (btn && menu) {
+          btn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const open = btn.getAttribute('aria-expanded') === 'true';
+            btn.setAttribute('aria-expanded', String(!open));
+            menu.classList.toggle('open', !open);
+          });
+          document.addEventListener('click', function() {
+            btn.setAttribute('aria-expanded', 'false');
+            menu.classList.remove('open');
+          });
+        }
+        const toggle = document.getElementById('nav-toggle');
+        const links = document.getElementById('nav-links');
+        if (toggle && links) {
+          toggle.addEventListener('click', function() {
+            const expanded = toggle.getAttribute('aria-expanded') === 'true';
+            toggle.setAttribute('aria-expanded', String(!expanded));
+            links.classList.toggle('open', !expanded);
+          });
+        }
+      })();
+    })();
+  </script>
+</body>
+</html>
