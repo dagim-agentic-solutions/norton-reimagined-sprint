@@ -295,15 +295,18 @@
     .submitted-section h2 { font-size: 26px; font-weight: 800; margin: 6px 0; }
     .submitted-section p { margin: 0; color: var(--ink-soft); }
     .submitted-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      width: 100%;
     }
     .submitted-card {
       border: 1px solid var(--line);
       border-radius: 18px;
       padding: 18px;
       background: #fdfdfc;
+      width: 100%;
+      max-width: none;
       display: flex;
       flex-direction: column;
       gap: 12px;
@@ -329,7 +332,6 @@
     }
     .submitted-card .card-actions button { flex: 1 0 120px; }
     .empty-state {
-      grid-column: 1 / -1;
       text-align: center;
       color: var(--ink-soft);
       padding: 24px 0;
