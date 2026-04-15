@@ -15,7 +15,7 @@
 **Files:**
 - Modify: `concept-card.html` (inline `<style>` + submitted card template)
 
-- [ ] In the `<style>` block, add classes for the scorecard panel (`.scorecard`, `.score-row`, `.score-label`, `.score-value`, `.score-status`) and the leaderboard banner (`.scorebar`, `.leaderboard`, `.leaderboard-item`, `.leaderboard-item.winner`).
+- [ ] In the `<style>` block, add classes for the scorecard panel (`.scorecard`, `.score-row`, `.score-label`, `.score-value`, `.score-status`, `.save-score`) and the leaderboard banner (`.scorebar`, `.leaderboard`, `.leaderboard-item`, `.leaderboard-item.winner`).
 - [ ] Add the global control bar + empty leaderboard placeholder right above the submitted cards container:
   ```html
   <div class="scorebar">
@@ -24,7 +24,7 @@
   </div>
   <div id="leaderboard"></div>
   ```
-- [ ] In `buildSubmittedCard`, insert a `.scorecard` block between the preview and download buttons containing three slider rows (with labels + value spans) and a status line (“Not scored yet”). Give each slider unique IDs based on the concept ID (e.g., `score-${card.id}-wanted`).
+- [ ] In `buildSubmittedCard`, render the download buttons first, then a `.scorecard` block containing three slider rows (with labels + value spans), a status line (“Not scored yet”), and a **Save score** button (data attributes for card id).
 
 ### Task 2: Wire slider state + sessionStorage
 
@@ -32,12 +32,12 @@
 - Modify: `concept-card.html` (JS block)
 
 - [ ] Introduce an in-memory map `const conceptScores = new Map();` and bootstrapping logic in `renderSubmitted()` that:
-  - Reads any existing `sessionStorage.getItem('conceptScores')` payload and hydrates the map.
-  - When rendering sliders, sets their `value` attributes from the stored scores if present.
+  - Reads any existing `sessionStorage.getItem('conceptScores')` payload and hydrates the map (values + `saved` flag).
+  - When rendering sliders, sets their `value` attributes from the stored draft values.
 - [ ] Add event listeners for the sliders (delegate off `submittedContainer`) that:
-  - Update the corresponding entry in `conceptScores` with the latest 1–5 value.
+  - Update the draft entry, set `saved = false`, and refresh the status text (“Unsaved changes”).
   - Write the serialized map back to `sessionStorage`.
-  - Update the per-card status text (“Saved locally” once all three sliders have values).
+- [ ] Add a `saveScore(cardId)` helper wired to the per-card button that validates all three sliders, sets `saved = true`, persists, and updates the status to “Saved locally.”
 - [ ] Provide helper functions `loadScoresFromStorage()` and `saveScoresToStorage()` to keep the logic tidy.
 
 ### Task 3: Summarize + reset logic
@@ -45,9 +45,9 @@
 **Files:**
 - Modify: `concept-card.html` (JS block)
 
-- [ ] Implement `summarizeScores()` that walks `submittedCards`, pulls each concept’s `conceptScores` entry (if complete), computes the `(wanted + understood + solves) / 3` average, sorts descending, and renders HTML into `#leaderboard`. Highlight the top row with the `.winner` class and scroll it into view. If no scores exist, show an inline warning instead.
+- [ ] Implement `summarizeScores()` that walks `submittedCards`, pulls each concept’s `conceptScores` entry, filters to those with `saved = true`, computes the `(wanted + understood + solves) / 3` average, sorts descending, and renders HTML into `#leaderboard`. Highlight the top row with the `.winner` class and scroll it into view. If no saved scores exist, show an inline warning instead.
 - [ ] Hook the global “Summarize scores” button to this function and hide the leaderboard whenever any slider changes (forcing a re-summarize after adjustments).
-- [ ] Implement `resetVotes()` that clears `conceptScores`, removes the storage entry, resets all sliders to 3, resets the status text, and clears the leaderboard. Wire it to the “Reset votes” button.
+- [ ] Implement `resetVotes()` that clears `conceptScores`, removes the storage entry, resets all sliders to 3, resets the status text (“Not scored yet”), and clears the leaderboard. Wire it to the “Reset votes” button.
 - [ ] Add a lightweight toast/notice mechanism (reuse `showStatus`) to announce “Votes cleared” and “No scores yet” events.
 
 ### Task 4: QA
