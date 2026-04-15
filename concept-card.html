@@ -294,6 +294,56 @@
     }
     .submitted-section h2 { font-size: 26px; font-weight: 800; margin: 6px 0; }
     .submitted-section p { margin: 0; color: var(--ink-soft); }
+    .scorebar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 18px;
+    }
+    .scorebar .hint { color: var(--ink-soft); font-size: 13px; }
+    .ghost-btn {
+      border: 1px solid var(--line);
+      background: transparent;
+      color: var(--ink);
+      padding: 10px 14px;
+      border-radius: 999px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .ghost-btn:hover { background: rgba(0,0,0,0.04); }
+    #leaderboard { margin-bottom: 24px; }
+    .leaderboard-card {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 18px;
+      background: #fffbe8;
+    }
+    .leaderboard-card ul { list-style: none; padding: 0; margin: 12px 0 0; }
+    .leaderboard-card li {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+    }
+    .leaderboard-card li:last-child { border-bottom: none; }
+    .leaderboard-card .winner { color: #0f7b0f; font-weight: 700; }
+    .scorecard {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 16px;
+      background: #fff;
+      margin-top: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .score-row { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+    .score-label { flex: 1 1 200px; font-weight: 600; }
+    .score-controls { display: flex; align-items: center; gap: 8px; min-width: 220px; }
+    .score-row input[type=range] { flex: 1; }
+    .score-value { font-weight: 700; min-width: 24px; text-align: center; }
+    .score-status { font-size: 13px; color: var(--ink-soft); }
     .submitted-grid {
       display: flex;
       flex-direction: column;
@@ -510,6 +560,12 @@
         </div>
         <button type="button" class="secondary-btn" id="refreshCards">Refresh list</button>
       </div>
+      <div class="scorebar">
+        <button type="button" class="primary-btn" id="summarizeScores">Summarize scores</button>
+        <button type="button" class="ghost-btn" id="resetScores">Reset votes</button>
+        <p class="hint">Scores stay private until you summarize.</p>
+      </div>
+      <div id="leaderboard"></div>
       <div id="submittedCards" class="submitted-grid">
         <div class="empty-state">No concept cards have been submitted yet.</div>
       </div>
@@ -527,6 +583,11 @@
       const previewCard = document.getElementById('conceptCard');
       const submittedContainer = document.getElementById('submittedCards');
       const formStatus = document.getElementById('formStatus');
+      const leaderboardEl = document.getElementById('leaderboard');
+      const summarizeBtn = document.getElementById('summarizeScores');
+      const resetBtn = document.getElementById('resetScores');
+      const SCORE_STORAGE_KEY = 'conceptScores';
+      const conceptScores = new Map();
       let submittedCards = [];
       let socket = null;
       let wsRetries = 0;
@@ -588,6 +649,92 @@
         ];
       }
 
+      function loadScoresFromStorage() {
+        try {
+          const raw = sessionStorage.getItem(SCORE_STORAGE_KEY);
+          if (!raw) return;
+          const parsed = JSON.parse(raw);
+          Object.entries(parsed).forEach(([cardId, scores]) => {
+            conceptScores.set(cardId, scores);
+          });
+        } catch (err) {
+          console.error('Failed to load scores', err);
+        }
+      }
+
+      function saveScoresToStorage() {
+        const obj = {};
+        conceptScores.forEach((value, key) => { obj[key] = value; });
+        sessionStorage.setItem(SCORE_STORAGE_KEY, JSON.stringify(obj));
+      }
+
+      function applyScoresToUI() {
+        submittedCards.forEach(card => {
+          const scores = conceptScores.get(card.id);
+          ['wanted','understood','solves'].forEach(metric => {
+            const slider = submittedContainer.querySelector(`.score-slider[data-card-id="${card.id}"][data-metric="${metric}"]`);
+            const valueEl = document.getElementById(`score-value-${card.id}-${metric}`);
+            const val = scores && typeof scores[metric] === 'number' ? scores[metric] : 3;
+            if (slider) slider.value = val;
+            if (valueEl) valueEl.textContent = val;
+          });
+          updateScoreStatus(card.id);
+        });
+      }
+
+      function updateScoreStatus(cardId) {
+        const statusEl = document.getElementById(`score-status-${cardId}`);
+        if (!statusEl) return;
+        const scores = conceptScores.get(cardId);
+        const complete = scores && ['wanted','understood','solves'].every(key => typeof scores[key] === 'number');
+        statusEl.textContent = complete ? 'Saved locally' : 'Not scored yet';
+        statusEl.style.color = complete ? '#0f7b0f' : 'var(--ink-soft)';
+      }
+
+      function hideLeaderboard() {
+        leaderboardEl.innerHTML = '';
+      }
+
+      function summarizeScores() {
+        const rows = [];
+        submittedCards.forEach(card => {
+          const scores = conceptScores.get(card.id);
+          if (!scores || ['wanted','understood','solves'].some(key => typeof scores[key] !== 'number')) return;
+          const avg = (scores.wanted + scores.understood + scores.solves) / 3;
+          rows.push({ id: card.id, title: card.headline || 'Untitled concept', avg });
+        });
+        if (!rows.length) {
+          showStatus('Score at least one concept before summarizing.', 'error');
+          hideLeaderboard();
+          return;
+        }
+        rows.sort((a, b) => b.avg - a.avg);
+        renderLeaderboard(rows);
+      }
+
+      function renderLeaderboard(rows) {
+        const list = rows.map((row, index) => {
+          const winner = index === 0 ? 'winner' : '';
+          const label = `${index + 1}. ${escapeHtml(row.title)}`;
+          return `<li class="${winner}"><span>${label}</span><span>${row.avg.toFixed(1)}</span></li>`;
+        }).join('');
+        leaderboardEl.innerHTML = `<div class="leaderboard-card"><strong>Concept leaderboard</strong><ul>${list}</ul></div>`;
+        leaderboardEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+
+      function resetVotes() {
+        conceptScores.clear();
+        sessionStorage.removeItem(SCORE_STORAGE_KEY);
+        document.querySelectorAll('.score-slider').forEach(slider => { slider.value = 3; });
+        document.querySelectorAll('.score-value').forEach(val => val.textContent = '3');
+        document.querySelectorAll('.score-status').forEach(status => {
+          status.textContent = 'Not scored yet';
+          status.style.color = 'var(--ink-soft)';
+        });
+        hideLeaderboard();
+        showStatus('Votes cleared for this session.', 'info');
+      }
+
       document.querySelectorAll('#conceptForm input, #conceptForm textarea').forEach(el => {
         el.addEventListener('input', renderPreview);
       });
@@ -609,6 +756,7 @@
 
       document.getElementById('submitCard').addEventListener('click', submitCard);
       document.getElementById('refreshCards').addEventListener('click', fetchCards);
+      submittedContainer.addEventListener('input', handleScoreInput);
       submittedContainer.addEventListener('click', handleSubmittedClick);
 
       async function submitCard() {
@@ -665,6 +813,7 @@
         }
         const fragments = submittedCards.map(card => buildSubmittedCard(card));
         submittedContainer.innerHTML = fragments.join('');
+        applyScoresToUI();
       }
 
       function removeCardLocally(id) {
@@ -672,6 +821,8 @@
         const next = submittedCards.filter(card => card.id !== id);
         if (next.length === submittedCards.length) return;
         submittedCards = next;
+        conceptScores.delete(id);
+        saveScoresToStorage();
         renderSubmitted();
       }
 
@@ -717,11 +868,51 @@
               <div class="trust-bar">${escapeHtml(card.proofPoint || '')}</div>
             </div>
           </div>
+          <div class="scorecard" data-card-id="${card.id}">
+            <div class="score-status" id="score-status-${card.id}">Not scored yet</div>
+            <div class="score-row">
+              <div class="score-label">Laura wanted it</div>
+              <div class="score-controls">
+                <input type="range" min="1" max="5" value="3" class="score-slider" data-metric="wanted" data-card-id="${card.id}">
+                <span class="score-value" id="score-value-${card.id}-wanted">3</span>
+              </div>
+            </div>
+            <div class="score-row">
+              <div class="score-label">Laura understood it</div>
+              <div class="score-controls">
+                <input type="range" min="1" max="5" value="3" class="score-slider" data-metric="understood" data-card-id="${card.id}">
+                <span class="score-value" id="score-value-${card.id}-understood">3</span>
+              </div>
+            </div>
+            <div class="score-row">
+              <div class="score-label">Solves a real problem</div>
+              <div class="score-controls">
+                <input type="range" min="1" max="5" value="3" class="score-slider" data-metric="solves" data-card-id="${card.id}">
+                <span class="score-value" id="score-value-${card.id}-solves">3</span>
+              </div>
+            </div>
+          </div>
           <div class="card-actions">
             <button type="button" class="secondary-btn" data-action="jpg" data-id="${card.id}">Download JPEG</button>
             <button type="button" class="secondary-btn" data-action="html" data-id="${card.id}">Download HTML</button>
           </div>
         </article>`;
+      }
+
+      function handleScoreInput(e) {
+        const slider = e.target.closest('.score-slider');
+        if (!slider) return;
+        const cardId = slider.dataset.cardId;
+        const metric = slider.dataset.metric;
+        const value = Number(slider.value);
+        const valueEl = document.getElementById(`score-value-${cardId}-${metric}`);
+        if (valueEl) valueEl.textContent = value;
+        const existing = conceptScores.get(cardId) || {};
+        existing[metric] = value;
+        conceptScores.set(cardId, existing);
+        saveScoresToStorage();
+        updateScoreStatus(cardId);
+        hideLeaderboard();
       }
 
       function handleSubmittedClick(e) {
@@ -847,6 +1038,9 @@
         setTimeout(connectFeed, delay);
       }
 
+      summarizeBtn.addEventListener('click', summarizeScores);
+      resetBtn.addEventListener('click', resetVotes);
+      loadScoresFromStorage();
       fetchCards();
       connectFeed();
 
