@@ -875,13 +875,28 @@ function sanitizeJsxSource(src) {
 
 
 function guessComponentName(source) {
-  const fn = source.match(/function\s+([A-Z][A-Za-z0-9_]*)\s*\(/);
-  if (fn) return fn[1];
-  const constMatch = source.match(/const\s+([A-Z][A-Za-z0-9_]*)\s*=\s*(?:\(|function|class)/);
-  if (constMatch) return constMatch[1];
-  const classMatch = source.match(/class\s+([A-Z][A-Za-z0-9_]*)\s+extends\s+React/);
-  if (classMatch) return classMatch[1];
-  return null;
+  // Priority 1: conventional entry-point names
+  const ENTRY_NAMES = ['App', 'Root', 'Main', 'Page', 'Index', 'Prototype', 'NortonApp', 'NortonPrototype'];
+  for (const name of ENTRY_NAMES) {
+    if (new RegExp('(?:function|const|class)\\s+' + name + '\\b').test(source)) return name;
+  }
+
+  // Priority 2: the *last* capitalized function/const/class definition
+  // (avoids picking utility helpers declared early like Ico, Av, etc.)
+  let lastMatch = null;
+  const patterns = [
+    /function\s+([A-Z][A-Za-z0-9_]*)\s*\(/g,
+    /const\s+([A-Z][A-Za-z0-9_]*)\s*=\s*(?:\(|function|class)/g,
+    /class\s+([A-Z][A-Za-z0-9_]*)\s+extends\s+React/g,
+  ];
+  for (const re of patterns) {
+    let m;
+    while ((m = re.exec(source)) !== null) {
+      // Skip React hooks and one-word acronyms <= 3 chars (Ico, Av, etc.)
+      if (m[1].length > 3 || /^use[A-Z]/.test(m[1])) lastMatch = m[1];
+    }
+  }
+  return lastMatch;
 }
 
 function base64ToUtf8(b64) {
