@@ -810,34 +810,8 @@
     </div>
   </div>
 
-  <!-- EXISTING PROTOTYPE PICKER — Landing Page only -->
-  <div class="cb-section" id="protoPickerSection" style="display:block;">
-    <div class="sec-label">
-      <span class="sec-num" style="font-size:16px;">↩</span>
-      <h3>Use an existing prototype <span style="font-size:12px;font-weight:400;color:var(--ink-softer);">— optional shortcut</span></h3>
-    </div>
-    <p class="sec-hint">Already have a prototype on the prototypes page? Toggle this on to select it and skip questions 2–9 below. Pricing is still required.</p>
-    <label class="logo-switch" onclick="toggleProtoPicker()">
-      <div class="switch-track" id="protoPickerTrack"><div class="switch-knob"></div></div>
-      <span id="protoPickerLabel" style="font-size:15px;font-weight:600;color:var(--ink);">Off — I will fill in all questions</span>
-    </label>
-    <div id="protoPickerDropdown" style="display:none;margin-top:16px;">
-      <div id="protoLoadingState" style="color:var(--ink-soft);font-size:14px;padding:8px 0;">Loading prototypes…</div>
-      <select id="protoSelect" class="cb-input" style="display:none;width:100%;font-size:15px;padding:10px 12px;" onchange="onProtoSelected()">
-        <option value="">— Select a prototype —</option>
-      </select>
-      <div id="protoPreview" style="display:none;margin-top:16px;padding:16px;background:#f0f0ee;border-radius:8px;border:1px solid #e0e0dc;">
-        <div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#8a8a8a;margin-bottom:6px;">Selected prototype</div>
-        <div id="protoPreviewTitle" style="font-size:16px;font-weight:700;color:#242424;margin-bottom:4px;"></div>
-        <div id="protoPreviewMeta" style="font-size:13px;color:#5a5a5a;margin-bottom:8px;"></div>
-        <div id="protoPreviewSummary" style="font-size:13px;color:#5a5a5a;line-height:1.5;"></div>
-        <div id="protoPreviewScore" style="margin-top:10px;display:none;"></div>
-      </div>
-    </div>
-  </div>
-
   <!-- 2. Concept -->
-  <div class="cb-section" id="cb-sec-concept">
+  <div class="cb-section">
     <div class="sec-label">
       <span class="sec-num">2</span>
       <h3>Describe your concept</h3>
@@ -847,7 +821,7 @@
   </div>
 
   <!-- 3. Capabilities -->
-  <div class="cb-section" id="cb-sec-caps">
+  <div class="cb-section">
     <div class="sec-label">
       <span class="sec-num">3</span>
       <h3>Which Norton capabilities does it use?</h3>
@@ -878,7 +852,7 @@
   </div>
 
   <!-- 4. AI hook -->
-  <div class="cb-section" id="cb-sec-ai">
+  <div class="cb-section">
     <div class="sec-label">
       <span class="sec-num">4</span>
       <h3>How does AI show up?</h3>
@@ -888,7 +862,7 @@
   </div>
 
   <!-- 5. User journey -->
-  <div class="cb-section" id="cb-sec-journey">
+  <div class="cb-section">
     <div class="sec-label">
       <span class="sec-num">5</span>
       <h3>Walk through the user journey</h3>
@@ -898,7 +872,7 @@
   </div>
 
   <!-- 6. Differentiators -->
-  <div class="cb-section" id="cb-sec-diff">
+  <div class="cb-section">
     <div class="sec-label">
       <span class="sec-num">6</span>
       <h3>What are the unique advantages?</h3>
@@ -908,7 +882,7 @@
   </div>
 
   <!-- 7. Engagement -->
-  <div class="cb-section" id="cb-sec-engagement">
+  <div class="cb-section">
     <div class="sec-label">
       <span class="sec-num">7</span>
       <h3>Why would Laura engage with this regularly?</h3>
@@ -918,7 +892,7 @@
   </div>
 
   <!-- 8. JTBDs -->
-  <div class="cb-section" id="cb-sec-jtbd">
+  <div class="cb-section">
     <div class="sec-label">
       <span class="sec-num">8</span>
       <h3>Jobs To Be Done — in priority order</h3>
@@ -929,7 +903,7 @@
   </div>
 
   <!-- 9. Competitors -->
-  <div class="cb-section" id="cb-sec-comps">
+  <div class="cb-section">
     <div class="sec-label">
       <span class="sec-num">9</span>
       <h3>Competitors &amp; inspiration to reference</h3>
@@ -937,16 +911,6 @@
     <p class="sec-hint">Name the product/company and what specifically to borrow from it.</p>
     <div class="comp-rows" id="compRows"></div>
     <button class="btn-add-row" onclick="addComp()">+ Add another reference</button>
-  </div>
-
-  <!-- PRICING — always required for landing pages -->
-  <div class="cb-section" id="pricingSection" style="display:block;">
-    <div class="sec-label">
-      <span class="sec-num" style="font-size:18px;">$</span>
-      <h3>Pricing Strategy <span style="font-size:13px;font-weight:500;color:var(--ink-softer);">— always required</span></h3>
-    </div>
-    <p class="sec-hint">Define your 3-tier pricing. Each tier needs a name, a price, included features, and a customer story explaining who it's for.</p>
-    <div id="pricingTiers"></div>
   </div>
 
   <!-- 10. Screen (iOS only) -->
@@ -1086,22 +1050,6 @@ function setBuildType(type) {
   document.getElementById('btnIOS').classList.toggle('active', type === 'ios');
   const show = type === 'ios' ? 'block' : 'none';
   document.querySelectorAll('.ios-only').forEach(el => el.style.display = show);
-  // Landing-only sections
-  ['protoPickerSection', 'pricingSection'].forEach(function(id) {
-    var sec = document.getElementById(id);
-    if (sec) sec.style.display = type === 'landing' ? 'block' : 'none';
-  });
-  // Reset proto picker when leaving landing
-  if (type !== 'landing' && typeof useExistingProto !== 'undefined' && useExistingProto) {
-    useExistingProto = false;
-    selectedProto = null;
-    var t = document.getElementById('protoPickerTrack'); if (t) t.classList.remove('on');
-    var l = document.getElementById('protoPickerLabel'); if (l) l.textContent = 'Off — I will fill in all questions';
-    var d = document.getElementById('protoPickerDropdown'); if (d) d.style.display = 'none';
-    ['cb-sec-concept','cb-sec-caps','cb-sec-ai','cb-sec-journey','cb-sec-diff','cb-sec-engagement','cb-sec-jtbd','cb-sec-comps'].forEach(function(id) {
-      var el = document.getElementById(id); if (el) el.style.display = '';
-    });
-  }
 }
 
 // ── Screen toggle ─────────────────────────────────────────────────────────────
@@ -1525,7 +1473,6 @@ function updateRemoveBtns(containerId, btnClass, minRows) {
 // Seed initial rows
 addJtbd(); addJtbd(); addJtbd();
 addComp();
-buildPricingTiers();
 
 // ── Voice & Tone ──────────────────────────────────────────────────────────────
 const TONE_OPTIONS = [
@@ -1758,56 +1705,11 @@ function validate() {
   if (!aiHook)          errors.push('AI integration description is required.');
   if (!journey)         errors.push('User journey is required.');
   if (complete.length < 3) errors.push('At least 3 complete JTBDs are required.');
-  // Pricing always required for landing page
-  if (buildType === 'landing') {
-    var pData = getPricingData();
-    var missingT = pData.find(function(t) { return !t.jtbd; });
-    if (missingT) errors.push('Pricing required — add a customer story for the "' + missingT.name + '" tier.');
-  }
   return errors;
 }
 
 function generate() {
   const errEl = document.getElementById('genErr');
-
-  // ── Proto picker path ───────────────────────────────────────────────────
-  if (typeof useExistingProto !== 'undefined' && useExistingProto && buildType === 'landing') {
-    if (!selectedProto) { errEl.textContent = 'Please select an existing prototype.'; return; }
-    var ppData = getPricingData();
-    var ppMiss = ppData.find(function(t) { return !t.jtbd; });
-    if (ppMiss) {
-      errEl.textContent = 'Pricing required — add a customer story for the "' + ppMiss.name + '" tier.';
-      var ps = document.getElementById('pricingSection'); if (ps) ps.scrollIntoView({behavior:'smooth',block:'start'});
-      return;
-    }
-    errEl.textContent = '';
-    var pp = selectedProto;
-    var ppLaura = pp.lauraScore != null ? ('LAURA SCORING:\n- Score: ' + pp.lauraScore + '/100\n- Verdict: ' + (pp.lauraVerdict||'N/A') + '\n- Recommendation: ' + (pp.lauraRecommendation||'N/A') + '\n- Engagement challenge: ' + (pp.lauraEngagementChallenge||'N/A') + '\n- Competitor gap: ' + (pp.lauraCompetitorGap||'N/A')) : '';
-    var ppPricing = buildPricingPromptSection(ppData);
-    var ppPrompt = [
-      'You are a Senior Product Designer and Frontend Developer specialising in consumer security and privacy products.',
-      'Build a production-quality single-file HTML landing page. Output ONLY the complete HTML file — no markdown, no explanation.',
-      '',
-      'PRODUCT: ' + (pp.title || pp.name),
-      'SUMMARY: ' + (pp.summary || ''),
-      ppLaura,
-      '',
-      ppPricing,
-      '',
-      'DESIGN: Inter Tight font. Colors: #242424 ink · #FFE800 yellow · #F8F8F7 bg. Sticky dark nav. 8px card radius. 999px pills.',
-      'SECTIONS: Hero · Problem · Solution · AI Showcase · Features as Outcomes · Pricing (3 tiers exact) · Differentiators · Social Proof · CTA · Footer',
-      'COPY: Outcome-first. No jargon. Household framing. No Lorem ipsum.',
-    ].filter(Boolean).join('\n');
-    document.getElementById('outputText').value = ppPrompt;
-    var ppCard = document.getElementById('outputCard');
-    ppCard.classList.add('visible');
-    ppCard.scrollIntoView({behavior:'smooth',block:'start'});
-    document.getElementById('copyBtn').textContent = 'Copy';
-    document.getElementById('copyBtn').className = 'btn-copy';
-    return;
-  }
-
-  // ── Normal flow ─────────────────────────────────────────────────────────
   const errors = validate();
   if (errors.length) { errEl.textContent = errors[0]; return; }
   errEl.textContent = '';
@@ -1830,8 +1732,6 @@ No shield, no icon, no complex graphic — just a clean minimal wordmark that do
   const differentiators = document.getElementById('differentiators').value.trim();
   const engagement    = document.getElementById('engagement').value.trim();
   const caps          = getSelectedCaps();
-  const normalPricing = buildType === 'landing' ? getPricingData() : null;
-  const normalPricingBlock = normalPricing ? buildPricingPromptSection(normalPricing) : '';
   const jtbds         = getJtbds().filter(j => j.when && j.want && j.soican);
   const comps         = getComps();
   const voiceTone     = getSelectedTone();
@@ -1992,7 +1892,7 @@ ${logoSection}
 ═══════════════════════════════════════════
 ${platformSection}
 
-${normalPricingBlock ? '═══════════════════════════════════════════\nPRICING STRATEGY\n═══════════════════════════════════════════\n' + normalPricingBlock + '\n\n' : ''}${additionalDetails ? '═══════════════════════════════════════════\nADDITIONAL DETAILS & CONSTRAINTS\n═══════════════════════════════════════════\n' + additionalDetails + '\n\n' : ''}═══════════════════════════════════════════
+${additionalDetails ? '═══════════════════════════════════════════\nADDITIONAL DETAILS & CONSTRAINTS\n═══════════════════════════════════════════\n' + additionalDetails + '\n\n' : ''}═══════════════════════════════════════════
 WHAT LAURA REJECTS — do not include any of these
 ═══════════════════════════════════════════
 - Dashboards full of toggles, sliders, or config screens
@@ -2027,155 +1927,6 @@ function escHtml(s) {
 }
 </script>
 
-<script src="nav.js">
-// ═══════════════════════════════════════════════════════════════════
-// PROTO PICKER
-// ═══════════════════════════════════════════════════════════════════
-var useExistingProto = false;
-var selectedProto = null;
-var allPrototypes = [];
-
-function toggleProtoPicker() {
-  useExistingProto = !useExistingProto;
-  document.getElementById('protoPickerTrack').classList.toggle('on', useExistingProto);
-  document.getElementById('protoPickerLabel').textContent = useExistingProto
-    ? 'On — using an existing prototype'
-    : 'Off — I will fill in all questions';
-  document.getElementById('protoPickerDropdown').style.display = useExistingProto ? 'block' : 'none';
-  var optIds = ['cb-sec-concept','cb-sec-caps','cb-sec-ai','cb-sec-journey','cb-sec-diff','cb-sec-engagement','cb-sec-jtbd','cb-sec-comps'];
-  optIds.forEach(function(id) {
-    var el = document.getElementById(id);
-    if (el) el.style.display = useExistingProto ? 'none' : '';
-  });
-  if (useExistingProto && allPrototypes.length === 0) loadPrototypes();
-}
-
-async function loadPrototypes() {
-  var loading = document.getElementById('protoLoadingState');
-  var sel = document.getElementById('protoSelect');
-  loading.style.display = 'block'; sel.style.display = 'none';
-  try {
-    var res = await fetch('/api/prototypes');
-    var data = await res.json();
-    allPrototypes = data.prototypes || [];
-    sel.innerHTML = '<option value="">— Select a prototype —</option>' +
-      allPrototypes.map(function(p) {
-        return '<option value="' + p.id + '">' + (p.title || p.name || 'Untitled') + ' — by ' + (p.name || 'Unknown') + '</option>';
-      }).join('');
-    loading.style.display = 'none'; sel.style.display = 'block';
-  } catch(e) { loading.textContent = 'Failed to load prototypes.'; }
-}
-
-function onProtoSelected() {
-  var id = document.getElementById('protoSelect').value;
-  selectedProto = allPrototypes.find(function(p) { return p.id === id; }) || null;
-  var preview = document.getElementById('protoPreview');
-  if (!selectedProto) { preview.style.display = 'none'; return; }
-  preview.style.display = 'block';
-  document.getElementById('protoPreviewTitle').textContent = selectedProto.title || selectedProto.name || 'Untitled';
-  document.getElementById('protoPreviewMeta').textContent = 'By ' + (selectedProto.name || 'Unknown') + ' · ' + new Date(selectedProto.submittedAt).toLocaleDateString();
-  document.getElementById('protoPreviewSummary').textContent = selectedProto.summary || '';
-  var scoreEl = document.getElementById('protoPreviewScore');
-  if (selectedProto.lauraScore != null) {
-    scoreEl.style.display = 'block';
-    scoreEl.innerHTML = '<span style="font-size:11px;font-weight:700;text-transform:uppercase;color:#8a8a8a;">Laura Score: </span>' +
-      '<span style="font-size:15px;font-weight:800;color:#242424;">' + selectedProto.lauraScore + '/100 — ' + (selectedProto.lauraVerdict || '') + '</span>';
-  } else { scoreEl.style.display = 'none'; }
-}
-
-// ═══════════════════════════════════════════════════════════════════
-// PRICING
-// ═══════════════════════════════════════════════════════════════════
-var PRICING_TIER_DEFAULTS = ['Essentials', 'Premium', 'Ultimate'];
-var _pricingCustomFeatures = [{}, {}, {}];
-
-function buildPricingTiers() {
-  var container = document.getElementById('pricingTiers');
-  if (!container) return;
-  container.innerHTML = '';
-  PRICING_TIER_DEFAULTS.forEach(function(name, i) {
-    var tier = document.createElement('div');
-    tier.id = 'pricing-tier-' + i;
-    tier.style.cssText = 'background:#f8f8f6;border:1.5px solid #e0e0dc;border-radius:10px;padding:22px;margin-bottom:16px;';
-    var allCaps = CAPABILITIES.concat(Object.keys(FEATURED_CAPS));
-    var chips = allCaps.map(function(cap) {
-      var safe = cap.replace(/&/g,'&amp;').replace(/"/g,'&quot;');
-      return '<button type="button" data-cap="' + safe + '" data-on="0" onclick="togglePricingCap(this,' + i + ')" style="padding:5px 11px;border-radius:999px;border:1.5px solid #d0d0cc;background:#fff;font-size:12px;font-weight:500;color:#5a5a5a;cursor:pointer;transition:all .15s;margin:3px;">' + cap + '</button>';
-    }).join('');
-
-    tier.innerHTML =
-      '<div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#8a8a8a;margin-bottom:12px;">Tier ' + (i+1) + '</div>' +
-      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">' +
-        '<div><label style="font-size:12px;font-weight:600;color:#5a5a5a;display:block;margin-bottom:5px;">Tier Name</label>' +
-          '<input class="cb-input" id="pt-name-' + i + '" value="' + name + '" maxlength="40" style="width:100%;box-sizing:border-box;"></div>' +
-        '<div><label style="font-size:12px;font-weight:600;color:#5a5a5a;display:block;margin-bottom:5px;">Price <span style="font-weight:400;color:#8a8a8a;">(e.g. $9.99/mo)</span></label>' +
-          '<input class="cb-input" id="pt-price-' + i + '" placeholder="e.g. $9.99/mo" maxlength="40" style="width:100%;box-sizing:border-box;"></div>' +
-      '</div>' +
-      '<div style="margin-bottom:14px;">' +
-        '<label style="font-size:12px;font-weight:600;color:#5a5a5a;display:block;margin-bottom:8px;">Features <span style="font-weight:400;color:#8a8a8a;">— select Norton capabilities</span></label>' +
-        '<div id="pt-caps-' + i + '">' + chips + '</div>' +
-        '<div style="display:flex;gap:8px;margin-top:10px;">' +
-          '<input class="cb-input" id="pt-custom-' + i + '" placeholder="Add a custom feature…" maxlength="80" style="flex:1;">' +
-          '<button class="btn-add-row" onclick="addPricingCustom(' + i + ')" style="padding:8px 14px;">+ Add</button>' +
-        '</div>' +
-        '<div id="pt-custom-list-' + i + '" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;"></div>' +
-      '</div>' +
-      '<div><label style="font-size:12px;font-weight:600;color:#5a5a5a;display:block;margin-bottom:5px;">Customer Story / JTBD <span style="font-weight:400;color:#8a8a8a;">— who is this tier for?</span></label>' +
-        '<textarea class="cb-textarea" id="pt-jtbd-' + i + '" rows="3" style="width:100%;box-sizing:border-box;" placeholder="e.g. The busy parent who wants household protection to just work…"></textarea></div>';
-
-    container.appendChild(tier);
-  });
-}
-
-function togglePricingCap(chip, tierIdx) {
-  var on = chip.dataset.on === '1';
-  chip.dataset.on = on ? '0' : '1';
-  chip.style.background = on ? '#fff' : '#242424';
-  chip.style.color      = on ? '#5a5a5a' : '#FFE800';
-  chip.style.borderColor= on ? '#d0d0cc' : '#242424';
-}
-
-function addPricingCustom(i) {
-  var inp = document.getElementById('pt-custom-' + i);
-  var val = inp.value.trim(); if (!val) return;
-  if (!_pricingCustomFeatures[i]) _pricingCustomFeatures[i] = {};
-  _pricingCustomFeatures[i][val] = true;
-  inp.value = '';
-  renderPricingCustom(i);
-}
-
-function removePricingCustom(i, feat) {
-  if (_pricingCustomFeatures[i]) delete _pricingCustomFeatures[i][feat];
-  renderPricingCustom(i);
-}
-
-function renderPricingCustom(i) {
-  var list = document.getElementById('pt-custom-list-' + i);
-  if (!list) return;
-  list.innerHTML = Object.keys(_pricingCustomFeatures[i]||{}).map(function(f) {
-    return '<span style="display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:999px;background:#242424;color:#FFE800;font-size:12px;font-weight:600;">' + f +
-      '<button type="button" data-f="' + f.replace(/"/g,'&quot;') + '" data-i="' + i + '" onclick="removePricingCustom(+this.dataset.i,this.dataset.f)" style="background:none;border:none;color:#FFE800;cursor:pointer;font-size:14px;line-height:1;padding:0 0 0 4px;">&#215;</button></span>';
-  }).join('');
-}
-
-function getPricingData() {
-  return [0,1,2].map(function(i) {
-    var n = document.getElementById('pt-name-'+i); var p = document.getElementById('pt-price-'+i);
-    var j = document.getElementById('pt-jtbd-'+i); var g = document.getElementById('pt-caps-'+i);
-    var caps = g ? Array.from(g.querySelectorAll('[data-on="1"]')).map(function(c){return c.dataset.cap;}) : [];
-    return { name: n?n.value.trim():PRICING_TIER_DEFAULTS[i], price: p?p.value.trim():'', jtbd: j?j.value.trim():'', features: caps.concat(Object.keys(_pricingCustomFeatures[i]||{})) };
-  });
-}
-
-function buildPricingPromptSection(pd) {
-  if (!pd) return '';
-  return 'PRICING STRATEGY:\n' + pd.map(function(t,i) {
-    return '\nTIER '+(i+1)+': '+t.name+(t.price?' — '+t.price:'')+
-      '\nFeatures:\n'+(t.features.length?t.features.map(function(f){return'  - '+f;}).join('\n'):'  (none selected)')+
-      '\nCustomer story:\n  '+(t.jtbd||'(not specified)');
-  }).join('\n');
-}
-
-</script>
+<script src="nav.js"></script>
 </body>
 </html>
