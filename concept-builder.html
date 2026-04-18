@@ -2229,7 +2229,7 @@ function buildPricingTiers() {
         '<label style="font-size:12px;font-weight:600;color:#5a5a5a;display:block;margin-bottom:8px;">Features included <span style="font-weight:400;color:#8a8a8a;">— select from Norton capabilities</span></label>',
         '<div id="pt-caps-' + i + '" style="display:flex;flex-wrap:wrap;gap:0;">' + capChips + '</div>',
         '<div style="display:flex;gap:8px;margin-top:10px;">',
-          '<input class="cb-input" id="pt-custom-input-' + i + '" placeholder="Add a custom feature…" maxlength="80" style="flex:1;" onkeydown="if(event.key==='Enter'){event.preventDefault();addPricingCustomFeature(' + i + ');}">',
+          '<input class="cb-input" id="pt-custom-input-' + i + '" placeholder="Add a custom feature…" maxlength="80" style="flex:1;" onkeydown="if(event.key===&apos;Enter&apos;){event.preventDefault();addPricingCustomFeature(' + i + ');}">',
           '<button class="btn-add-row" onclick="addPricingCustomFeature(' + i + ')" style="white-space:nowrap;padding:8px 14px;">+ Add</button>',
         '</div>',
         '<div id="pt-custom-list-' + i + '" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;"></div>',
