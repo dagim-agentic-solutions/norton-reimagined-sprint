@@ -943,7 +943,7 @@
   <div class="cb-section" id="pricingSection" style="display:block;">
     <div class="sec-label">
       <span class="sec-num" style="font-size:18px;">$</span>
-      <h3>Pricing Strategy <span style="font-size:13px;font-weight:500;color:var(--ink-softer);">— required for landing pages</span></h3>
+      <h3>Pricing Strategy <span style="font-size:13px;font-weight:500;color:var(--ink-softer);">— always required</span></h3>
     </div>
     <p class="sec-hint">Define your 3-tier pricing. Each tier needs a name, a price, its included features (select from Norton capabilities or add custom ones), and a customer story explaining who this tier is for and what it solves for them.</p>
     <div id="pricingTiers"></div>
@@ -1828,7 +1828,7 @@ function validate() {
     const pd = getPricingData();
     const missingTier = pd.find(t => !t.jtbd);
     if (missingTier) {
-      errors.push('Please add a customer story for the "' + missingTier.name + '" pricing tier (Pricing section).');
+      errors.push('Pricing is required — please complete the "' + missingTier.name + '" tier (add a customer story).');
     }
   }
 
@@ -1850,7 +1850,8 @@ function generate() {
     const pd = getPricingData();
     const missingPricingTier = pd.find(t => !t.jtbd);
     if (missingPricingTier) {
-      errEl.textContent = 'Please add a customer story for the "' + missingPricingTier.name + '" pricing tier — this is required.';
+      errEl.textContent = 'Pricing is required — please add a customer story for the "' + missingPricingTier.name + '" tier.';
+      document.getElementById('pricingSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
       return;
     }
     const p = selectedProto;
