@@ -811,7 +811,7 @@
   </div>
 
   <!-- 2. Concept -->
-  <div class="cb-section">
+  <div class="cb-section" id="sec2">
     <div class="sec-label">
       <span class="sec-num">2</span>
       <h3>Describe your concept</h3>
@@ -821,7 +821,7 @@
   </div>
 
   <!-- 3. Capabilities -->
-  <div class="cb-section">
+  <div class="cb-section" id="sec3">
     <div class="sec-label">
       <span class="sec-num">3</span>
       <h3>Which Norton capabilities does it use?</h3>
@@ -852,7 +852,7 @@
   </div>
 
   <!-- 4. AI hook -->
-  <div class="cb-section">
+  <div class="cb-section" id="sec4">
     <div class="sec-label">
       <span class="sec-num">4</span>
       <h3>How does AI show up?</h3>
@@ -862,7 +862,7 @@
   </div>
 
   <!-- 5. User journey -->
-  <div class="cb-section">
+  <div class="cb-section" id="sec5">
     <div class="sec-label">
       <span class="sec-num">5</span>
       <h3>Walk through the user journey</h3>
@@ -872,7 +872,7 @@
   </div>
 
   <!-- 6. Differentiators -->
-  <div class="cb-section">
+  <div class="cb-section" id="sec6">
     <div class="sec-label">
       <span class="sec-num">6</span>
       <h3>What are the unique advantages?</h3>
@@ -882,7 +882,7 @@
   </div>
 
   <!-- 7. Engagement -->
-  <div class="cb-section">
+  <div class="cb-section" id="sec7">
     <div class="sec-label">
       <span class="sec-num">7</span>
       <h3>Why would Laura engage with this regularly?</h3>
@@ -892,7 +892,7 @@
   </div>
 
   <!-- 8. JTBDs -->
-  <div class="cb-section">
+  <div class="cb-section" id="sec8">
     <div class="sec-label">
       <span class="sec-num">8</span>
       <h3>Jobs To Be Done — in priority order</h3>
@@ -903,7 +903,7 @@
   </div>
 
   <!-- 9. Competitors -->
-  <div class="cb-section">
+  <div class="cb-section" id="sec9">
     <div class="sec-label">
       <span class="sec-num">9</span>
       <h3>Competitors &amp; inspiration to reference</h3>
@@ -911,6 +911,44 @@
     <p class="sec-hint">Name the product/company and what specifically to borrow from it.</p>
     <div class="comp-rows" id="compRows"></div>
     <button class="btn-add-row" onclick="addComp()">+ Add another reference</button>
+  </div>
+
+
+  <!-- PROTO PICKER — Landing Page only -->
+  <div class="cb-section" id="protoPickerSection" style="display:block;">
+    <div class="sec-label">
+      <span class="sec-num" style="font-size:15px;">↩</span>
+      <h3>Use an existing prototype <span style="font-size:12px;font-weight:400;color:var(--ink-softer);">— optional shortcut</span></h3>
+    </div>
+    <p class="sec-hint">Have a prototype already on the prototypes page? Toggle this on, select it, and skip questions 2–9. Pricing is still required regardless.</p>
+    <label class="logo-switch" onclick="toggleProtoPicker()">
+      <div class="switch-track" id="protoPickerTrack"><div class="switch-knob"></div></div>
+      <span id="protoPickerLabel" style="font-size:15px;font-weight:600;color:var(--ink);">Off — fill in all questions</span>
+    </label>
+    <div id="protoPickerDropdown" style="display:none;margin-top:16px;">
+      <div id="protoLoadingMsg" style="color:var(--ink-soft);font-size:14px;padding:8px 0;">Loading prototypes…</div>
+      <select id="protoPickerSelect" class="cb-input" style="display:none;width:100%;font-size:15px;padding:10px 12px;" onchange="onProtoPickerSelected()">
+        <option value="">— Select a prototype —</option>
+      </select>
+      <div id="protoPickerPreview" style="display:none;margin-top:16px;padding:16px;background:#f0f0ee;border-radius:8px;border:1px solid #e0e0dc;">
+        <div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#8a8a8a;margin-bottom:6px;">Selected</div>
+        <div id="ppTitle" style="font-size:16px;font-weight:700;color:#242424;margin-bottom:4px;"></div>
+        <div id="ppMeta" style="font-size:13px;color:#5a5a5a;margin-bottom:6px;"></div>
+        <div id="ppSummary" style="font-size:13px;color:#5a5a5a;line-height:1.5;"></div>
+        <div id="ppScore" style="margin-top:8px;display:none;"></div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- PRICING — always required for landing pages -->
+  <div class="cb-section" id="pricingSection" style="display:block;">
+    <div class="sec-label">
+      <span class="sec-num">$</span>
+      <h3>Pricing Strategy <span style="font-size:13px;font-weight:500;color:var(--ink-softer);">— always required</span></h3>
+    </div>
+    <p class="sec-hint">Define your 3-tier pricing. Each tier needs a name, price, features (from Norton capabilities + custom), and a customer story.</p>
+    <div id="pricingTiers"></div>
   </div>
 
   <!-- 10. Screen (iOS only) -->
@@ -1050,6 +1088,22 @@ function setBuildType(type) {
   document.getElementById('btnIOS').classList.toggle('active', type === 'ios');
   const show = type === 'ios' ? 'block' : 'none';
   document.querySelectorAll('.ios-only').forEach(el => el.style.display = show);
+  // Landing-only sections
+  const landingOnly = ['protoPickerSection', 'pricingSection'];
+  landingOnly.forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.style.display = (type === 'landing') ? 'block' : 'none';
+  });
+  // Reset proto picker when switching away from landing
+  if (type !== 'landing' && _protoPickerActive) {
+    _protoPickerActive = false;
+    _selectedProto = null;
+    var tr = document.getElementById('protoPickerTrack'); if (tr) tr.classList.remove('on');
+    var lb = document.getElementById('protoPickerLabel'); if (lb) lb.textContent = 'Off — fill in all questions';
+    var dd = document.getElementById('protoPickerDropdown'); if (dd) dd.style.display = 'none';
+    var optSecs = ['sec2','sec3','sec4','sec5','sec6','sec7','sec8','sec9'];
+    optSecs.forEach(function(id) { var el = document.getElementById(id); if (el) el.style.display = ''; });
+  }
 }
 
 // ── Screen toggle ─────────────────────────────────────────────────────────────
@@ -1473,6 +1527,7 @@ function updateRemoveBtns(containerId, btnClass, minRows) {
 // Seed initial rows
 addJtbd(); addJtbd(); addJtbd();
 addComp();
+buildPricingTiers();
 
 // ── Voice & Tone ──────────────────────────────────────────────────────────────
 const TONE_OPTIONS = [
@@ -1705,11 +1760,57 @@ function validate() {
   if (!aiHook)          errors.push('AI integration description is required.');
   if (!journey)         errors.push('User journey is required.');
   if (complete.length < 3) errors.push('At least 3 complete JTBDs are required.');
+  // Pricing required for landing page
+  if (buildType === 'landing') {
+    var pd = getPricingData();
+    var missing = pd.find(function(t){ return !t.jtbd; });
+    if (missing) errors.push('Pricing required — add a customer story for the "' + missing.name + '" tier.');
+  }
   return errors;
 }
 
 function generate() {
   const errEl = document.getElementById('genErr');
+
+  // Proto picker shortcut
+  if (_protoPickerActive && buildType === 'landing') {
+    if (!_selectedProto) { errEl.textContent = 'Please select a prototype from the dropdown.'; return; }
+    var ppd = getPricingData();
+    var ppm = ppd.find(function(t){ return !t.jtbd; });
+    if (ppm) {
+      errEl.textContent = 'Pricing required — add a customer story for the "' + ppm.name + '" tier.';
+      var ps = document.getElementById('pricingSection'); if (ps) ps.scrollIntoView({behavior:'smooth',block:'start'});
+      return;
+    }
+    errEl.textContent = '';
+    var sp = _selectedProto;
+    var spLaura = '';
+    if (sp.lauraScore != null) spLaura = 'LAURA SCORING:\n- Score: '+sp.lauraScore+'/100\n- Verdict: '+(sp.lauraVerdict||'N/A')+'\n- Recommendation: '+(sp.lauraRecommendation||'N/A')+'\n- Engagement challenge: '+(sp.lauraEngagementChallenge||'N/A')+'\n- Competitor gap: '+(sp.lauraCompetitorGap||'N/A');
+    var spPricing = buildPricingPromptSection(ppd);
+    var spPrompt = [
+      'You are a Senior Product Designer and Frontend Developer specialising in consumer security and privacy products.',
+      'Build a production-quality single-file HTML landing page. Output ONLY the complete HTML — no markdown, no explanation.',
+      '',
+      'PRODUCT: '+(sp.title||sp.name||'Untitled'),
+      'SUMMARY: '+(sp.summary||''),
+      spLaura,
+      '',
+      spPricing,
+      '',
+      'DESIGN SYSTEM: Inter Tight font via Google Fonts. Colors: #242424 ink · #FFE800 yellow · #F8F8F7 bg. Sticky dark nav. 8px card radius. 999px pills.',
+      'PAGE SECTIONS (in order): Hero · Problem · Solution · AI Showcase · Features as Outcomes · Pricing (3 tiers, exact names/prices) · Differentiators · Social Proof · CTA · Footer',
+      'COPY: Outcome-first. Plain language. Household framing. No Lorem ipsum.',
+    ].filter(Boolean).join('\n');
+    document.getElementById('outputText').value = spPrompt;
+    var spCard = document.getElementById('outputCard');
+    spCard.classList.add('visible');
+    spCard.scrollIntoView({behavior:'smooth',block:'start'});
+    document.getElementById('copyBtn').textContent = 'Copy';
+    document.getElementById('copyBtn').className = 'btn-copy';
+    return;
+  }
+
+  // Normal flow
   const errors = validate();
   if (errors.length) { errEl.textContent = errors[0]; return; }
   errEl.textContent = '';
@@ -1732,6 +1833,8 @@ No shield, no icon, no complex graphic — just a clean minimal wordmark that do
   const differentiators = document.getElementById('differentiators').value.trim();
   const engagement    = document.getElementById('engagement').value.trim();
   const caps          = getSelectedCaps();
+  const lpPricingData = buildType === 'landing' ? getPricingData() : null;
+  const lpPricingBlock = lpPricingData ? buildPricingPromptSection(lpPricingData) : '';
   const jtbds         = getJtbds().filter(j => j.when && j.want && j.soican);
   const comps         = getComps();
   const voiceTone     = getSelectedTone();
@@ -1892,7 +1995,7 @@ ${logoSection}
 ═══════════════════════════════════════════
 ${platformSection}
 
-${additionalDetails ? '═══════════════════════════════════════════\nADDITIONAL DETAILS & CONSTRAINTS\n═══════════════════════════════════════════\n' + additionalDetails + '\n\n' : ''}═══════════════════════════════════════════
+${lpPricingBlock ? '═══════════════════════════════════════════\nPRICING STRATEGY\n═══════════════════════════════════════════\n' + lpPricingBlock + '\n\n' : ''}${additionalDetails ? '═══════════════════════════════════════════\nADDITIONAL DETAILS & CONSTRAINTS\n═══════════════════════════════════════════\n' + additionalDetails + '\n\n' : ''}═══════════════════════════════════════════
 WHAT LAURA REJECTS — do not include any of these
 ═══════════════════════════════════════════
 - Dashboards full of toggles, sliders, or config screens
@@ -1927,6 +2030,141 @@ function escHtml(s) {
 }
 </script>
 
-<script src="nav.js"></script>
+<script src="nav.js">
+// ═══════════════════════════════════
+// PROTO PICKER
+// ═══════════════════════════════════
+var _protoPickerActive = false;
+var _selectedProto = null;
+var _allPrototypes = [];
+
+function toggleProtoPicker() {
+  _protoPickerActive = !_protoPickerActive;
+  document.getElementById('protoPickerTrack').classList.toggle('on', _protoPickerActive);
+  document.getElementById('protoPickerLabel').textContent = _protoPickerActive
+    ? 'On — using an existing prototype' : 'Off — fill in all questions';
+  document.getElementById('protoPickerDropdown').style.display = _protoPickerActive ? 'block' : 'none';
+  var optSecs = ['sec2','sec3','sec4','sec5','sec6','sec7','sec8','sec9'];
+  optSecs.forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.style.display = _protoPickerActive ? 'none' : '';
+  });
+  if (_protoPickerActive && _allPrototypes.length === 0) _loadPrototypes();
+}
+
+async function _loadPrototypes() {
+  var msg = document.getElementById('protoLoadingMsg');
+  var sel = document.getElementById('protoPickerSelect');
+  msg.style.display = 'block'; sel.style.display = 'none';
+  try {
+    var res = await fetch('/api/prototypes');
+    var data = await res.json();
+    _allPrototypes = data.prototypes || [];
+    sel.innerHTML = '<option value="">— Select a prototype —</option>' +
+      _allPrototypes.map(function(p) {
+        return '<option value="' + p.id + '">' + (p.title || p.name || 'Untitled') + ' — by ' + (p.name || 'Unknown') + '</option>';
+      }).join('');
+    msg.style.display = 'none'; sel.style.display = 'block';
+  } catch(e) { msg.textContent = 'Failed to load prototypes. Try refreshing.'; }
+}
+
+function onProtoPickerSelected() {
+  var id = document.getElementById('protoPickerSelect').value;
+  _selectedProto = _allPrototypes.find(function(p){ return p.id === id; }) || null;
+  var preview = document.getElementById('protoPickerPreview');
+  if (!_selectedProto) { preview.style.display = 'none'; return; }
+  preview.style.display = 'block';
+  document.getElementById('ppTitle').textContent = _selectedProto.title || _selectedProto.name || 'Untitled';
+  document.getElementById('ppMeta').textContent = 'By ' + (_selectedProto.name || 'Unknown') + ' · ' + new Date(_selectedProto.submittedAt).toLocaleDateString();
+  document.getElementById('ppSummary').textContent = _selectedProto.summary || '';
+  var sc = document.getElementById('ppScore');
+  if (_selectedProto.lauraScore != null) {
+    sc.style.display = 'block';
+    sc.innerHTML = '<span style="font-size:11px;font-weight:700;text-transform:uppercase;color:#8a8a8a;">Laura Score: </span><span style="font-size:15px;font-weight:800;color:#242424;">' + _selectedProto.lauraScore + '/100 — ' + (_selectedProto.lauraVerdict||'') + '</span>';
+  } else { sc.style.display = 'none'; }
+}
+
+// ═══════════════════════════════════
+// PRICING
+// ═══════════════════════════════════
+var _TIER_NAMES = ['Essentials', 'Premium', 'Ultimate'];
+var _pricingCustom = [{}, {}, {}];
+
+function buildPricingTiers() {
+  var container = document.getElementById('pricingTiers');
+  if (!container) return;
+  container.innerHTML = '';
+  _TIER_NAMES.forEach(function(name, i) {
+    var div = document.createElement('div');
+    div.style.cssText = 'background:#f8f8f6;border:1.5px solid #e0e0dc;border-radius:10px;padding:20px;margin-bottom:14px;';
+    var allCaps = CAPABILITIES.concat(Object.keys(FEATURED_CAPS));
+    var chips = allCaps.map(function(cap) {
+      return '<button type="button" data-cap="' + cap.replace(/"/g,'&quot;') + '" data-on="0" onclick="togglePricingCap(this,' + i + ')" style="padding:5px 11px;border-radius:999px;border:1.5px solid #d0d0cc;background:#fff;font-size:12px;font-weight:500;color:#5a5a5a;cursor:pointer;margin:3px;">' + cap + '</button>';
+    }).join('');
+    div.innerHTML =
+      '<div style="font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#8a8a8a;margin-bottom:10px;">Tier '+(i+1)+'</div>'+
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">'+
+        '<div><label style="font-size:12px;font-weight:600;color:#5a5a5a;display:block;margin-bottom:4px;">Name</label>'+
+        '<input class="cb-input" id="ptName'+i+'" value="'+name+'" maxlength="40" style="width:100%;box-sizing:border-box;"></div>'+
+        '<div><label style="font-size:12px;font-weight:600;color:#5a5a5a;display:block;margin-bottom:4px;">Price <span style="font-weight:400;color:#8a8a8a;">(e.g. $9.99/mo)</span></label>'+
+        '<input class="cb-input" id="ptPrice'+i+'" placeholder="e.g. $9.99/mo" maxlength="40" style="width:100%;box-sizing:border-box;"></div>'+
+      '</div>'+
+      '<div style="margin-bottom:12px;">'+
+        '<label style="font-size:12px;font-weight:600;color:#5a5a5a;display:block;margin-bottom:6px;">Features</label>'+
+        '<div id="ptCaps'+i+'">'+chips+'</div>'+
+        '<div style="display:flex;gap:8px;margin-top:8px;">'+
+          '<input class="cb-input" id="ptCustom'+i+'" placeholder="Add custom feature…" maxlength="80" style="flex:1;">'+
+          '<button class="btn-add-row" onclick="addPricingCustom('+i+')" style="padding:8px 14px;">+ Add</button>'+
+        '</div>'+
+        '<div id="ptCustomList'+i+'" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;"></div>'+
+      '</div>'+
+      '<div><label style="font-size:12px;font-weight:600;color:#5a5a5a;display:block;margin-bottom:4px;">Customer Story / JTBD</label>'+
+      '<textarea class="cb-textarea" id="ptJtbd'+i+'" rows="3" style="width:100%;box-sizing:border-box;" placeholder="Who is this tier for and what does it solve for them?"></textarea></div>';
+    container.appendChild(div);
+  });
+}
+
+function togglePricingCap(chip, i) {
+  var on = chip.dataset.on === '1';
+  chip.dataset.on = on ? '0' : '1';
+  chip.style.background = on ? '#fff' : '#242424';
+  chip.style.color = on ? '#5a5a5a' : '#FFE800';
+  chip.style.borderColor = on ? '#d0d0cc' : '#242424';
+}
+
+function addPricingCustom(i) {
+  var inp = document.getElementById('ptCustom'+i);
+  var v = inp.value.trim(); if (!v) return;
+  _pricingCustom[i][v] = true; inp.value = ''; renderPricingCustom(i);
+}
+
+function removePricingCustom(i, f) { delete _pricingCustom[i][f]; renderPricingCustom(i); }
+
+function renderPricingCustom(i) {
+  var el = document.getElementById('ptCustomList'+i); if (!el) return;
+  el.innerHTML = Object.keys(_pricingCustom[i]).map(function(f) {
+    return '<span style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:999px;background:#242424;color:#FFE800;font-size:12px;font-weight:600;">'+f+
+      '<button type="button" data-f="'+f.replace(/"/g,'&quot;')+'" data-i="'+i+'" onclick="removePricingCustom(+this.dataset.i,this.dataset.f)" style="background:none;border:none;color:#FFE800;cursor:pointer;font-size:13px;line-height:1;padding:0 0 0 3px;">&#215;</button></span>';
+  }).join('');
+}
+
+function getPricingData() {
+  return [0,1,2].map(function(i) {
+    var n=document.getElementById('ptName'+i), pr=document.getElementById('ptPrice'+i), j=document.getElementById('ptJtbd'+i), g=document.getElementById('ptCaps'+i);
+    var caps = g ? Array.from(g.querySelectorAll('[data-on="1"]')).map(function(c){return c.dataset.cap;}) : [];
+    return { name:(n?n.value.trim():_TIER_NAMES[i]), price:(pr?pr.value.trim():''), jtbd:(j?j.value.trim():''), features:caps.concat(Object.keys(_pricingCustom[i]||{})) };
+  });
+}
+
+function buildPricingPromptSection(pd) {
+  if (!pd) return '';
+  return 'PRICING STRATEGY:\n' + pd.map(function(t,i) {
+    return '\nTIER '+(i+1)+': '+t.name+(t.price?' — '+t.price:'')+
+      '\nFeatures:\n'+(t.features.length ? t.features.map(function(f){return'  - '+f;}).join('\n') : '  (none selected)')+
+      '\nCustomer story:\n  '+(t.jtbd||'(not specified)');
+  }).join('\n');
+}
+
+</script>
 </body>
 </html>
