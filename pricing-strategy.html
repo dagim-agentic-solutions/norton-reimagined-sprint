@@ -747,7 +747,7 @@
   <!-- ─── Action Buttons ─── -->
   <div class="action-row">
     <button class="btn-primary" id="btnGenPrompt">Generate Prompt</button>
-    <button class="btn-secondary" id="btnValidate">Validate with AI</button>
+    <button class="btn-secondary" id="btnValidate">Pressure test strategy</button>
   </div>
 
   <!-- ─── Output: Generated Prompt ─── -->
@@ -1343,7 +1343,7 @@ async function validateWithAI() {
 
   const btn = document.getElementById('btnValidate');
   btn.disabled = true;
-  btn.textContent = 'Validating…';
+  btn.textContent = 'Testing strategy…';
 
   const resultEl = document.getElementById('validationResult');
   resultEl.classList.remove('visible');
@@ -1377,7 +1377,7 @@ async function validateWithAI() {
     resultEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
   } finally {
     btn.disabled = false;
-    btn.textContent = 'Validate with AI';
+    btn.textContent = 'Pressure test strategy';
   }
 }
 
@@ -1768,7 +1768,7 @@ function validateWithAIVariants(allVariants) {
   };
 
   var resultEl = document.getElementById('validationResult');
-  resultEl.innerHTML = '<div style="padding:20px;text-align:center;color:var(--ink-soft);">⚡ Validating your pricing strategy…</div>';
+  resultEl.innerHTML = '<div style="padding:20px;text-align:center;color:var(--ink-soft);">⚡ Testing your pricing strategy…</div>';
   resultEl.classList.add('visible');
   resultEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
