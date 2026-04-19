@@ -1325,12 +1325,25 @@ async function validateWithAI() {
   const tiers = collectTiers();
   if (!tiers) return;
 
-  const proto = prototypes[parseInt(sel.value, 10)];
+  const protoRaw = prototypes[parseInt(sel.value, 10)];
+  // Strip large binary fields before sending to API (fileContent can be megabytes)
+  const proto = {
+    id: protoRaw.id,
+    title: protoRaw.title,
+    name: protoRaw.name,
+    summary: protoRaw.summary,
+    url: protoRaw.url || protoRaw.resolvedUrl || null,
+    lauraScore: protoRaw.lauraScore,
+    lauraVerdict: protoRaw.lauraVerdict,
+    lauraRecommendation: protoRaw.lauraRecommendation,
+    lauraEngagementChallenge: protoRaw.lauraEngagementChallenge,
+    lauraCompetitorGap: protoRaw.lauraCompetitorGap,
+  };
   const additionalDetails = document.getElementById('additionalDetails').value.trim();
 
   const btn = document.getElementById('btnValidate');
   btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span> Validating…';
+  btn.textContent = 'Validating…';
 
   const resultEl = document.getElementById('validationResult');
   resultEl.classList.remove('visible');
@@ -1743,11 +1756,12 @@ function validateWithAIVariants(allVariants) {
   var sel = document.getElementById('protoSelect');
   if (!sel.value) { sel.classList.add('req-err'); setTimeout(function(){sel.classList.remove('req-err');},2500); return; }
 
-  var proto = prototypes[parseInt(sel.value, 10)];
+  var protoRaw2 = prototypes[parseInt(sel.value, 10)];
+  var proto2 = { id: protoRaw2.id, title: protoRaw2.title, name: protoRaw2.name, summary: protoRaw2.summary, url: protoRaw2.url || protoRaw2.resolvedUrl || null, lauraScore: protoRaw2.lauraScore, lauraVerdict: protoRaw2.lauraVerdict, lauraRecommendation: protoRaw2.lauraRecommendation, lauraEngagementChallenge: protoRaw2.lauraEngagementChallenge, lauraCompetitorGap: protoRaw2.lauraCompetitorGap };
   var additionalDetails = document.getElementById('additionalDetails').value.trim();
 
   var body = {
-    prototype: proto,
+    prototype: proto2,
     tiers: allVariants[0].tiers, // primary variant for scoring
     variantSummary: allVariants.map(function(v){ return v.variantName + ': ' + v.tiers.map(function(t){ return t.name + ' ' + t.price; }).join(' / '); }).join(' | '),
     additionalDetails: additionalDetails
