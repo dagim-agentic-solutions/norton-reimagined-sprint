@@ -146,7 +146,41 @@
   display: flex;
   align-items: center;
   gap: 8px;
+  flex-wrap: wrap;
 }
+.tier-recommended-toggle {
+  display: inline-flex; align-items: center; gap: 6px;
+  margin-left: auto; cursor: pointer;
+  font-size: 11px; font-weight: 700; letter-spacing: .06em;
+  color: var(--ink-softer); text-transform: uppercase; user-select: none;
+}
+.tier-recommended-cb { display: none; }
+.tier-rec-label {
+  padding: 3px 10px; border-radius: 999px;
+  border: 1.5px solid var(--line); background: #fff; color: var(--ink-softer);
+  transition: all .15s;
+}
+.tier-recommended-cb:checked + .tier-rec-label {
+  background: var(--ink); border-color: var(--ink); color: var(--yellow);
+}
+.tier-label-row {
+  display: flex; align-items: center; justify-content: space-between;
+  font-size: 12px; font-weight: 600; color: var(--ink-soft);
+  margin-bottom: 0; cursor: pointer;
+}
+.trial-switch { display: inline-flex; align-items: center; cursor: pointer; }
+.trial-switch input { display: none; }
+.trial-track {
+  width: 40px; height: 22px; border-radius: 999px;
+  background: var(--line); position: relative; transition: background .2s;
+}
+.trial-track .trial-knob {
+  position: absolute; top: 3px; left: 3px;
+  width: 16px; height: 16px; border-radius: 50%;
+  background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.15); transition: transform .2s;
+}
+.trial-switch input:checked + .trial-track { background: var(--ink); }
+.trial-switch input:checked + .trial-track .trial-knob { transform: translateX(18px); }
 .tier-block-header .tier-badge {
   background: var(--yellow);
   color: var(--ink);
@@ -697,8 +731,8 @@
 
   <!-- ─── Action Buttons ─── -->
   <div class="action-row">
-    <button class="btn-primary" id="btnGenPrompt">✦ Generate Claude Prompt</button>
-    <button class="btn-secondary" id="btnValidate">⚡ Validate with AI</button>
+    <button class="btn-primary" id="btnGenPrompt">Generate Prompt</button>
+    <button class="btn-secondary" id="btnValidate">Validate with AI</button>
   </div>
 
   <!-- ─── Output: Generated Prompt ─── -->
@@ -847,6 +881,15 @@ function buildPricingTiers() {
     block.querySelector('.tier-price').addEventListener('input', function() {
       tierState[idx].price = this.value;
     });
+
+    // Wire trial toggle
+    const trialCb = block.querySelector('.tier-trial-cb');
+    const trialDaysWrap = document.getElementById('trial-days-wrap-' + idx);
+    if (trialCb && trialDaysWrap) {
+      trialCb.addEventListener('change', function() {
+        trialDaysWrap.style.display = this.checked ? '' : 'none';
+      });
+    }
 
     // Wire add custom feature button
     const addBtn = block.querySelector('.btn-add-feat');
@@ -1048,7 +1091,13 @@ function collectTiers() {
       tierState[i].customFeatures.forEach(f => { if (!inheritedCustom.includes(f)) inheritedCustom.push(f); });
     }
     const features = [...new Set([...inheritedFeats, ...inheritedCustom, ...ownFeatures])];
-    tiers.push({ name, price, features, ownFeatures, jtbd });
+    const recCb = block.querySelector('.tier-recommended-cb');
+    const recommended = recCb ? recCb.checked : false;
+    const trialCbEl = block.querySelector('.tier-trial-cb');
+    const trialEnabled = trialCbEl ? trialCbEl.checked : false;
+    const trialDaysInput = block.querySelector('.tier-trial-days');
+    const trialDays = trialEnabled ? (parseInt(trialDaysInput ? trialDaysInput.value : '7') || 7) : 0;
+    tiers.push({ name, price, features, ownFeatures, jtbd, recommended, trialDays });
   });
   return valid ? tiers : null;
 }
@@ -1076,41 +1125,69 @@ function generatePrompt() {
     ? `Laura Fit Score: ${proto.lauraScore}/100${proto.lauraVerdict ? ' (' + proto.lauraVerdict + ')' : ''}`
     : '';
 
-  const formatTierForPrompt = (t, i) =>
-    `TIER ${i + 1}: ${t.name} — ${t.price}
-All features: ${t.features.length ? t.features.join(', ') : 'Standard protection suite'}${t.ownFeatures && t.ownFeatures.length ? '\n    Added in this tier: ' + t.ownFeatures.join(', ') : ''}
-Target customer (raw input — rewrite using subscription best practices): ${t.jtbd}`;
+  const formatTierForPrompt = (t, i) => {
+    const lines = [
+      'TIER ' + (i+1) + ': ' + t.name + ' — ' + t.price,
+      'All features: ' + (t.features.length ? t.features.join(', ') : 'Standard protection suite'),
+      t.ownFeatures && t.ownFeatures.length ? 'Added in this tier: ' + t.ownFeatures.join(', ') : '',
+      'Target customer (raw input — rewrite with world-class subscription copy): ' + t.jtbd,
+      t.recommended ? 'RECOMMENDED: Yes — give this tier a prominent recommended badge/highlight' : '',
+      t.trialDays ? 'FREE TRIAL: ' + t.trialDays + ' days — use "Try ' + t.trialDays + ' days free" as the primary CTA for this tier' : '',
+    ];
+    return lines.filter(Boolean).join('\n');
+  };
 
-  const prompt = `You are a Senior Product Designer and Frontend Developer specialising in consumer security and privacy products.
+  const protoUrl = proto ? (proto.url || proto.resolvedUrl || null) : null;
 
-Build a complete, production-quality HTML landing page. Output ONLY a single self-contained HTML file.
+  const prompt = `You are a world-class product designer and frontend developer building a PUBLIC-FACING PRODUCT LAUNCH landing page. This must look like it came from a funded startup with a top design team — not a prototype.
 
-PRODUCT CONCEPT:
+Output ONLY a single self-contained HTML file. All CSS in <style>. All JS in <script>. No external deps except Google Fonts.
+
+PRODUCT:
 Title: ${proto ? (proto.title || proto.name) : 'Norton Security Product'}
 Summary: ${proto && proto.summary ? proto.summary : 'A comprehensive digital security solution for modern families.'}${lauraLine ? '\n' + lauraLine : ''}
+${protoUrl ? 'Prototype URL: ' + protoUrl : ''}
 
 PRICING STRATEGY:
 ${tiers.map((t, i) => formatTierForPrompt(t, i)).join('\n\n')}
 ${additionalDetails ? '\nADDITIONAL CONTEXT:\n' + additionalDetails + '\n' : ''}
-DESIGN: Inter Tight via Google Fonts. #242424 ink · #FFE800 yellow · #F8F8F7 bg. Sticky dark nav. 8px cards. 999px pills.
-SECTIONS: Hero · Problem · Solution · Features as Outcomes · Pricing (exact 3 tiers) · Social Proof · CTA · Footer
+DESIGN SYSTEM (Norton Reimagined):
+- Font: Inter Tight (400/500/600/700/800) via Google Fonts — only typeface
+- Colors: #242424 ink · #FFE800 yellow · #F8F8F7 paper · #FFFFFF card surface
+- Radius: 8px cards · 999px pills/buttons/tags
+- Nav: sticky, #242424 bg, yellow accent on active, no emojis
+- NO EMOJIS anywhere on the page
+- Section padding: 80–120px vertical
+- Cards: white bg, 1px #E6E6E4 border, 8px radius, 28px internal padding
 
-COPY STANDARDS — apply throughout, especially in the Pricing section:
-- Outcome-first: every headline leads with what Laura gains, not what the product does
-- Plain language — no jargon, no acronyms, no tech speak
+PROTOTYPE SCREENSHOTS:
+${protoUrl ? 'The product prototype is live at: ' + protoUrl + '. Use this Microlink API to embed real screenshots as product mockups: https://api.microlink.io?url=' + encodeURIComponent(protoUrl) + '&screenshot=true&meta=false&embed=screenshot.url — show 2-3 key screens in device frames (phone mockup using CSS) in the hero and features sections. This makes the page feel like a real launch.' : 'No prototype URL — use clean CSS/SVG feature illustrations instead.'}
+
+PAGE SECTIONS (in order):
+1. HERO — Large outcome headline, one primary CTA, product screenshot in phone frame
+2. PROBLEM — Laura pain points in her own words, household framing
+3. PRODUCT IN ACTION — 2-3 prototype screenshots in device frames with captions
+4. SOLUTION — What this product makes possible (outcomes, not features)
+5. FEATURES — Each capability as a felt outcome (before/after or icon + text)
+6. PRICING — 3-tier cards (see tier data above)
+7. SOCIAL PROOF — 2-3 real-feeling testimonials from Laura-alike users
+8. CTA — Clear, outcome-framed final call to action
+9. FOOTER — Minimal, clean
+
+COPY RULES (non-negotiable):
+- Outcome-first everywhere. Lead with what Laura gains.
+- Plain language — zero jargon, no acronyms, no tech speak
 - Household framing: "your family", "everyone's devices", "your home"
-- No Lorem ipsum. All copy must be realistic and specific.
+- No Lorem ipsum. All copy must be specific and realistic.
 
-PRICING TIER COPY — critical rules:
-- The "Target customer" notes for each tier are raw directional input from the sprint team. DO NOT copy them verbatim.
-- Rewrite each tier's customer story and value prop using world-class subscription page standards:
-  · Lead with the identity: "For the [household/family/individual] who wants..."
-  · Follow with the core promise in one crisp sentence — what does this tier make possible?
-  · List 2-3 outcomes (not features) the customer will feel
-  · The upgrade logic must be clear: why would someone pay more for Tier 2 vs Tier 1?
-- Use proven SaaS pricing page patterns: Stripe, Linear, Notion, Life360, Aura all do this well
-- The recommended tier (middle tier) should have the most compelling copy and a "Most Popular" badge
-- Pricing cards should feel like decisions, not spec sheets`;
+PRICING SECTION (Life360 / Aura / Stripe standard):
+- DO NOT copy the "Target customer" inputs verbatim — rewrite entirely
+- Each card: identity line ("For families who...") + crisp promise + 3-4 checkmarked outcomes
+- Tiers marked RECOMMENDED: give a prominent yellow #FFE800 badge and elevated card treatment
+- Tiers with FREE TRIAL: primary CTA button says "Try X days free" (not "Get started")
+- Show additive features: "Everything in [lower tier], plus:" before listing new additions
+- Upgrade logic must be obvious — why pay more must be viscerally clear
+- Cards feel like decisions, not feature tables`;
 
   document.getElementById('promptText').value = prompt;
   const card = document.getElementById('promptCard');
@@ -1175,7 +1252,7 @@ async function validateWithAI() {
     resultEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
   } finally {
     btn.disabled = false;
-    btn.innerHTML = '⚡ Validate with AI';
+    btn.textContent = 'Validate with AI';
   }
 }
 
