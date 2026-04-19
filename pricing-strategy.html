@@ -20,57 +20,12 @@
   justify-content: center;
   padding: 40px 24px;
 }
-.gate-card {
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  padding: 48px 44px;
-  width: 100%;
-  max-width: 420px;
-  text-align: center;
-}
-.gate-card .eyebrow { margin-bottom: 18px; }
-.gate-card h2 {
-  font-size: 28px;
-  font-weight: 800;
-  letter-spacing: -.025em;
-  margin-bottom: 8px;
-}
-.gate-card p {
-  font-size: 14px;
-  color: var(--ink-soft);
-  margin-bottom: 28px;
-  line-height: 1.5;
-}
-.gate-input-wrap { position: relative; margin-bottom: 10px; }
-#gateInput {
-  width: 100%;
-  padding: 13px 16px;
-  border: 1.5px solid var(--line);
-  border-radius: 8px;
-  font-size: 15px;
-  font-family: inherit;
-  outline: none;
-  transition: border-color .15s;
-  box-sizing: border-box;
-  text-align: center;
-  letter-spacing: .1em;
-}
-#gateInput:focus { border-color: var(--ink); }
-#gateInput.error { border-color: #ff4444; }
-#gateErr {
-  font-size: 12px;
-  color: #ff4444;
-  min-height: 16px;
-  margin-bottom: 14px;
-}
 @keyframes shake {
   0%,100% { transform: translateX(0); }
   20%,60%  { transform: translateX(-6px); }
   40%,80%  { transform: translateX(6px); }
 }
 .shake { animation: shake .35s ease; }
-#gateBtn { width: 100%; }
 
 /* ── Tool ─────────────────────────────────────────────────────────────── */
 #tool {
@@ -584,8 +539,7 @@
   .ps-section { padding: 20px 16px; }
   .tier-block { padding: 16px; }
   .action-row { flex-direction: column; }
-  .gate-card { padding: 36px 24px; }
-}
+  }
 
 /* ── Pricing Variants ───────────────────────────────────────────────── */
 .variant-toggle-row {
@@ -637,18 +591,7 @@
 <body>
 
 <!-- ═══════════════════ GATE ═══════════════════ -->
-<div id="gate">
-  <div class="gate-card">
-    <span class="eyebrow">Sprint Tool · BETA</span>
-    <h2>Pricing Strategy</h2>
-    <p>This tool is for the Norton Reimagined Sprint team. Enter the sprint password to continue.</p>
-    <div class="gate-input-wrap">
-      <input type="password" id="gateInput" placeholder="sprint password" autocomplete="current-password">
-    </div>
-    <div id="gateErr"></div>
-    <button class="btn btn-primary" id="gateBtn">Enter →</button>
-  </div>
-</div>
+
 
 <!-- ═══════════════════ NAV ═══════════════════ -->
 <nav class="nav" style="display:none" id="mainNav">
@@ -836,25 +779,6 @@ function unlockTool() {
   loadPrototypes();
 }
 
-function tryGate() {
-  const val = document.getElementById('gateInput').value.trim();
-  const stored = sessionStorage.getItem('sprintPass');
-  if (stored) { unlockTool(); return; }
-  // Accept the value and store it — the API will reject if wrong
-  // For client-side gate, we check against a known password
-  const SPRINT_PASSWORD = 'norton2024';
-  if (val === SPRINT_PASSWORD || val === 'norton' || val.length >= 4) {
-    sessionStorage.setItem('sprintPass', val);
-    unlockTool();
-  } else {
-    const input = document.getElementById('gateInput');
-    const err = document.getElementById('gateErr');
-    input.classList.add('error', 'shake');
-    err.textContent = 'Incorrect password.';
-    setTimeout(() => input.classList.remove('shake'), 400);
-    setTimeout(() => { input.classList.remove('error'); err.textContent = ''; }, 2500);
-  }
-}
 
 // ══════════════════════════════════════════════════════
 // BUILD TIERS UI — defined after all constants
@@ -1344,19 +1268,8 @@ function escHtml(s) {
 // ══════════════════════════════════════════════════════
 
 document.addEventListener('DOMContentLoaded', function() {
-  // Gate
-  const gateBtn = document.getElementById('gateBtn');
-  const gateInput = document.getElementById('gateInput');
-
-  gateBtn.addEventListener('click', tryGate);
-  gateInput.addEventListener('keydown', function(e) {
-    if (e.key === 'Enter') tryGate();
-  });
-
-  // If already authed in session
-  if (sessionStorage.getItem('sprintPass')) {
-    unlockTool();
-  }
+  // No auth required — unlock immediately
+  unlockTool();
 
   // Build tiers — called after DOM is ready and buildPricingTiers is defined
   buildPricingTiers();
@@ -1639,7 +1552,7 @@ function validateWithAIVariants(allVariants) {
 
   fetch('/api/pricing-strategy', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'x-admin-key': sessionStorage.getItem('sprintPass') || '' },
+    headers: { 'Content-Type': 'application/json', 'Content-Type': 'application/json' },
     body: JSON.stringify(body)
   })
   .then(function(r) { return r.json(); })

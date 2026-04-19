@@ -1,8 +1,8 @@
 import { runLLM } from "../_lib/llmRouter";
-import { ensureAdmin } from "../_lib/adminAuth.js";
 
 /**
  * POST /api/pricing-strategy
+ * Public endpoint — no auth required.
  * Evaluates a 3-tier subscription pricing strategy against Laura persona + competitive market.
  *
  * Request body: {
@@ -13,58 +13,42 @@ import { ensureAdmin } from "../_lib/adminAuth.js";
  * }
  */
 
-const ALLOWED_ORIGIN = "*";
+const CORS = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type",
+};
 
-function corsHeaders() {
-  return {
-    "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
-    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type, x-admin-key, x-sprintbox-key, Authorization",
-  };
-}
-
-function guard(request, env) {
-  const auth = ensureAdmin(request, env);
-  if (!auth.ok) {
-    return new Response(JSON.stringify({ error: auth.error || "Unauthorized" }), {
-      status: auth.status || 401,
-      headers: { "Content-Type": "application/json", ...corsHeaders() },
-    });
-  }
-  return null;
+function json(data, status = 200) {
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: { "Content-Type": "application/json", ...CORS },
+  });
 }
 
 export async function onRequestOptions() {
-  return new Response(null, { status: 204, headers: corsHeaders() });
+  return new Response(null, { status: 204, headers: CORS });
 }
 
 export async function onRequestPost({ request, env }) {
-  const denied = guard(request, env);
-  if (denied) return denied;
-
-  const headers = { "Content-Type": "application/json", ...corsHeaders() };
-
   let body;
   try {
     body = await request.json();
   } catch {
-    return new Response(JSON.stringify({ error: "Invalid JSON body." }), { status: 400, headers });
+    return json({ error: "Invalid JSON body." }, 400);
   }
 
   const { prototype, tiers, additionalDetails } = body;
 
   if (!prototype || !prototype.title) {
-    return new Response(JSON.stringify({ error: "Missing prototype." }), { status: 400, headers });
+    return json({ error: "Missing prototype." }, 400);
   }
   if (!Array.isArray(tiers) || tiers.length !== 3) {
-    return new Response(JSON.stringify({ error: "Exactly 3 tiers required." }), { status: 400, headers });
+    return json({ error: "Exactly 3 tiers required." }, 400);
   }
   for (let i = 0; i < 3; i++) {
     if (!tiers[i].name || !tiers[i].price) {
-      return new Response(
-        JSON.stringify({ error: `Tier ${i + 1} is missing name or price.` }),
-        { status: 400, headers }
-      );
+      return json({ error: `Tier ${i + 1} is missing name or price.` }, 400);
     }
   }
 
@@ -78,7 +62,7 @@ export async function onRequestPost({ request, env }) {
 
   const formatTier = (t, i) =>
     `TIER ${i + 1}: ${t.name} — ${t.price}
-Features: ${Array.isArray(t.features) ? t.features.join(", ") || "None specified" : t.features || "None specified"}
+Features: ${Array.isArray(t.features) && t.features.length ? t.features.join(", ") : "None specified"}
 Customer Story / JTBD: ${t.jtbd || "Not provided"}`;
 
   const prompt = `You are a world-class product strategist evaluating a 3-tier subscription pricing strategy for a Norton security product.
@@ -138,11 +122,8 @@ Evaluate rigorously. Return ONLY valid JSON (no markdown):
       .trim();
 
     const result = JSON.parse(cleaned);
-    return new Response(JSON.stringify(result), { status: 200, headers });
+    return json(result);
   } catch (err) {
-    return new Response(
-      JSON.stringify({ error: "LLM error", detail: err.message }),
-      { status: 502, headers }
-    );
+    return json({ error: "LLM error", detail: err.message }, 502);
   }
 }
