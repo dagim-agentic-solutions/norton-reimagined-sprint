@@ -565,6 +565,52 @@
   .action-row { flex-direction: column; }
   .gate-card { padding: 36px 24px; }
 }
+
+/* ── Pricing Variants ───────────────────────────────────────────────── */
+.variant-toggle-row {
+  display: flex; align-items: center; gap: 14px; margin-bottom: 20px; flex-wrap: wrap;
+}
+.variant-toggle-label { font-size: 13px; font-weight: 600; color: var(--ink); }
+.variant-toggle-switch { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+.vtoggle-track {
+  width: 44px; height: 24px; background: #e0e0dc; border-radius: 999px;
+  position: relative; transition: background .2s; flex-shrink: 0;
+}
+.vtoggle-track.on { background: var(--ink); }
+.vtoggle-knob {
+  position: absolute; top: 3px; left: 3px;
+  width: 18px; height: 18px; border-radius: 50%; background: #fff;
+  transition: transform .2s; box-shadow: 0 1px 3px rgba(0,0,0,.2);
+}
+.vtoggle-track.on .vtoggle-knob { transform: translateX(20px); }
+.vtoggle-text { font-size: 14px; font-weight: 600; color: var(--ink); }
+
+.variant-tabs-wrap { margin-bottom: 18px; }
+.variant-tabs-row {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 12px;
+}
+.variant-tab {
+  padding: 7px 18px; border-radius: 999px; border: 1.5px solid var(--line);
+  background: #fff; font-size: 13px; font-weight: 600; color: var(--ink-soft);
+  cursor: pointer; transition: all .15s;
+}
+.variant-tab.active { background: var(--ink); color: var(--yellow); border-color: var(--ink); }
+.variant-tab-actions { display: flex; align-items: center; gap: 6px; }
+.btn-add-variant {
+  padding: 6px 14px; border-radius: 999px; border: 1.5px dashed var(--line);
+  background: transparent; font-size: 12px; font-weight: 600; color: var(--ink-softer);
+  cursor: pointer; transition: all .15s;
+}
+.btn-add-variant:hover { border-color: var(--ink); color: var(--ink); }
+.btn-remove-variant {
+  width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid #e0e0dc;
+  background: #fff; color: #c00; font-size: 14px; line-height: 1; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center; margin-left: 2px;
+  transition: all .15s; padding: 0;
+}
+.btn-remove-variant:hover { background: #fff0f0; border-color: #c00; }
+.variant-hint { font-size: 12px; color: var(--ink-softer); margin-bottom: 14px; }
+
 </style>
 </head>
 <body>
@@ -653,6 +699,22 @@
       <h3>Pricing Tiers</h3>
     </div>
     <p class="sec-hint">Define your 3-tier pricing strategy. Select features for each tier and write a customer story (JTBD) explaining who buys it and why.</p>
+
+    <div class="variant-toggle-row">
+      <span class="variant-toggle-label">Pricing variants</span>
+      <label class="variant-toggle-switch" id="variantToggleLabel">
+        <div class="vtoggle-track" id="variantToggleTrack"><div class="vtoggle-knob"></div></div>
+        <span class="vtoggle-text" id="variantToggleText">Off — flat 3-tier only</span>
+      </label>
+      <span style="font-size:12px;color:var(--ink-softer);">e.g. Monthly / Annually, Individual / Family / Business</span>
+    </div>
+    <div id="variantTabsWrap" style="display:none;" class="variant-tabs-wrap">
+      <p class="variant-hint">Each variant has its own version of the 3 tiers. Participants switch between tabs to set pricing per context.</p>
+      <div class="variant-tabs-row" id="variantTabsRow"></div>
+      <div class="variant-tab-actions">
+        <button class="btn-add-variant" id="btnAddVariant">+ Add variant</button>
+      </div>
+    </div>
 
     <div id="tiersContainer">
       <!-- Tiers rendered by JS -->
@@ -1223,6 +1285,275 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 });
+// ══════════════════════════════════════════════════════
+// PRICING VARIANTS
+// ══════════════════════════════════════════════════════
+
+var variantsEnabled = false;
+
+// variants: array of { name, tierStates: [tierState0, tierState1, tierState2] }
+// Each tierState mirrors the global tierState structure but is per-variant
+var variants = [];
+var activeVariantIdx = 0;
+
+// Deep-clone a tier state set
+function cloneTierStates() {
+  return tierState.map(function(ts) {
+    return {
+      name: ts.name,
+      price: ts.price,
+      selectedChips: new Set(ts.selectedChips),
+      customFeatures: ts.customFeatures.slice()
+    };
+  });
+}
+
+function saveTierStatesToVariant(varIdx) {
+  if (!variantsEnabled || !variants[varIdx]) return;
+  // Sync live DOM inputs back into tierState first
+  document.querySelectorAll('.tier-block').forEach(function(block, idx) {
+    tierState[idx].name = block.querySelector('.tier-name').value;
+    tierState[idx].price = block.querySelector('.tier-price').value;
+    tierState[idx].jtbd = block.querySelector('.tier-jtbd').value;
+  });
+  variants[varIdx].tierStates = cloneTierStates();
+  variants[varIdx].jtbds = tierState.map(function(ts) { return ts.jtbd || ''; });
+}
+
+function loadTierStatesFromVariant(varIdx) {
+  if (!variants[varIdx]) return;
+  var vts = variants[varIdx].tierStates;
+  tierState.forEach(function(ts, i) {
+    ts.name = vts[i].name;
+    ts.price = vts[i].price;
+    ts.selectedChips = new Set(vts[i].selectedChips);
+    ts.customFeatures = vts[i].customFeatures.slice();
+  });
+  buildPricingTiers();
+  // Restore JTBD values
+  var jtbds = variants[varIdx].jtbds || [];
+  document.querySelectorAll('.tier-block').forEach(function(block, i) {
+    block.querySelector('.tier-jtbd').value = jtbds[i] || '';
+    block.querySelector('.tier-name').value = tierState[i].name;
+    block.querySelector('.tier-price').value = tierState[i].price;
+  });
+}
+
+function renderVariantTabs() {
+  var row = document.getElementById('variantTabsRow');
+  row.innerHTML = '';
+  variants.forEach(function(v, i) {
+    var tab = document.createElement('button');
+    tab.className = 'variant-tab' + (i === activeVariantIdx ? ' active' : '');
+    tab.dataset.variantIdx = i;
+    // Editable name on double-click
+    tab.textContent = v.name;
+    tab.title = 'Click to switch. Double-click to rename.';
+    tab.addEventListener('click', function() {
+      if (activeVariantIdx === i) return;
+      saveTierStatesToVariant(activeVariantIdx);
+      activeVariantIdx = i;
+      loadTierStatesFromVariant(i);
+      renderVariantTabs();
+    });
+    tab.addEventListener('dblclick', function() {
+      var newName = prompt('Rename variant:', v.name);
+      if (newName && newName.trim()) {
+        variants[i].name = newName.trim();
+        renderVariantTabs();
+      }
+    });
+    row.appendChild(tab);
+
+    // Remove button (only if more than 1 variant)
+    if (variants.length > 1) {
+      var rmBtn = document.createElement('button');
+      rmBtn.className = 'btn-remove-variant';
+      rmBtn.title = 'Remove variant';
+      rmBtn.textContent = '×';
+      rmBtn.dataset.variantIdx = i;
+      rmBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        var idx = parseInt(this.dataset.variantIdx, 10);
+        variants.splice(idx, 1);
+        if (activeVariantIdx >= variants.length) activeVariantIdx = variants.length - 1;
+        loadTierStatesFromVariant(activeVariantIdx);
+        renderVariantTabs();
+      });
+      row.appendChild(rmBtn);
+    }
+  });
+}
+
+function initVariants() {
+  // Seed first variant from current tier state
+  variants = [{
+    name: 'Monthly',
+    tierStates: cloneTierStates(),
+    jtbds: tierState.map(function() { return ''; })
+  }];
+  activeVariantIdx = 0;
+  renderVariantTabs();
+}
+
+// Toggle on/off
+document.getElementById('variantToggleLabel').addEventListener('click', function() {
+  variantsEnabled = !variantsEnabled;
+  document.getElementById('variantToggleTrack').classList.toggle('on', variantsEnabled);
+  document.getElementById('variantToggleText').textContent = variantsEnabled
+    ? 'On — multi-variant pricing' : 'Off — flat 3-tier only';
+  document.getElementById('variantTabsWrap').style.display = variantsEnabled ? 'block' : 'none';
+  if (variantsEnabled && variants.length === 0) initVariants();
+});
+
+// Add variant button
+document.getElementById('btnAddVariant').addEventListener('click', function() {
+  // Save current
+  saveTierStatesToVariant(activeVariantIdx);
+  // Add new variant cloned from current
+  var newName = 'Variant ' + (variants.length + 1);
+  variants.push({
+    name: newName,
+    tierStates: cloneTierStates(),
+    jtbds: tierState.map(function(ts) { return ts.jtbd || ''; })
+  });
+  activeVariantIdx = variants.length - 1;
+  renderVariantTabs();
+  // Prompt rename immediately
+  var newNameInput = prompt('Name this variant:', newName);
+  if (newNameInput && newNameInput.trim()) {
+    variants[activeVariantIdx].name = newNameInput.trim();
+    renderVariantTabs();
+  }
+});
+
+// ── Override collectTiers to support variants ──────────────────────────────
+var _collectTiersOriginal = collectTiers;
+
+function collectAllVariants() {
+  if (!variantsEnabled || variants.length <= 1) return null; // use normal flow
+
+  // Save current active variant first
+  saveTierStatesToVariant(activeVariantIdx);
+
+  // Collect tiers for each variant
+  var result = [];
+  variants.forEach(function(v) {
+    var tiers = v.tierStates.map(function(ts, i) {
+      return {
+        name: ts.name || TIER_DEFAULTS[i].name,
+        price: ts.price || TIER_DEFAULTS[i].price,
+        features: Array.from(ts.selectedChips).concat(ts.customFeatures),
+        jtbd: (v.jtbds && v.jtbds[i]) || ''
+      };
+    });
+    result.push({ variantName: v.name, tiers: tiers });
+  });
+  return result;
+}
+
+// ── Patch generatePrompt to include variants ───────────────────────────────
+var _generatePromptOriginal = generatePrompt;
+
+function generatePrompt() {
+  var allVariants = collectAllVariants();
+  if (!allVariants) {
+    // Normal single-variant flow
+    _generatePromptOriginal();
+    return;
+  }
+
+  var sel = document.getElementById('protoSelect');
+  if (!sel.value) { sel.classList.add('req-err'); setTimeout(function(){sel.classList.remove('req-err');},2500); return; }
+
+  // Validate all variants have JTBDs
+  var missing = false;
+  allVariants.forEach(function(v) {
+    v.tiers.forEach(function(t) { if (!t.jtbd) missing = true; });
+  });
+  if (missing) { alert('Please add a customer story for every tier in every variant.'); return; }
+
+  var proto = prototypes[parseInt(sel.value, 10)];
+  var additionalDetails = document.getElementById('additionalDetails').value.trim();
+  var lauraLine = proto && proto.lauraScore != null
+    ? 'Laura Fit Score: ' + proto.lauraScore + '/100' + (proto.lauraVerdict ? ' (' + proto.lauraVerdict + ')' : '') : '';
+
+  var variantBlocks = allVariants.map(function(v) {
+    return '--- ' + v.variantName.toUpperCase() + ' PRICING ---\n' +
+      v.tiers.map(function(t, i) {
+        return 'TIER ' + (i+1) + ': ' + t.name + ' — ' + t.price + '\nFeatures: ' + (t.features.join(', ') || 'None') + '\nCustomer story: ' + t.jtbd;
+      }).join('\n\n');
+  }).join('\n\n');
+
+  var promptText = [
+    'You are a Senior Product Designer and Frontend Developer specialising in consumer security and privacy products.',
+    '',
+    'Build a complete, production-quality HTML landing page. Output ONLY a single self-contained HTML file.',
+    '',
+    'PRODUCT CONCEPT:',
+    'Title: ' + (proto.title || proto.name || 'Untitled'),
+    'Summary: ' + (proto.summary || ''),
+    lauraLine,
+    '',
+    'PRICING STRATEGY — MULTI-VARIANT:',
+    'The pricing page should include a tab switcher at the top (like Life360 Monthly/Annually) for each variant below.',
+    'When a tab is selected, the 3-tier cards below update to show that variant pricing.',
+    '',
+    variantBlocks,
+    '',
+    additionalDetails ? 'ADDITIONAL CONTEXT:\n' + additionalDetails + '\n' : '',
+    'DESIGN: Inter Tight via Google Fonts. #242424 ink · #FFE800 yellow · #F8F8F7 bg. Sticky dark nav. 8px cards. 999px pills.',
+    'SECTIONS: Hero · Problem · Solution · Features as Outcomes · Pricing with variant tabs · Social Proof · CTA · Footer',
+    'COPY: Outcome-first. Plain language. Household framing. No Lorem ipsum.',
+    'Output ONLY the complete HTML file — no preamble, no markdown fences.',
+  ].filter(Boolean).join('\n');
+
+  document.getElementById('promptText').value = promptText;
+  var card = document.getElementById('promptCard');
+  card.style.display = 'block';
+  card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  document.getElementById('copyBtn').textContent = 'Copy';
+  document.getElementById('copyBtn').className = 'btn-copy';
+}
+
+// ── Patch validateWithAI to send all variants ──────────────────────────────
+var _validateOriginal = validateWithAI;
+
+function validateWithAI() {
+  var allVariants = collectAllVariants();
+  if (!allVariants) {
+    _validateOriginal();
+    return;
+  }
+
+  var sel = document.getElementById('protoSelect');
+  if (!sel.value) { sel.classList.add('req-err'); setTimeout(function(){sel.classList.remove('req-err');},2500); return; }
+
+  var proto = prototypes[parseInt(sel.value, 10)];
+  var additionalDetails = document.getElementById('additionalDetails').value.trim();
+
+  var body = {
+    prototype: proto,
+    tiers: allVariants[0].tiers, // primary variant for scoring
+    variantSummary: allVariants.map(function(v){ return v.variantName + ': ' + v.tiers.map(function(t){ return t.name + ' ' + t.price; }).join(' / '); }).join(' | '),
+    additionalDetails: additionalDetails
+  };
+
+  var resultEl = document.getElementById('validationResult');
+  resultEl.innerHTML = '<div style="padding:20px;text-align:center;color:var(--ink-soft);">⚡ Validating your pricing strategy…</div>';
+  resultEl.classList.add('visible');
+  resultEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  fetch('/api/pricing-strategy', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-admin-key': sessionStorage.getItem('sprintPass') || '' },
+    body: JSON.stringify(body)
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(data) { renderValidation(data); })
+  .catch(function(e) { resultEl.innerHTML = '<div style="padding:20px;color:#c00;">Validation failed: ' + e.message + '<\/div>'; });
+}
+
 </script>
 
 <script src="nav.js"></script>
