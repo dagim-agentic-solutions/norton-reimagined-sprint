@@ -1349,30 +1349,38 @@ async function validateWithAI() {
   resultEl.classList.remove('visible');
   resultEl.innerHTML = '';
 
+  resultEl.innerHTML = `<div class="val-card" style="text-align:center;padding:24px;color:var(--ink-soft);">Analyzing your strategy — this takes about 20 seconds…</div>`;
+  resultEl.classList.add('visible');
+
   try {
-    const adminKey = sessionStorage.getItem('sprintPass') || '';
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 55000);
+
     const res = await fetch('/api/pricing-strategy', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-admin-key': adminKey
-      },
-      body: JSON.stringify({
-        prototype: proto,
-        tiers,
-        additionalDetails
-      })
+      signal: controller.signal,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prototype: proto, tiers, additionalDetails })
     });
 
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({ error: res.statusText }));
-      throw new Error(err.error || `HTTP ${res.status}`);
+    clearTimeout(timeoutId);
+
+    const rawText = await res.text();
+    let data;
+    try {
+      data = JSON.parse(rawText);
+    } catch {
+      throw new Error(`Server returned invalid response (status ${res.status})`);
     }
 
-    const data = await res.json();
+    if (!res.ok) {
+      throw new Error(data.error || data.detail || `Server error ${res.status}`);
+    }
+
     renderValidation(data);
   } catch (err) {
-    resultEl.innerHTML = `<div class="val-card"><p style="color:#ff4444;font-weight:600;">⚠ Validation failed: ${escHtml(err.message)}</p></div>`;
+    const msg = err.name === 'AbortError' ? 'Request timed out — try again' : err.message;
+    resultEl.innerHTML = `<div class="val-card"><p style="color:#ff4444;font-weight:600;">Validation failed: ${escHtml(msg)}</p></div>`;
     resultEl.classList.add('visible');
     resultEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
   } finally {
