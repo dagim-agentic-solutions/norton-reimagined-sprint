@@ -772,10 +772,12 @@ const tierState = TIER_DEFAULTS.map(t => ({
 const GATE_PASS = sessionStorage.getItem('sprintPass');
 
 function unlockTool() {
-  document.getElementById('gate').style.display = 'none';
-  document.getElementById('mainNav').style.display = '';
+  const gate = document.getElementById('gate');
+  if (gate) gate.style.display = 'none';
+  const nav = document.getElementById('mainNav');
+  if (nav) nav.style.display = '';
   const tool = document.getElementById('tool');
-  tool.classList.add('visible');
+  if (tool) tool.classList.add('visible');
   loadPrototypes();
 }
 
