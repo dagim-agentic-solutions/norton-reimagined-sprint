@@ -1325,13 +1325,19 @@ async function validateWithAI() {
   const tiers = collectTiers();
   if (!tiers) return;
 
-  const protoRaw = prototypes[parseInt(sel.value, 10)];
+  const protoIdx = parseInt(sel.value, 10);
+  const protoRaw = prototypes[protoIdx];
+  if (!protoRaw) {
+    resultEl.innerHTML = `<div class="val-card"><p style="color:#ff4444;font-weight:600;">Please select a prototype first — or reload the page if the list is empty.</p></div>`;
+    resultEl.classList.add('visible');
+    return;
+  }
   // Strip large binary fields before sending to API (fileContent can be megabytes)
   const proto = {
     id: protoRaw.id,
-    title: protoRaw.title,
-    name: protoRaw.name,
-    summary: protoRaw.summary,
+    title: protoRaw.title || protoRaw.name || 'Untitled',
+    name: protoRaw.name || protoRaw.title || 'Untitled',
+    summary: protoRaw.summary || protoRaw.description || '',
     url: protoRaw.url || protoRaw.resolvedUrl || null,
     lauraScore: protoRaw.lauraScore,
     lauraVerdict: protoRaw.lauraVerdict,
@@ -1379,8 +1385,9 @@ async function validateWithAI() {
 
     renderValidation(data);
   } catch (err) {
-    const msg = err.name === 'AbortError' ? 'Request timed out — try again' : err.message;
-    resultEl.innerHTML = `<div class="val-card"><p style="color:#ff4444;font-weight:600;">Validation failed: ${escHtml(msg)}</p></div>`;
+    console.error('[Pressure test] error:', err);
+    const msg = err.name === 'AbortError' ? 'Request timed out — try again' : (err.message || String(err));
+    resultEl.innerHTML = `<div class="val-card"><p style="color:#ff4444;font-weight:600;">Validation failed: ${escHtml(msg)}</p><p style="font-size:12px;color:var(--ink-softer);margin-top:8px;">Check browser console for details.</p></div>`;
     resultEl.classList.add('visible');
     resultEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
   } finally {
