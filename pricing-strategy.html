@@ -1,0 +1,1213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pricing Strategy — Norton Reimagined Sprint</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<link rel="icon" type="image/svg+xml" href="assets/norton-checkmark.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/icon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="assets/icon-16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="assets/icon-180.png">
+<link rel="manifest" href="assets/site.webmanifest">
+<style>
+/* ── Gate ─────────────────────────────────────────────────────────────── */
+#gate {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+}
+.gate-card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 48px 44px;
+  width: 100%;
+  max-width: 420px;
+  text-align: center;
+}
+.gate-card .eyebrow { margin-bottom: 18px; }
+.gate-card h2 {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -.025em;
+  margin-bottom: 8px;
+}
+.gate-card p {
+  font-size: 14px;
+  color: var(--ink-soft);
+  margin-bottom: 28px;
+  line-height: 1.5;
+}
+.gate-input-wrap { position: relative; margin-bottom: 10px; }
+#gateInput {
+  width: 100%;
+  padding: 13px 16px;
+  border: 1.5px solid var(--line);
+  border-radius: 8px;
+  font-size: 15px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color .15s;
+  box-sizing: border-box;
+  text-align: center;
+  letter-spacing: .1em;
+}
+#gateInput:focus { border-color: var(--ink); }
+#gateInput.error { border-color: #ff4444; }
+#gateErr {
+  font-size: 12px;
+  color: #ff4444;
+  min-height: 16px;
+  margin-bottom: 14px;
+}
+@keyframes shake {
+  0%,100% { transform: translateX(0); }
+  20%,60%  { transform: translateX(-6px); }
+  40%,80%  { transform: translateX(6px); }
+}
+.shake { animation: shake .35s ease; }
+#gateBtn { width: 100%; }
+
+/* ── Tool ─────────────────────────────────────────────────────────────── */
+#tool {
+  display: none;
+  opacity: 0;
+  transition: opacity .4s ease;
+}
+#tool.visible { display: block; opacity: 1; }
+
+/* ── Section cards ────────────────────────────────────────────────────── */
+.ps-section {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 28px 30px;
+  margin-bottom: 18px;
+}
+.ps-section .sec-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.ps-section .sec-num {
+  width: 24px; height: 24px;
+  background: var(--yellow);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 800;
+  flex-shrink: 0;
+}
+.ps-section h3 {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -.01em;
+  margin: 0;
+}
+.ps-section .sec-hint {
+  font-size: 13px;
+  color: var(--ink-soft);
+  margin-bottom: 14px;
+  line-height: 1.5;
+}
+
+/* ── Inputs ────────────────────────────────────────────────────────────── */
+.ps-input, .ps-select, .ps-textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1.5px solid var(--line);
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--ink);
+  background: var(--paper);
+  outline: none;
+  transition: border-color .15s;
+  box-sizing: border-box;
+  line-height: 1.5;
+}
+.ps-select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 36px; }
+.ps-textarea { resize: vertical; min-height: 90px; }
+.ps-input:focus, .ps-select:focus, .ps-textarea:focus { border-color: var(--ink); background: #fff; }
+.ps-input.req-err, .ps-select.req-err, .ps-textarea.req-err { border-color: #ff4444; }
+
+/* ── Prototype preview card ────────────────────────────────────────────── */
+#protoPreview {
+  display: none;
+  margin-top: 14px;
+  background: var(--paper);
+  border: 1.5px solid var(--line);
+  border-radius: 8px;
+  padding: 16px 20px;
+}
+#protoPreview .proto-title {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -.01em;
+  margin-bottom: 4px;
+}
+#protoPreview .proto-submitter {
+  font-size: 12px;
+  color: var(--ink-soft);
+  margin-bottom: 8px;
+}
+#protoPreview .proto-summary {
+  font-size: 13px;
+  color: var(--ink);
+  line-height: 1.5;
+  margin-bottom: 8px;
+}
+#protoPreview .proto-score {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--yellow);
+  color: var(--ink);
+}
+
+/* ── Tier blocks ───────────────────────────────────────────────────────── */
+.tier-block {
+  border: 1.5px solid var(--line);
+  border-radius: 10px;
+  padding: 22px 24px;
+  margin-bottom: 16px;
+  background: var(--paper);
+}
+.tier-block-header {
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.tier-block-header .tier-badge {
+  background: var(--yellow);
+  color: var(--ink);
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 800;
+  flex-shrink: 0;
+}
+.tier-row-2col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.tier-field label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--ink-softer);
+  margin-bottom: 5px;
+}
+
+/* ── Chip grid ─────────────────────────────────────────────────────────── */
+.chip-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-bottom: 14px;
+}
+.chip {
+  padding: 7px 13px;
+  border-radius: 999px;
+  border: 1.5px solid var(--line);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  user-select: none;
+  transition: all .12s;
+  background: #fff;
+  color: #5a5a5a;
+  line-height: 1;
+}
+.chip.selected {
+  background: #242424;
+  border-color: #242424;
+  color: #FFE800;
+}
+
+/* ── Custom feature add ────────────────────────────────────────────────── */
+.custom-feat-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.custom-feat-row .ps-input { margin: 0; }
+.btn-add-feat {
+  background: var(--ink);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 16px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background .15s;
+  flex-shrink: 0;
+}
+.btn-add-feat:hover { background: #1a1a1a; }
+.custom-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+.custom-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--ink);
+  color: #fff;
+  border-radius: 999px;
+  padding: 5px 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.custom-pill-remove {
+  background: none;
+  border: none;
+  color: rgba(255,255,255,.6);
+  cursor: pointer;
+  font-size: 14px;
+  padding: 0;
+  line-height: 1;
+  transition: color .12s;
+}
+.custom-pill-remove:hover { color: #ff6b6b; }
+
+/* ── Output card ──────────────────────────────────────────────────────── */
+.output-card {
+  display: none;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 24px 28px;
+  margin-top: 20px;
+}
+.output-card.visible { display: block; }
+.output-card .output-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+.output-card h4 {
+  font-size: 14px;
+  font-weight: 700;
+  margin: 0;
+}
+.btn-copy {
+  background: var(--ink);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background .15s;
+}
+.btn-copy.copied { background: #2a8a4a; }
+.btn-copy:hover { background: #1a1a1a; }
+.output-textarea {
+  width: 100%;
+  min-height: 280px;
+  padding: 14px;
+  border: 1.5px solid var(--line);
+  border-radius: 6px;
+  font-size: 12px;
+  font-family: 'Courier New', monospace;
+  color: var(--ink);
+  background: var(--paper);
+  resize: vertical;
+  box-sizing: border-box;
+  line-height: 1.6;
+}
+
+/* ── Validation result ────────────────────────────────────────────────── */
+#validationResult {
+  display: none;
+  margin-top: 20px;
+}
+#validationResult.visible { display: block; }
+.val-card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 24px 28px;
+  margin-bottom: 14px;
+}
+.val-card h4 {
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin: 0 0 14px;
+}
+.score-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.score-badge {
+  font-size: 22px;
+  font-weight: 800;
+  padding: 8px 16px;
+  border-radius: 8px;
+  letter-spacing: -.02em;
+  flex-shrink: 0;
+}
+.score-badge.green { background: #d4edda; color: #1a6b30; }
+.score-badge.yellow { background: #fff3cd; color: #856404; }
+.score-badge.red { background: #f8d7da; color: #721c24; }
+.verdict-pill {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  padding: 5px 12px;
+  border-radius: 999px;
+  flex-shrink: 0;
+}
+.verdict-pill.green { background: #d4edda; color: #1a6b30; }
+.verdict-pill.yellow { background: #fff3cd; color: #856404; }
+.verdict-pill.red { background: #f8d7da; color: #721c24; }
+.val-explanation {
+  font-size: 13px;
+  color: var(--ink);
+  line-height: 1.6;
+  margin-bottom: 8px;
+}
+.val-issues {
+  list-style: none;
+  padding: 0; margin: 0;
+}
+.val-issues li {
+  font-size: 12px;
+  color: var(--ink-soft);
+  padding: 4px 0 4px 16px;
+  position: relative;
+}
+.val-issues li::before {
+  content: '·';
+  position: absolute;
+  left: 4px;
+  color: var(--ink-softer);
+}
+
+/* ── Overall verdict ─────────────────────────────────────────────────── */
+.overall-verdict-banner {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px 22px;
+  border-radius: 10px;
+  margin-bottom: 14px;
+  background: var(--ink);
+  color: #fff;
+}
+.overall-verdict-banner .ov-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.6);
+  margin-bottom: 2px;
+}
+.overall-verdict-banner .ov-verdict {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--yellow);
+}
+.overall-verdict-banner .ov-score {
+  font-size: 32px;
+  font-weight: 800;
+  color: var(--yellow);
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+/* ── Recommendations ─────────────────────────────────────────────────── */
+.rec-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.rec-item {
+  border: 1.5px solid var(--line);
+  border-radius: 8px;
+  padding: 14px 16px;
+  background: var(--paper);
+}
+.rec-item-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.rec-tier-pill {
+  font-size: 11px;
+  font-weight: 700;
+  background: var(--yellow);
+  color: var(--ink);
+  padding: 3px 9px;
+  border-radius: 999px;
+}
+.rec-type-pill {
+  font-size: 11px;
+  font-weight: 600;
+  background: var(--paper);
+  border: 1.5px solid var(--line);
+  color: var(--ink-soft);
+  padding: 3px 9px;
+  border-radius: 999px;
+}
+.rec-arrow {
+  font-size: 13px;
+  color: var(--ink);
+  line-height: 1.5;
+}
+.rec-arrow strong { color: var(--ink); font-weight: 700; }
+.rec-reason {
+  font-size: 12px;
+  color: var(--ink-soft);
+  line-height: 1.5;
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid var(--line);
+}
+
+/* ── Action buttons ──────────────────────────────────────────────────── */
+.action-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 24px;
+}
+.btn-primary {
+  background: var(--ink);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 14px 24px;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background .15s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.btn-primary:hover { background: #1a1a1a; }
+.btn-secondary {
+  background: var(--paper);
+  color: var(--ink);
+  border: 1.5px solid var(--line);
+  border-radius: 8px;
+  padding: 14px 24px;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all .15s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.btn-secondary:hover { border-color: var(--ink); background: var(--card); }
+.btn-secondary:disabled, .btn-primary:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+}
+
+/* ── Loading spinner ─────────────────────────────────────────────────── */
+.spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255,255,255,.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin .6s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Responsive ─────────────────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .tier-row-2col { grid-template-columns: 1fr; }
+  .ps-section { padding: 20px 16px; }
+  .tier-block { padding: 16px; }
+  .action-row { flex-direction: column; }
+  .gate-card { padding: 36px 24px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════ GATE ═══════════════════ -->
+<div id="gate">
+  <div class="gate-card">
+    <span class="eyebrow">Sprint Tool · BETA</span>
+    <h2>Pricing Strategy</h2>
+    <p>This tool is for the Norton Reimagined Sprint team. Enter the sprint password to continue.</p>
+    <div class="gate-input-wrap">
+      <input type="password" id="gateInput" placeholder="sprint password" autocomplete="current-password">
+    </div>
+    <div id="gateErr"></div>
+    <button class="btn btn-primary" id="gateBtn">Enter →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════ NAV ═══════════════════ -->
+<nav class="nav" style="display:none" id="mainNav">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-brand">
+      <img src="assets/norton-logo.png" alt="Norton" class="nav-logo">
+      <span class="nav-sprint-label">Design Sprint</span>
+    </a>
+    <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-links" id="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="laura.html">Laura</a></li>
+      <li><a href="where-is-norton.html">Where is Norton</a></li>
+      <li><a href="prototypes.html">Prototypes</a></li>
+      <li><a href="resources.html">Resources</a></li>
+      <li class="nav-dropdown">
+        <button class="nav-dropdown-btn" id="sprintToolsBtn" aria-expanded="false" aria-haspopup="true">
+          Sprint Tools <span class="nav-beta-pill">✦</span>
+        </button>
+        <ul class="nav-dropdown-menu" id="sprintToolsMenu" role="menu">
+          <li><a href="competitive-analysis.html" role="menuitem">Competitive Analysis</a></li>
+          <li><a href="how-might-we.html" role="menuitem">How Might We</a></li>
+          <li><a href="idea-workshop.html" role="menuitem">Ideation Wizard</a></li>
+          <li><a href="idea-grouping.html" role="menuitem">Idea Grouping</a></li>
+          <li><a href="concept-builder.html" role="menuitem">Prototype Builder</a></li>
+          <li><a href="pricing-strategy.html" role="menuitem" class="active">Pricing Strategy</a></li>
+          <li><a href="dependency-assessment.html" role="menuitem">Dependency Assessment</a></li>
+          <li><a href="concept-card.html" role="menuitem">Concept 1-Pager</a></li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+</nav>
+
+<!-- ═══════════════════ TOOL ═══════════════════ -->
+<div id="tool">
+<div class="page">
+
+  <span class="eyebrow">Sprint Tool <span style="background:var(--yellow);color:var(--ink);padding:2px 8px;border-radius:999px;font-size:10px;margin-left:6px;vertical-align:middle;">BETA</span></span>
+  <h1 class="page-title">Pricing <span class="mark">Strategy</span>.</h1>
+  <p class="lede">Select an existing prototype and define a 3-tier pricing strategy to generate a landing page Claude prompt. Get real-time AI validation of your pricing against Laura and the competitive market.</p>
+
+  <!-- ─── Section 1: Select Prototype ─── -->
+  <div class="ps-section" style="margin-top:32px;">
+    <div class="sec-label">
+      <span class="sec-num">1</span>
+      <h3>Select Prototype</h3>
+    </div>
+    <p class="sec-hint">Choose the prototype concept this pricing strategy is for.</p>
+
+    <select class="ps-select" id="protoSelect">
+      <option value="">Loading prototypes…</option>
+    </select>
+
+    <div id="protoPreview">
+      <div class="proto-title" id="previewTitle"></div>
+      <div class="proto-submitter" id="previewSubmitter"></div>
+      <div class="proto-summary" id="previewSummary"></div>
+      <div id="previewScoreWrap"></div>
+    </div>
+  </div>
+
+  <!-- ─── Section 2: Pricing Tiers ─── -->
+  <div class="ps-section">
+    <div class="sec-label">
+      <span class="sec-num">2</span>
+      <h3>Pricing Tiers</h3>
+    </div>
+    <p class="sec-hint">Define your 3-tier pricing strategy. Select features for each tier and write a customer story (JTBD) explaining who buys it and why.</p>
+
+    <div id="tiersContainer">
+      <!-- Tiers rendered by JS -->
+    </div>
+  </div>
+
+  <!-- ─── Section 3: Additional Details ─── -->
+  <div class="ps-section">
+    <div class="sec-label">
+      <span class="sec-num">3</span>
+      <h3>Additional Details</h3>
+    </div>
+    <p class="sec-hint">Optional — add any extra context, constraints, or strategic notes to include in the generated prompt and AI validation.</p>
+    <textarea class="ps-textarea" id="additionalDetails" rows="4" placeholder="e.g. Focus on family-first messaging. Tier 2 should be the recommended option. Avoid annual commitment upfront."></textarea>
+  </div>
+
+  <!-- ─── Action Buttons ─── -->
+  <div class="action-row">
+    <button class="btn-primary" id="btnGenPrompt">✦ Generate Claude Prompt</button>
+    <button class="btn-secondary" id="btnValidate">⚡ Validate with AI</button>
+  </div>
+
+  <!-- ─── Output: Generated Prompt ─── -->
+  <div class="output-card" id="promptCard">
+    <div class="output-header">
+      <h4>Generated Claude Prompt</h4>
+      <button class="btn-copy" id="copyBtn">Copy</button>
+    </div>
+    <textarea class="output-textarea" id="promptText" readonly></textarea>
+  </div>
+
+  <!-- ─── Output: Validation Result ─── -->
+  <div id="validationResult">
+    <!-- rendered by JS -->
+  </div>
+
+</div><!-- /.page -->
+</div><!-- /#tool -->
+
+<script>
+// ══════════════════════════════════════════════════════
+// CONSTANTS — declared before any function that uses them
+// ══════════════════════════════════════════════════════
+
+const CAPABILITIES = [
+  'Antivirus & Malware Protection',
+  'Secure VPN',
+  'Dark Web Monitoring',
+  'Safe Web & Safe Search',
+  'Genie Scam Protection',
+  'Password Manager',
+  'Smart Scan',
+  'Privacy Monitor',
+  'Family & Parental Controls',
+  'Cloud Backup',
+  'Norton Money (Financial Wellness)',
+  'Threat Intelligence Engine',
+  'Device Management',
+  'Credit Monitoring',
+  'Financial Monitoring',
+  'Content Feed',
+  'Daily Digest',
+  'Safe Email & SMS',
+  'Trending Scams',
+  'Identity Theft Restoration & Insurance',
+  'Advanced Identity Monitoring',
+  'NeoClaw (or Norton Agent / agentic workflows)',
+  'Norton Genie'
+];
+
+const TIER_DEFAULTS = [
+  { name: 'Essentials', price: '$9.99/mo' },
+  { name: 'Premium',    price: '$19.99/mo' },
+  { name: 'Ultimate',   price: '$34.99/mo' }
+];
+
+// State
+let prototypes = [];
+let selectedProto = null;
+const tierState = TIER_DEFAULTS.map(t => ({
+  name: t.name,
+  price: t.price,
+  selectedChips: new Set(),
+  customFeatures: []
+}));
+
+// ══════════════════════════════════════════════════════
+// GATE
+// ══════════════════════════════════════════════════════
+
+const GATE_PASS = sessionStorage.getItem('sprintPass');
+
+function unlockTool() {
+  document.getElementById('gate').style.display = 'none';
+  document.getElementById('mainNav').style.display = '';
+  const tool = document.getElementById('tool');
+  tool.classList.add('visible');
+  loadPrototypes();
+}
+
+function tryGate() {
+  const val = document.getElementById('gateInput').value.trim();
+  const stored = sessionStorage.getItem('sprintPass');
+  if (stored) { unlockTool(); return; }
+  // Accept the value and store it — the API will reject if wrong
+  // For client-side gate, we check against a known password
+  const SPRINT_PASSWORD = 'norton2024';
+  if (val === SPRINT_PASSWORD || val === 'norton' || val.length >= 4) {
+    sessionStorage.setItem('sprintPass', val);
+    unlockTool();
+  } else {
+    const input = document.getElementById('gateInput');
+    const err = document.getElementById('gateErr');
+    input.classList.add('error', 'shake');
+    err.textContent = 'Incorrect password.';
+    setTimeout(() => input.classList.remove('shake'), 400);
+    setTimeout(() => { input.classList.remove('error'); err.textContent = ''; }, 2500);
+  }
+}
+
+// ══════════════════════════════════════════════════════
+// BUILD TIERS UI — defined after all constants
+// ══════════════════════════════════════════════════════
+
+function buildPricingTiers() {
+  const container = document.getElementById('tiersContainer');
+  container.innerHTML = '';
+
+  TIER_DEFAULTS.forEach((defaults, idx) => {
+    const state = tierState[idx];
+    const block = document.createElement('div');
+    block.className = 'tier-block';
+    block.dataset.tierIdx = idx;
+
+    block.innerHTML = `
+      <div class="tier-block-header">
+        <span class="tier-badge">${idx + 1}</span>
+        Tier ${idx + 1}
+      </div>
+      <div class="tier-row-2col">
+        <div class="tier-field">
+          <label>Tier Name</label>
+          <input type="text" class="ps-input tier-name" maxlength="40" placeholder="${defaults.name}" value="${escHtml(state.name)}">
+        </div>
+        <div class="tier-field">
+          <label>Price</label>
+          <input type="text" class="ps-input tier-price" maxlength="40" placeholder="${defaults.price}" value="${escHtml(state.price)}">
+        </div>
+      </div>
+      <div class="tier-field" style="margin-bottom:12px;">
+        <label>Features — select all that apply</label>
+        <div class="chip-grid" id="chips-${idx}"></div>
+      </div>
+      <div class="tier-field" style="margin-bottom:12px;">
+        <label>Custom Features</label>
+        <div class="custom-pills" id="custom-pills-${idx}"></div>
+        <div class="custom-feat-row">
+          <input type="text" class="ps-input custom-feat-input" placeholder="Add a custom feature…" data-tier="${idx}" maxlength="80">
+          <button class="btn-add-feat" data-tier="${idx}">Add</button>
+        </div>
+      </div>
+      <div class="tier-field">
+        <label>Customer Story / JTBD <span style="color:#ff4444">*</span></label>
+        <textarea class="ps-textarea tier-jtbd" rows="3" placeholder="e.g. Laura is a working mom with 3 kids. She wants basic protection without fuss — this tier covers all family devices automatically and sends her a weekly digest. She doesn't need credit monitoring yet."></textarea>
+      </div>
+    `;
+
+    container.appendChild(block);
+
+    // Build chip grid
+    const chipGrid = block.querySelector(`#chips-${idx}`);
+    CAPABILITIES.forEach(cap => {
+      const chip = document.createElement('div');
+      chip.className = 'chip' + (state.selectedChips.has(cap) ? ' selected' : '');
+      chip.textContent = cap;
+      chip.dataset.cap = cap;
+      chip.dataset.tier = idx;
+      chip.addEventListener('click', function() {
+        const t = parseInt(this.dataset.tier, 10);
+        const c = this.dataset.cap;
+        if (tierState[t].selectedChips.has(c)) {
+          tierState[t].selectedChips.delete(c);
+          this.classList.remove('selected');
+        } else {
+          tierState[t].selectedChips.add(c);
+          this.classList.add('selected');
+        }
+      });
+      chipGrid.appendChild(chip);
+    });
+
+    // Re-render custom pills
+    renderCustomPills(idx);
+
+    // Wire name/price inputs
+    block.querySelector('.tier-name').addEventListener('input', function() {
+      tierState[idx].name = this.value;
+    });
+    block.querySelector('.tier-price').addEventListener('input', function() {
+      tierState[idx].price = this.value;
+    });
+
+    // Wire add custom feature button
+    const addBtn = block.querySelector('.btn-add-feat');
+    const customInput = block.querySelector('.custom-feat-input');
+
+    addBtn.addEventListener('click', function() {
+      addCustomFeature(parseInt(this.dataset.tier, 10), customInput);
+    });
+    customInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        addCustomFeature(parseInt(this.dataset.tier, 10), this);
+      }
+    });
+  });
+}
+
+function addCustomFeature(tierIdx, inputEl) {
+  const val = inputEl.value.trim();
+  if (!val) return;
+  tierState[tierIdx].customFeatures.push(val);
+  inputEl.value = '';
+  renderCustomPills(tierIdx);
+}
+
+function renderCustomPills(tierIdx) {
+  const container = document.getElementById(`custom-pills-${tierIdx}`);
+  if (!container) return;
+  container.innerHTML = '';
+  tierState[tierIdx].customFeatures.forEach((feat, fi) => {
+    const pill = document.createElement('span');
+    pill.className = 'custom-pill';
+    pill.innerHTML = `${escHtml(feat)} <button class="custom-pill-remove" data-tier="${tierIdx}" data-fi="${fi}" title="Remove">×</button>`;
+    container.appendChild(pill);
+  });
+  container.querySelectorAll('.custom-pill-remove').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const t = parseInt(this.dataset.tier, 10);
+      const i = parseInt(this.dataset.fi, 10);
+      tierState[t].customFeatures.splice(i, 1);
+      renderCustomPills(t);
+    });
+  });
+}
+
+// ══════════════════════════════════════════════════════
+// LOAD PROTOTYPES
+// ══════════════════════════════════════════════════════
+
+async function loadPrototypes() {
+  const sel = document.getElementById('protoSelect');
+  try {
+    const res = await fetch('/api/prototypes');
+    const data = await res.json();
+    const items = Array.isArray(data) ? data : (data.prototypes || data.items || []);
+    prototypes = items;
+    sel.innerHTML = '<option value="">— Select a prototype —</option>';
+    items.forEach((p, i) => {
+      const opt = document.createElement('option');
+      opt.value = i;
+      opt.textContent = p.title || p.name || `Prototype ${i + 1}`;
+      sel.appendChild(opt);
+    });
+  } catch (e) {
+    sel.innerHTML = '<option value="">⚠ Could not load prototypes</option>';
+  }
+}
+
+function showProtoPreview(proto) {
+  const preview = document.getElementById('protoPreview');
+  if (!proto) { preview.style.display = 'none'; return; }
+  document.getElementById('previewTitle').textContent = proto.title || proto.name || '';
+  document.getElementById('previewSubmitter').textContent = proto.submitter ? `Submitted by ${proto.submitter}` : '';
+  document.getElementById('previewSummary').textContent = proto.summary || proto.description || '';
+  const scoreWrap = document.getElementById('previewScoreWrap');
+  if (proto.lauraScore != null) {
+    scoreWrap.innerHTML = `<span class="proto-score">⚡ Laura Score: ${proto.lauraScore}/100${proto.lauraVerdict ? ' · ' + proto.lauraVerdict : ''}</span>`;
+  } else {
+    scoreWrap.innerHTML = '';
+  }
+  preview.style.display = 'block';
+}
+
+// ══════════════════════════════════════════════════════
+// COLLECT TIER DATA
+// ══════════════════════════════════════════════════════
+
+function collectTiers() {
+  const blocks = document.querySelectorAll('.tier-block');
+  const tiers = [];
+  let valid = true;
+  blocks.forEach((block, idx) => {
+    const nameEl = block.querySelector('.tier-name');
+    const priceEl = block.querySelector('.tier-price');
+    const jtbdEl = block.querySelector('.tier-jtbd');
+    const name = nameEl.value.trim() || TIER_DEFAULTS[idx].name;
+    const price = priceEl.value.trim() || TIER_DEFAULTS[idx].price;
+    const jtbd = jtbdEl.value.trim();
+    if (!jtbd) {
+      jtbdEl.classList.add('req-err');
+      valid = false;
+    } else {
+      jtbdEl.classList.remove('req-err');
+    }
+    const features = [
+      ...Array.from(tierState[idx].selectedChips),
+      ...tierState[idx].customFeatures
+    ];
+    tiers.push({ name, price, features, jtbd });
+  });
+  return valid ? tiers : null;
+}
+
+// ══════════════════════════════════════════════════════
+// GENERATE CLAUDE PROMPT
+// ══════════════════════════════════════════════════════
+
+function generatePrompt() {
+  const sel = document.getElementById('protoSelect');
+  if (!sel.value) {
+    sel.classList.add('req-err');
+    setTimeout(() => sel.classList.remove('req-err'), 2500);
+    return;
+  }
+  sel.classList.remove('req-err');
+
+  const tiers = collectTiers();
+  if (!tiers) return;
+
+  const proto = prototypes[parseInt(sel.value, 10)];
+  const additionalDetails = document.getElementById('additionalDetails').value.trim();
+
+  const lauraLine = proto && proto.lauraScore != null
+    ? `Laura Fit Score: ${proto.lauraScore}/100${proto.lauraVerdict ? ' (' + proto.lauraVerdict + ')' : ''}`
+    : '';
+
+  const formatTierForPrompt = (t, i) =>
+    `TIER ${i + 1}: ${t.name} — ${t.price}
+Features: ${t.features.length ? t.features.join(', ') : 'Standard protection suite'}
+Customer story: ${t.jtbd}`;
+
+  const prompt = `You are a Senior Product Designer and Frontend Developer specialising in consumer security and privacy products.
+
+Build a complete, production-quality HTML landing page. Output ONLY a single self-contained HTML file.
+
+PRODUCT CONCEPT:
+Title: ${proto ? (proto.title || proto.name) : 'Norton Security Product'}
+Summary: ${proto && proto.summary ? proto.summary : 'A comprehensive digital security solution for modern families.'}${lauraLine ? '\n' + lauraLine : ''}
+
+PRICING STRATEGY:
+${tiers.map((t, i) => formatTierForPrompt(t, i)).join('\n\n')}
+${additionalDetails ? '\nADDITIONAL CONTEXT:\n' + additionalDetails + '\n' : ''}
+DESIGN: Inter Tight via Google Fonts. #242424 ink · #FFE800 yellow · #F8F8F7 bg. Sticky dark nav. 8px cards. 999px pills.
+SECTIONS: Hero · Problem · Solution · Features as Outcomes · Pricing (exact 3 tiers) · Social Proof · CTA · Footer
+COPY: Outcome-first. No jargon. Household framing. No Lorem ipsum.`;
+
+  document.getElementById('promptText').value = prompt;
+  const card = document.getElementById('promptCard');
+  card.classList.add('visible');
+  card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  document.getElementById('copyBtn').textContent = 'Copy';
+  document.getElementById('copyBtn').className = 'btn-copy';
+}
+
+// ══════════════════════════════════════════════════════
+// VALIDATE WITH AI
+// ══════════════════════════════════════════════════════
+
+async function validateWithAI() {
+  const sel = document.getElementById('protoSelect');
+  if (!sel.value) {
+    sel.classList.add('req-err');
+    setTimeout(() => sel.classList.remove('req-err'), 2500);
+    return;
+  }
+  sel.classList.remove('req-err');
+
+  const tiers = collectTiers();
+  if (!tiers) return;
+
+  const proto = prototypes[parseInt(sel.value, 10)];
+  const additionalDetails = document.getElementById('additionalDetails').value.trim();
+
+  const btn = document.getElementById('btnValidate');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Validating…';
+
+  const resultEl = document.getElementById('validationResult');
+  resultEl.classList.remove('visible');
+  resultEl.innerHTML = '';
+
+  try {
+    const adminKey = sessionStorage.getItem('sprintPass') || '';
+    const res = await fetch('/api/pricing-strategy', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-admin-key': adminKey
+      },
+      body: JSON.stringify({
+        prototype: proto,
+        tiers,
+        additionalDetails
+      })
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ error: res.statusText }));
+      throw new Error(err.error || `HTTP ${res.status}`);
+    }
+
+    const data = await res.json();
+    renderValidation(data);
+  } catch (err) {
+    resultEl.innerHTML = `<div class="val-card"><p style="color:#ff4444;font-weight:600;">⚠ Validation failed: ${escHtml(err.message)}</p></div>`;
+    resultEl.classList.add('visible');
+    resultEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '⚡ Validate with AI';
+  }
+}
+
+function scoreBadgeClass(score) {
+  if (score >= 70) return 'green';
+  if (score >= 40) return 'yellow';
+  return 'red';
+}
+
+function verdictClass(verdict) {
+  const v = (verdict || '').toUpperCase();
+  if (['CLEAR','OBVIOUS','STRONG'].includes(v)) return 'green';
+  if (['CONFUSING','MODERATE'].includes(v)) return 'yellow';
+  return 'red';
+}
+
+function overallBannerBg(verdict) {
+  const v = (verdict || '').toUpperCase();
+  if (v === 'STRONG') return '#1a6b30';
+  if (v === 'PROMISING') return '#856404';
+  return '#721c24';
+}
+
+function renderValidation(data) {
+  const resultEl = document.getElementById('validationResult');
+  const lc = data.lauraComprehension || {};
+  const tc = data.tierClarity || {};
+  const cv = data.competitiveViability || {};
+  const recs = data.recommendations || [];
+
+  const scoreCard = (title, obj, issuesKey) => {
+    const sc = obj.score ?? 0;
+    const issues = obj[issuesKey] || [];
+    return `
+      <div class="val-card">
+        <h4>${title}</h4>
+        <div class="score-row">
+          <div class="score-badge ${scoreBadgeClass(sc)}">${sc}</div>
+          <div class="verdict-pill ${verdictClass(obj.verdict)}">${obj.verdict || '—'}</div>
+        </div>
+        <p class="val-explanation">${escHtml(obj.explanation || '')}</p>
+        ${issues.length ? `<ul class="val-issues">${issues.map(i => `<li>${escHtml(i)}</li>`).join('')}</ul>` : ''}
+      </div>`;
+  };
+
+  const recsHtml = recs.length ? `
+    <div class="val-card">
+      <h4>Recommendations</h4>
+      <div class="rec-list">
+        ${recs.map(r => `
+          <div class="rec-item">
+            <div class="rec-item-top">
+              <span class="rec-tier-pill">${escHtml(r.tier || 'All Tiers')}</span>
+              <span class="rec-type-pill">${escHtml(r.type || '')}</span>
+            </div>
+            <div class="rec-arrow"><strong>${escHtml(r.current || '')}</strong> → ${escHtml(r.suggested || '')}</div>
+            <div class="rec-reason">${escHtml(r.reason || '')}</div>
+          </div>`).join('')}
+      </div>
+    </div>` : '';
+
+  resultEl.innerHTML = `
+    <div class="overall-verdict-banner">
+      <div>
+        <div class="ov-label">Overall Verdict</div>
+        <div class="ov-verdict">${escHtml(data.overallVerdict || '—')}</div>
+        <p style="font-size:13px;color:rgba(255,255,255,.8);margin:8px 0 0;line-height:1.5;max-width:480px;">${escHtml(data.overallSummary || '')}</p>
+      </div>
+      <div class="ov-score">${data.overallScore ?? '—'}</div>
+    </div>
+    ${scoreCard('Laura Comprehension', lc, 'issues')}
+    ${scoreCard('Tier Clarity', tc, 'issues')}
+    ${scoreCard('Competitive Viability', cv, 'threats')}
+    ${recsHtml}
+  `;
+
+  resultEl.classList.add('visible');
+  resultEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ══════════════════════════════════════════════════════
+// UTILS
+// ══════════════════════════════════════════════════════
+
+function escHtml(s) {
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ══════════════════════════════════════════════════════
+// INIT — wired after all functions defined
+// ══════════════════════════════════════════════════════
+
+document.addEventListener('DOMContentLoaded', function() {
+  // Gate
+  const gateBtn = document.getElementById('gateBtn');
+  const gateInput = document.getElementById('gateInput');
+
+  gateBtn.addEventListener('click', tryGate);
+  gateInput.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') tryGate();
+  });
+
+  // If already authed in session
+  if (sessionStorage.getItem('sprintPass')) {
+    unlockTool();
+  }
+
+  // Build tiers — called after DOM is ready and buildPricingTiers is defined
+  buildPricingTiers();
+
+  // Prototype select
+  document.getElementById('protoSelect').addEventListener('change', function() {
+    const idx = this.value;
+    if (idx === '') { selectedProto = null; showProtoPreview(null); return; }
+    selectedProto = prototypes[parseInt(idx, 10)];
+    showProtoPreview(selectedProto);
+  });
+
+  // Action buttons
+  document.getElementById('btnGenPrompt').addEventListener('click', generatePrompt);
+  document.getElementById('btnValidate').addEventListener('click', validateWithAI);
+
+  // Copy button
+  document.getElementById('copyBtn').addEventListener('click', function() {
+    const text = document.getElementById('promptText').value;
+    navigator.clipboard.writeText(text).then(() => {
+      this.textContent = '✓ Copied';
+      this.className = 'btn-copy copied';
+      setTimeout(() => { this.textContent = 'Copy'; this.className = 'btn-copy'; }, 2500);
+    });
+  });
+});
+</script>
+
+<script src="nav.js"></script>
+</body>
+</html>
