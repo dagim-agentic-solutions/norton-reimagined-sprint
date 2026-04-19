@@ -94,13 +94,29 @@ TARGET PERSONA — LAURA:
 - Price-sensitive but pays for clear value
 - Rejects complexity, jargon, unclear tier differentiation
 
-COMPETITORS: Norton 360 ($39.99-99.99/yr), Aura ($12-37/mo), LifeLock ($8.99-34.99/mo), McAfee+ ($39.99-149.99/yr), Google One with security ($2.99-9.99/mo)
+COMPETITIVE LANDSCAPE INSTRUCTIONS:
+Do NOT use a fixed competitor list. Instead, infer the most relevant competitors based on what this product actually does (derived from the product concept, features selected, and customer stories).
 
-${additionalDetails ? `ADDITIONAL CONTEXT: ${additionalDetails}\n\n` : ""}Evaluate rigorously. Return ONLY valid JSON (no markdown):
+Examples of how to map the concept to competitors:
+- AI assistant / conversational AI → ChatGPT, Gemini, Claude, Copilot, Perplexity
+- Family safety / parental controls / location sharing → Aura, Life360, Google Family Link, Apple Screen Time
+- Identity theft protection / credit monitoring → Aura, Experian IdentityWorks, TransUnion TrueIdentity
+- Password management → 1Password, Bitwarden, Dashlane
+- VPN → ExpressVPN, NordVPN, Mullvad
+- Antivirus / device protection → McAfee+, Bitdefender, Malwarebytes
+- Digital wellness / privacy → Surfshark One, Privacy.com
+- Broad security suite → McAfee+, Bitdefender Total Security, Google One with security
+
+CRITICAL: Never include LifeLock as a competitor — LifeLock is part of Norton's own product family.
+Always compare against 3-5 directly relevant competitors for the specific concept being evaluated.
+
+${additionalDetails ? `ADDITIONAL CONTEXT: ${additionalDetails}\n\n` : ""}In the competitiveViability section, name the specific competitors you chose and explain why they are the right comparison set for this concept.
+
+Evaluate rigorously. Return ONLY valid JSON (no markdown):
 {
   "lauraComprehension": { "score": 0-100, "verdict": "CLEAR|CONFUSING|UNCLEAR", "explanation": "2-3 sentences", "issues": [] },
   "tierClarity": { "score": 0-100, "verdict": "OBVIOUS|MODERATE|UNCLEAR", "explanation": "2-3 sentences", "issues": [] },
-  "competitiveViability": { "score": 0-100, "verdict": "STRONG|MODERATE|WEAK", "explanation": "2-3 sentences", "threats": [] },
+  "competitiveViability": { "score": 0-100, "verdict": "STRONG|MODERATE|WEAK", "competitors": ["name the 3-5 relevant competitors you chose"], "explanation": "2-3 sentences referencing those specific competitors", "threats": [] },
   "overallVerdict": "STRONG|PROMISING|NEEDS WORK|RETHINK",
   "overallScore": 0-100,
   "overallSummary": "3-4 sentences",

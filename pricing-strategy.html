@@ -1119,6 +1119,23 @@ function renderValidation(data) {
       </div>`;
   };
 
+  const cvCard = (obj) => {
+    const sc = obj.score ?? 0;
+    const competitors = obj.competitors || [];
+    const threats = obj.threats || [];
+    return `
+      <div class="val-card">
+        <h4>Competitive Viability</h4>
+        <div class="score-row">
+          <div class="score-badge ${scoreBadgeClass(sc)}">${sc}</div>
+          <div class="verdict-pill ${verdictClass(obj.verdict)}">${obj.verdict || '—'}</div>
+        </div>
+        ${competitors.length ? `<div style="margin:10px 0 6px;"><span style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-softer);">Compared against: </span>${competitors.map(c => `<span style="display:inline-block;padding:3px 10px;border-radius:999px;border:1.5px solid var(--line);font-size:12px;font-weight:600;color:var(--ink-soft);margin:2px 3px 2px 0;">${escHtml(c)}</span>`).join('')}</div>` : ''}
+        <p class="val-explanation">${escHtml(obj.explanation || '')}</p>
+        ${threats.length ? `<ul class="val-issues">${threats.map(t => `<li>${escHtml(t)}</li>`).join('')}</ul>` : ''}
+      </div>`;
+  };
+
   const recsHtml = recs.length ? `
     <div class="val-card">
       <h4>Recommendations</h4>
@@ -1146,7 +1163,7 @@ function renderValidation(data) {
     </div>
     ${scoreCard('Laura Comprehension', lc, 'issues')}
     ${scoreCard('Tier Clarity', tc, 'issues')}
-    ${scoreCard('Competitive Viability', cv, 'threats')}
+    ${cvCard(cv)}
     ${recsHtml}
   `;
 
