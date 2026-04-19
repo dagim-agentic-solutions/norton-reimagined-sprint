@@ -1077,7 +1077,7 @@ function generatePrompt() {
   const formatTierForPrompt = (t, i) =>
     `TIER ${i + 1}: ${t.name} — ${t.price}
 All features: ${t.features.length ? t.features.join(', ') : 'Standard protection suite'}${t.ownFeatures && t.ownFeatures.length ? '\n    Added in this tier: ' + t.ownFeatures.join(', ') : ''}
-Customer story: ${t.jtbd}`;
+Target customer (raw input — rewrite using subscription best practices): ${t.jtbd}`;
 
   const prompt = `You are a Senior Product Designer and Frontend Developer specialising in consumer security and privacy products.
 
@@ -1092,7 +1092,23 @@ ${tiers.map((t, i) => formatTierForPrompt(t, i)).join('\n\n')}
 ${additionalDetails ? '\nADDITIONAL CONTEXT:\n' + additionalDetails + '\n' : ''}
 DESIGN: Inter Tight via Google Fonts. #242424 ink · #FFE800 yellow · #F8F8F7 bg. Sticky dark nav. 8px cards. 999px pills.
 SECTIONS: Hero · Problem · Solution · Features as Outcomes · Pricing (exact 3 tiers) · Social Proof · CTA · Footer
-COPY: Outcome-first. No jargon. Household framing. No Lorem ipsum.`;
+
+COPY STANDARDS — apply throughout, especially in the Pricing section:
+- Outcome-first: every headline leads with what Laura gains, not what the product does
+- Plain language — no jargon, no acronyms, no tech speak
+- Household framing: "your family", "everyone's devices", "your home"
+- No Lorem ipsum. All copy must be realistic and specific.
+
+PRICING TIER COPY — critical rules:
+- The "Target customer" notes for each tier are raw directional input from the sprint team. DO NOT copy them verbatim.
+- Rewrite each tier's customer story and value prop using world-class subscription page standards:
+  · Lead with the identity: "For the [household/family/individual] who wants..."
+  · Follow with the core promise in one crisp sentence — what does this tier make possible?
+  · List 2-3 outcomes (not features) the customer will feel
+  · The upgrade logic must be clear: why would someone pay more for Tier 2 vs Tier 1?
+- Use proven SaaS pricing page patterns: Stripe, Linear, Notion, Life360, Aura all do this well
+- The recommended tier (middle tier) should have the most compelling copy and a "Most Popular" badge
+- Pricing cards should feel like decisions, not spec sheets`;
 
   document.getElementById('promptText').value = prompt;
   const card = document.getElementById('promptCard');
@@ -1493,7 +1509,7 @@ function generatePromptWithVariants(allVariants) {
   var variantBlocks = allVariants.map(function(v) {
     return '--- ' + v.variantName.toUpperCase() + ' PRICING ---\n' +
       v.tiers.map(function(t, i) {
-        return 'TIER ' + (i+1) + ': ' + t.name + ' — ' + t.price + '\nFeatures: ' + (t.features.join(', ') || 'None') + '\nCustomer story: ' + t.jtbd;
+        return 'TIER ' + (i+1) + ': ' + t.name + ' — ' + t.price + '\nFeatures: ' + (t.features.join(', ') || 'None') + '\nTarget customer (raw input — rewrite using subscription best practices): ' + t.jtbd;
       }).join('\n\n');
   }).join('\n\n');
 
@@ -1516,7 +1532,8 @@ function generatePromptWithVariants(allVariants) {
     additionalDetails ? 'ADDITIONAL CONTEXT:\n' + additionalDetails + '\n' : '',
     'DESIGN: Inter Tight via Google Fonts. #242424 ink · #FFE800 yellow · #F8F8F7 bg. Sticky dark nav. 8px cards. 999px pills.',
     'SECTIONS: Hero · Problem · Solution · Features as Outcomes · Pricing with variant tabs · Social Proof · CTA · Footer',
-    'COPY: Outcome-first. Plain language. Household framing. No Lorem ipsum.',
+    'COPY STANDARDS: Outcome-first. Plain language. Household framing. No Lorem ipsum.',
+    'PRICING TIER COPY: The "Target customer" inputs are raw sprint notes — DO NOT copy verbatim. Rewrite each tier using world-class subscription copy standards: lead with identity ("For the family who..."), follow with a crisp promise, list 2-3 felt outcomes. Make the upgrade logic obvious. Middle tier gets "Most Popular" badge and strongest copy. Pricing cards should feel like decisions, not spec sheets.',
     'Output ONLY the complete HTML file — no preamble, no markdown fences.',
   ].filter(Boolean).join('\n');
 
