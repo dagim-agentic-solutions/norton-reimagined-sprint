@@ -112,7 +112,7 @@ Evaluate rigorously. Return ONLY valid JSON (no markdown):
       env,
       mode: "strategy",
       messages: [{ role: "user", content: prompt }],
-      maxTokens: 2000,
+      maxTokens: 4000,
       temperature: 0.2,
     });
 
