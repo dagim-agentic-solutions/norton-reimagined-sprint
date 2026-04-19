@@ -242,6 +242,27 @@
   border-color: #242424;
   color: #FFE800;
 }
+.chip.inherited {
+  background: #f0f0ee;
+  border-color: #d0d0cc;
+  color: #8a8a8a;
+  cursor: default;
+  opacity: 0.75;
+  position: relative;
+}
+.chip.inherited::before {
+  content: '✓ ';
+  font-size: 10px;
+  color: #5a8a5a;
+}
+.chip-grid-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--ink-softer);
+  margin: 10px 0 6px;
+}
 
 /* ── Custom feature add ────────────────────────────────────────────────── */
 .custom-feat-row {
@@ -698,7 +719,7 @@
       <span class="sec-num">2</span>
       <h3>Pricing Tiers</h3>
     </div>
-    <p class="sec-hint">Define your 3-tier pricing strategy. Select features for each tier and write a customer story (JTBD) explaining who buys it and why.</p>
+    <p class="sec-hint">Define your 3-tier pricing strategy. Features are <strong>additive</strong> — select only the features <em>added</em> at each tier. Tier 2 automatically includes everything from Tier 1. Tier 3 includes Tier 1 + 2 + its own.</p>
 
     <div class="variant-toggle-row">
       <span class="variant-toggle-label">Pricing variants</span>
@@ -848,6 +869,7 @@ function buildPricingTiers() {
     const block = document.createElement('div');
     block.className = 'tier-block';
     block.dataset.tierIdx = idx;
+    block.setAttribute('data-tier-idx', idx);
 
     block.innerHTML = `
       <div class="tier-block-header">
@@ -865,7 +887,9 @@ function buildPricingTiers() {
         </div>
       </div>
       <div class="tier-field" style="margin-bottom:12px;">
-        <label>Features — select all that apply</label>
+        <label>Features</label>
+        <div id="inherited-chips-${idx}"></div>
+        <div class="chip-grid-label" id="own-label-${idx}" style="display:none;">Added in this tier</div>
         <div class="chip-grid" id="chips-${idx}"></div>
       </div>
       <div class="tier-field" style="margin-bottom:12px;">
@@ -884,27 +908,8 @@ function buildPricingTiers() {
 
     container.appendChild(block);
 
-    // Build chip grid
-    const chipGrid = block.querySelector(`#chips-${idx}`);
-    CAPABILITIES.forEach(cap => {
-      const chip = document.createElement('div');
-      chip.className = 'chip' + (state.selectedChips.has(cap) ? ' selected' : '');
-      chip.textContent = cap;
-      chip.dataset.cap = cap;
-      chip.dataset.tier = idx;
-      chip.addEventListener('click', function() {
-        const t = parseInt(this.dataset.tier, 10);
-        const c = this.dataset.cap;
-        if (tierState[t].selectedChips.has(c)) {
-          tierState[t].selectedChips.delete(c);
-          this.classList.remove('selected');
-        } else {
-          tierState[t].selectedChips.add(c);
-          this.classList.add('selected');
-        }
-      });
-      chipGrid.appendChild(chip);
-    });
+    // Build chip grid (additive model — only show chips not inherited from lower tiers)
+    refreshChipsForTier(idx, block);
 
     // Re-render custom pills
     renderCustomPills(idx);
@@ -931,6 +936,92 @@ function buildPricingTiers() {
       }
     });
   });
+}
+
+// ── Additive chip model helpers ─────────────────────────────────────────────
+// Returns the set of all features inherited from tiers below idx
+function getInheritedFeatures(idx) {
+  const inherited = new Set();
+  for (let i = 0; i < idx; i++) {
+    tierState[i].selectedChips.forEach(c => inherited.add(c));
+    tierState[i].customFeatures.forEach(c => inherited.add(c));
+  }
+  return inherited;
+}
+
+// Renders inherited chip row + own chip row for a given tier block
+function refreshChipsForTier(idx, block) {
+  if (!block) block = document.querySelector(`.tier-block[data-tier-idx="${idx}"]`);
+  if (!block) return;
+
+  const inherited = getInheritedFeatures(idx);
+  const state = tierState[idx];
+
+  // ── Inherited section ──────────────────────────────────────────────────
+  const inheritedWrap = block.querySelector(`#inherited-chips-${idx}`);
+  const ownLabel = block.querySelector(`#own-label-${idx}`);
+  if (inheritedWrap) {
+    inheritedWrap.innerHTML = '';
+    if (inherited.size > 0) {
+      const label = document.createElement('div');
+      label.className = 'chip-grid-label';
+      label.textContent = idx === 1 ? 'Included from Tier 1' : 'Included from Tiers 1 & 2';
+      inheritedWrap.appendChild(label);
+      const grid = document.createElement('div');
+      grid.className = 'chip-grid';
+      inherited.forEach(cap => {
+        const chip = document.createElement('div');
+        chip.className = 'chip inherited';
+        chip.textContent = cap;
+        chip.title = 'Inherited from lower tier — always included';
+        grid.appendChild(chip);
+      });
+      inheritedWrap.appendChild(grid);
+      if (ownLabel) ownLabel.style.display = 'block';
+    } else {
+      if (ownLabel) ownLabel.style.display = 'none';
+    }
+  }
+
+  // ── Own chips (selectable) ─────────────────────────────────────────────
+  const chipGrid = block.querySelector(`#chips-${idx}`);
+  if (!chipGrid) return;
+  chipGrid.innerHTML = '';
+
+  CAPABILITIES.forEach(cap => {
+    if (inherited.has(cap)) return; // skip inherited
+    const chip = document.createElement('div');
+    const isSelected = state.selectedChips.has(cap);
+    chip.className = 'chip' + (isSelected ? ' selected' : '');
+    chip.textContent = cap;
+    chip.dataset.cap = cap;
+    chip.dataset.tier = idx;
+    chip.addEventListener('click', function() {
+      const t = parseInt(this.dataset.tier, 10);
+      const c = this.dataset.cap;
+      if (tierState[t].selectedChips.has(c)) {
+        tierState[t].selectedChips.delete(c);
+        this.classList.remove('selected');
+      } else {
+        tierState[t].selectedChips.add(c);
+        this.classList.add('selected');
+      }
+      // Refresh downstream tiers so inherited chips update
+      refreshDownstreamTiers(t);
+    });
+    chipGrid.appendChild(chip);
+  });
+}
+
+// Re-renders chip grids for all tiers above changedIdx
+function refreshDownstreamTiers(changedIdx) {
+  for (let i = changedIdx + 1; i < tierState.length; i++) {
+    // Remove any chips that are now inherited from own selection
+    const inherited = getInheritedFeatures(i);
+    inherited.forEach(c => tierState[i].selectedChips.delete(c));
+    const block = document.querySelector(`.tier-block[data-tier-idx="${i}"]`);
+    if (block) refreshChipsForTier(i, block);
+  }
 }
 
 function addCustomFeature(tierIdx, inputEl) {
@@ -1020,11 +1111,18 @@ function collectTiers() {
     } else {
       jtbdEl.classList.remove('req-err');
     }
-    const features = [
+    // Additive: include all features from lower tiers + own
+    const ownFeatures = [
       ...Array.from(tierState[idx].selectedChips),
       ...tierState[idx].customFeatures
     ];
-    tiers.push({ name, price, features, jtbd });
+    const inheritedFeats = Array.from(getInheritedFeatures(idx));
+    const inheritedCustom = [];
+    for (let i = 0; i < idx; i++) {
+      tierState[i].customFeatures.forEach(f => { if (!inheritedCustom.includes(f)) inheritedCustom.push(f); });
+    }
+    const features = [...new Set([...inheritedFeats, ...inheritedCustom, ...ownFeatures])];
+    tiers.push({ name, price, features, ownFeatures, jtbd });
   });
   return valid ? tiers : null;
 }
@@ -1054,7 +1152,7 @@ function generatePrompt() {
 
   const formatTierForPrompt = (t, i) =>
     `TIER ${i + 1}: ${t.name} — ${t.price}
-Features: ${t.features.length ? t.features.join(', ') : 'Standard protection suite'}
+All features: ${t.features.length ? t.features.join(', ') : 'Standard protection suite'}${t.ownFeatures && t.ownFeatures.length ? '\n    Added in this tier: ' + t.ownFeatures.join(', ') : ''}
 Customer story: ${t.jtbd}`;
 
   const prompt = `You are a Senior Product Designer and Frontend Developer specialising in consumer security and privacy products.
