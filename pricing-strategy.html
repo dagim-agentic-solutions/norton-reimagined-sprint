@@ -1370,8 +1370,16 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
   // Action buttons
-  document.getElementById('btnGenPrompt').addEventListener('click', generatePrompt);
-  document.getElementById('btnValidate').addEventListener('click', validateWithAI);
+  document.getElementById('btnGenPrompt').addEventListener('click', function() {
+    var allVariants = typeof collectAllVariants === 'function' ? collectAllVariants() : null;
+    if (allVariants) generatePromptWithVariants(allVariants);
+    else generatePrompt();
+  });
+  document.getElementById('btnValidate').addEventListener('click', function() {
+    var allVariants = typeof collectAllVariants === 'function' ? collectAllVariants() : null;
+    if (allVariants) validateWithAIVariants(allVariants);
+    else validateWithAI();
+  });
 
   // Copy button
   document.getElementById('copyBtn').addEventListener('click', function() {
@@ -1550,16 +1558,9 @@ function collectAllVariants() {
   return result;
 }
 
-// ── Patch generatePrompt to include variants ───────────────────────────────
-var _generatePromptOriginal = generatePrompt;
-
-function generatePrompt() {
-  var allVariants = collectAllVariants();
-  if (!allVariants) {
-    // Normal single-variant flow
-    _generatePromptOriginal();
-    return;
-  }
+// ── Variant prompt generation ───────────────────────────────────────────────
+function generatePromptWithVariants(allVariants) {
+  if (!allVariants) { generatePrompt(); return; }
 
   var sel = document.getElementById('protoSelect');
   if (!sel.value) { sel.classList.add('req-err'); setTimeout(function(){sel.classList.remove('req-err');},2500); return; }
@@ -1614,15 +1615,9 @@ function generatePrompt() {
   document.getElementById('copyBtn').className = 'btn-copy';
 }
 
-// ── Patch validateWithAI to send all variants ──────────────────────────────
-var _validateOriginal = validateWithAI;
-
-function validateWithAI() {
-  var allVariants = collectAllVariants();
-  if (!allVariants) {
-    _validateOriginal();
-    return;
-  }
+// ── Variant AI validation ───────────────────────────────────────────────────
+function validateWithAIVariants(allVariants) {
+  if (!allVariants) { validateWithAI(); return; }
 
   var sel = document.getElementById('protoSelect');
   if (!sel.value) { sel.classList.add('req-err'); setTimeout(function(){sel.classList.remove('req-err');},2500); return; }
