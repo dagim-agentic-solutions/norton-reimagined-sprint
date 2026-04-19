@@ -1151,43 +1151,124 @@ ${protoUrl ? 'Prototype URL: ' + protoUrl : ''}
 PRICING STRATEGY:
 ${tiers.map((t, i) => formatTierForPrompt(t, i)).join('\n\n')}
 ${additionalDetails ? '\nADDITIONAL CONTEXT:\n' + additionalDetails + '\n' : ''}
-DESIGN SYSTEM (Norton Reimagined):
-- Font: Inter Tight (400/500/600/700/800) via Google Fonts — only typeface
-- Colors: #242424 ink · #FFE800 yellow · #F8F8F7 paper · #FFFFFF card surface
-- Radius: 8px cards · 999px pills/buttons/tags
-- Nav: sticky, #242424 bg, yellow accent on active, no emojis
-- NO EMOJIS anywhere on the page
-- Section padding: 80–120px vertical
-- Cards: white bg, 1px #E6E6E4 border, 8px radius, 28px internal padding
+═══════════════════════════════════════════════════════════════════
+NORTON REIMAGINED DESIGN SYSTEM — STRICTLY ENFORCED
+═══════════════════════════════════════════════════════════════════
 
-PROTOTYPE SCREENSHOTS:
-${protoUrl ? 'The product prototype is live at: ' + protoUrl + '. Use this Microlink API to embed real screenshots as product mockups: https://api.microlink.io?url=' + encodeURIComponent(protoUrl) + '&screenshot=true&meta=false&embed=screenshot.url — show 2-3 key screens in device frames (phone mockup using CSS) in the hero and features sections. This makes the page feel like a real launch.' : 'No prototype URL — use clean CSS/SVG feature illustrations instead.'}
+TYPOGRAPHY:
+- Typeface: Inter Tight ONLY — weights 400 (body), 500 (ui), 600 (labels), 700 (subheads), 800 (display)
+- Import via Google Fonts: <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+- Hero headline: 800 weight, tight tracking (letter-spacing: -0.03em), line-height 1.05
+- Body text: 400–500, line-height 1.55
+- Section labels: 700, 0.10–0.14em letter-spacing, UPPERCASE, 11px
+- -webkit-font-smoothing: antialiased on body always
 
-PAGE SECTIONS (in order):
-1. HERO — Large outcome headline, one primary CTA, product screenshot in phone frame
-2. PROBLEM — Laura pain points in her own words, household framing
-3. PRODUCT IN ACTION — 2-3 prototype screenshots in device frames with captions
-4. SOLUTION — What this product makes possible (outcomes, not features)
-5. FEATURES — Each capability as a felt outcome (before/after or icon + text)
-6. PRICING — 3-tier cards (see tier data above)
-7. SOCIAL PROOF — 2-3 real-feeling testimonials from Laura-alike users
-8. CTA — Clear, outcome-framed final call to action
-9. FOOTER — Minimal, clean
+COLOR PALETTE (exact hex values — do not approximate):
+- #242424 — ink: primary text, dark surfaces, nav background, CTA buttons
+- #FFE800 — yellow: accent, active states, highlights, badges, CTA hover
+- #F8F8F7 — paper: page background (not pure white)
+- #FFFFFF — card: elevated surfaces
+- #E6E6E4 — line: borders, dividers
+- #5a5a5a — ink-soft: secondary text
+- #8a8a8a — ink-softer: tertiary text, labels
+- #1D9E75 — success green (use sparingly)
 
-COPY RULES (non-negotiable):
-- Outcome-first everywhere. Lead with what Laura gains.
-- Plain language — zero jargon, no acronyms, no tech speak
-- Household framing: "your family", "everyone's devices", "your home"
-- No Lorem ipsum. All copy must be specific and realistic.
+BORDER RADIUS:
+- 8px — cards, inputs, standard containers
+- 999px — pill buttons, tags, badges, nav items, toggles
+- 12px — larger feature cards
+- 0 — table cells, full-bleed sections
 
-PRICING SECTION (Life360 / Aura / Stripe standard):
-- DO NOT copy the "Target customer" inputs verbatim — rewrite entirely
-- Each card: identity line ("For families who...") + crisp promise + 3-4 checkmarked outcomes
-- Tiers marked RECOMMENDED: give a prominent yellow #FFE800 badge and elevated card treatment
-- Tiers with FREE TRIAL: primary CTA button says "Try X days free" (not "Get started")
-- Show additive features: "Everything in [lower tier], plus:" before listing new additions
-- Upgrade logic must be obvious — why pay more must be viscerally clear
-- Cards feel like decisions, not feature tables`;
+SPACING & LAYOUT:
+- Page max-width: 1180px, centered
+- Page horizontal padding: 56px desktop, 24px tablet, 20px mobile
+- Section vertical padding: 96–120px (hero: 140px)
+- Card internal padding: 28–32px
+- Component gap: 16–24px between cards in a grid
+- Grid: 12 columns, 24px gap
+
+NAVIGATION (non-negotiable):
+- Dark (#242424) background
+- Logo: Inter Tight 800, ink on yellow or white on dark
+- Nav links: 500 weight, 14px, white/60% opacity, active = white 100%
+- Primary CTA in nav: yellow (#FFE800) pill, #242424 text, 700 weight
+- Sticky, full-width, 64px height
+- No hamburger on desktop — full nav visible
+
+COMPONENT PATTERNS:
+- Buttons: 999px radius, 700 weight, 15px font, 14px 28px padding
+  · Primary: #FFE800 bg, #242424 text
+  · Secondary: transparent bg, #242424 border, #242424 text
+  · Ghost: transparent, white border, white text (dark sections)
+- Cards: #FFFFFF bg, 1px #E6E6E4 border, 8px radius, 28px padding, no drop shadows (use border)
+- Section labels (eyebrow): 11px, 700, 0.12em letter-spacing, UPPERCASE, #FFE800 on dark / #242424 on light
+- Feature icons: 44px × 44px container, 1px border, 8px radius — SVG line icons only, no emoji
+- Testimonial cards: white bg, left border 3px #FFE800, author with initial avatar (36px circle, #242424 bg, #FFE800 text)
+
+DEVICE FRAME (for screenshots):
+- Phone mockup: pure CSS, 390px wide, 844px tall, 36px border-radius, #242424 border 6px, no notch complexity
+- Use max-width on frame to scale responsively
+- Screenshot inside: border-radius 30px, overflow hidden
+
+WHAT IS STRICTLY FORBIDDEN:
+- No emojis anywhere on the page (not in body, not in code, not in headings)
+- No gradients (solid colors only)
+- No drop shadows (use borders instead)
+- No glassmorphism or blur effects
+- No lorem ipsum or placeholder text
+- No "hero@example.com" email addresses
+- No generic stock photo URLs that won't load
+
+═══════════════════════════════════════════════════════════════════
+PROTOTYPE SCREENSHOTS
+═══════════════════════════════════════════════════════════════════
+${protoUrl ? 'Prototype URL: ' + protoUrl + '\n\nEmbed live screenshots using Microlink:\n  <img src="https://api.microlink.io?url=' + encodeURIComponent(protoUrl) + '&screenshot=true&meta=false&embed=screenshot.url" alt="Product screenshot">\n\nWrap each screenshot in a CSS phone device frame. Show 2-3 key screens — one in the hero section, 1-2 more in a dedicated "Product in Action" section.' : 'No prototype URL available. Use clean CSS-drawn feature illustrations (using SVG or CSS shapes) to represent the product visually in the hero and features sections.'}
+
+═══════════════════════════════════════════════════════════════════
+PAGE STRUCTURE (all 9 sections required)
+═══════════════════════════════════════════════════════════════════
+1. NAV — Sticky dark nav with logo, links, and yellow CTA button
+2. HERO — 800-weight outcome headline (2-3 lines), subhead (400, ink-soft), single primary CTA, prototype screenshot in device frame. Full-width section, paper background.
+3. PROBLEM SECTION — Laura's pain in her own words. Household framing. Dark (#242424) background, white text. 2-3 pain points as short punchy statements.
+4. PRODUCT IN ACTION — 2-3 prototype screenshots in phone frames, each with a short caption. Side-by-side or staggered layout. Paper background.
+5. SOLUTION — What this product makes possible. Lead with the outcome. Ink-on-paper, clean type.
+6. FEATURES — 3-6 features as outcomes. Icon (44px SVG) + headline + 1-sentence description. Grid layout. White card bg.
+7. PRICING — 3-tier cards. See pricing rules below.
+8. SOCIAL PROOF — 2-3 testimonials. Real names, realistic quotes. Yellow left-border card style.
+9. CTA BAND — Full-width dark (#242424) section. Single outcome-framed headline. Yellow primary button.
+10. FOOTER — Logo, 3-4 footer links, copyright. Dark bg. Minimal.
+
+═══════════════════════════════════════════════════════════════════
+COPY RULES (enforced throughout)
+═══════════════════════════════════════════════════════════════════
+- Outcome-first: every headline leads with what Laura gains, not what the product does
+- Plain language: zero jargon, no acronyms (no VPN, IOC, DNS, SSO in headlines)
+- Household framing: "your family", "everyone's devices", "your home", "your kids"
+- Voice: calm, assured, protective — Norton as trusted expert, not salesperson
+- No Lorem ipsum. All copy specific and realistic. Names, places, scenarios must feel real.
+
+═══════════════════════════════════════════════════════════════════
+PRICING SECTION — Life360 / Stripe / Linear standard
+═══════════════════════════════════════════════════════════════════
+- Three cards in a row (desktop), stacked (mobile)
+- Tiers marked RECOMMENDED: elevated card treatment — #FFE800 top border (4px), "Recommended" pill badge above tier name, slight scale(1.02) transform
+- Tiers with FREE TRIAL: primary CTA = "Try X days free" pill button (#FFE800, #242424 text)
+- Tiers without free trial: CTA = "Get started" ghost button
+- Each card must have: tier name (800 weight) · price (large, 800) · billing period (soft) · identity line ("For families who...") · 3-4 checkmarked outcome lines · CTA
+- Additive features shown as: "Everything in [tier below], plus:" before listing new items
+- DO NOT copy "Target customer" inputs verbatim — rewrite with professional subscription copy
+- Upgrade logic must be viscerally obvious from card to card
+
+═══════════════════════════════════════════════════════════════════
+DESIGN QA — apply before outputting
+═══════════════════════════════════════════════════════════════════
+- Every section scrolls naturally — no overflow:hidden trapping content
+- No text touches container edges — minimum 20px internal horizontal padding
+- All colors match the exact hex palette above
+- No emojis appear anywhere
+- Color contrast passes WCAG AA: white on #242424, #242424 on #FFE800
+- Responsive: desktop (1180px+), tablet (768px), mobile (390px) all work correctly
+- Realistic data everywhere — no placeholders`;
 
   document.getElementById('promptText').value = prompt;
   const card = document.getElementById('promptCard');
