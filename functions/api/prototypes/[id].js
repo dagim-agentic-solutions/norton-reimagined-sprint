@@ -92,6 +92,11 @@ STRICT weighted composite:
   - 10% Market Splash: Would non-subscribers hear about this and switch?
   - 5% Protection Heritage: Does it feel like the next Norton chapter, not a random pivot?
 
+CALIBRATION UPDATE — Balanced scoring & coaching (Apr 23, 2026)
+- Assume this concept already cleared an internal pitch; start neutral and let the evidence move you up or down.
+- Use the full 60–85 band for promising sprint work. Keep 45–59 for "needs shaping" and reserve <45 for clear misses.
+- Always surface at least two actionable improvements — even if you like it. Highlight the fastest way to earn +10 points.
+
 Concept reminder: you’re reviewing sprint concepts, not production apps. If the ritual and moat are clearly described, score the potential assuming they execute it well—even if every pixel isn’t drawn yet. Still keep the bar honest: only go above 70 when BOTH the ritual and the moat feel concrete and defensible.
 
 THE SECURITY-APP TRUTH:
@@ -191,7 +196,8 @@ Respond with ONLY a valid JSON object — no prose, no markdown fences:
   "personaFitScore": <integer 0-100>,
   "engagementChallenge": "<why Laura would/wouldn't open weekly>",
   "competitorGap": "<who copies this fastest>",
-  "wouldLauraOpenWeekly": <true | false>
+  "wouldLauraOpenWeekly": <true | false>,
+  "improvementIdeas": ["<Specific sprint-ready improvement>", "<Second improvement>", "<Optional third>"]
 }
 Verdict bands: 85-100 → LOVES IT | 70-84 → LIKES IT | 50-69 → MEH | 30-49 → SKEPTICAL | 0-29 → REJECTS IT`;
 
@@ -223,6 +229,11 @@ Verdict bands: 85-100 → LOVES IT | 70-84 → LIKES IT | 50-69 → MEH | 30-49 
     lauraEngagementChallenge: result.engagementChallenge  ?? null,
     lauraCompetitorGap:       result.competitorGap        ?? null,
     lauraWouldOpenWeekly:     result.wouldLauraOpenWeekly ?? null,
+    lauraImprovementIdeas: Array.isArray(result.improvementIdeas)
+      ? result.improvementIdeas.map(item => typeof item === 'string' ? item.trim() : '').filter(Boolean).slice(0, 4)
+      : typeof result.improvementIdeas === 'string'
+        ? result.improvementIdeas.split(/\n|\u2022|-/).map(part => part.trim()).filter(Boolean).slice(0, 4)
+        : proto.lauraImprovementIdeas || null,
     lauraRescored: new Date().toISOString(),
     lauraScreensAnalyzed: crawlResult.screens.length,
   };
@@ -243,6 +254,7 @@ Verdict bands: 85-100 → LOVES IT | 70-84 → LIKES IT | 50-69 → MEH | 30-49 
     lauraEngagementChallenge:  updated.lauraEngagementChallenge,
     lauraCompetitorGap:        updated.lauraCompetitorGap,
     lauraWouldOpenWeekly:      updated.lauraWouldOpenWeekly,
+    lauraImprovementIdeas:     updated.lauraImprovementIdeas,
     screensAnalyzed: crawlResult.screens.length,
   });
 }

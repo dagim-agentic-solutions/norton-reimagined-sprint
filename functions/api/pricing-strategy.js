@@ -56,6 +56,12 @@ export async function onRequestPost({ request, env }) {
   const lauraLines = [];
   if (prototype.lauraScore != null) lauraLines.push(`Laura Score: ${prototype.lauraScore}/100 (${prototype.lauraVerdict || ""})`);
   if (prototype.lauraRecommendation) lauraLines.push(`Laura Recommendation: ${prototype.lauraRecommendation}`);
+  if (prototype.lauraImprovementIdeas && prototype.lauraImprovementIdeas.length) {
+    lauraLines.push('Improvement Ideas:');
+    prototype.lauraImprovementIdeas.slice(0, 3).forEach((idea, idx) => {
+      lauraLines.push(`  ${idx + 1}. ${idea}`);
+    });
+  }
   if (prototype.lauraEngagementChallenge) lauraLines.push(`Engagement Challenge: ${prototype.lauraEngagementChallenge}`);
   if (prototype.lauraCompetitorGap) lauraLines.push(`Competitor Gap: ${prototype.lauraCompetitorGap}`);
   const lauraBlock = lauraLines.length ? `\n${lauraLines.join("\n")}` : "";

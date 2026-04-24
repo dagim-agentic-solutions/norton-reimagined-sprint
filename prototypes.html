@@ -862,6 +862,35 @@
   .callout-text { color: #333; }
   .callout-yes  { color: #15803d; font-weight: 700; }
   .callout-no   { color: #b91c1c; font-weight: 700; }
+
+  .score-improve {
+    margin-top: 10px;
+    padding: 10px 12px 12px;
+    border-radius: 8px;
+    border: 1px solid #e0e0dd;
+    background: #fffef6;
+  }
+  .improve-title {
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: #8a6a00;
+    margin-bottom: 8px;
+  }
+  .improve-list {
+    list-style: disc;
+    padding-left: 18px;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .improve-list li {
+    font-size: 12.5px;
+    line-height: 1.45;
+    color: #3c2f00;
+  }
   .score-dims {
     display: flex;
     flex-direction: column;
@@ -1099,6 +1128,13 @@ async function loadPrototypes() {
               ${p.lauraEngagementChallenge ? `<div class="score-callout-item"><span class="callout-label">Engagement challenge</span><span class="callout-text">${escapeHtml(p.lauraEngagementChallenge)}</span></div>` : ''}
               ${p.lauraCompetitorGap ? `<div class="score-callout-item"><span class="callout-label">Competitor risk</span><span class="callout-text">${escapeHtml(p.lauraCompetitorGap)}</span></div>` : ''}
               ${p.lauraWouldOpenWeekly != null ? `<div class="score-callout-item"><span class="callout-label">Would Laura open weekly?</span><span class="callout-text callout-${p.lauraWouldOpenWeekly ? 'yes' : 'no'}">${p.lauraWouldOpenWeekly ? 'Yes' : 'No'}</span></div>` : ''}
+            </div>` : ''}
+            ${Array.isArray(p.lauraImprovementIdeas) && p.lauraImprovementIdeas.length ? `
+            <div class="score-improve">
+              <div class="improve-title">Recommendations</div>
+              <ul class="improve-list">
+                ${p.lauraImprovementIdeas.slice(0, 4).map(item => `<li>${escapeHtml(item)}</li>`).join('')}
+              </ul>
             </div>` : ''}
             ${[
               {label:'Engagement', val: p.lauraEngagementScore},

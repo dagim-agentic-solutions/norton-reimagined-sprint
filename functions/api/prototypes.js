@@ -357,6 +357,12 @@ Your final 0–100 score is a STRICT weighted composite:
   - 10% MARKET SPLASH: Would this make headlines? Drive trial? Create a "wait, Norton does that now?" moment?
   - 5% PROTECTION HERITAGE: Does it still feel like the next chapter of Norton — not a random pivot?
 
+CALIBRATION UPDATE — Balanced scoring & actionable coaching (Apr 23, 2026)
+- Assume every prototype cleared a senior concept review already; start from neutrality, not suspicion.
+- Realistic distribution: most solid sprint concepts should land between 60–85. Reserve <45 for clear misses and >90 for truly category-defining leaps.
+- If a concept articulates either a compelling ritual or a unique wedge, keep it in the 55–70 band even if the other half is still forming. Do not cluster everything in the 30s.
+- ALWAYS return at least two concrete recommendations the team can act on this week. If the concept is already strong, focus on stretch moves, not nitpicks.
+
 Concept reminder: you’re reviewing sprint concepts, not finished products. If the prototype clearly describes a believable ritual or moat—even if every screen isn’t built yet—credit the potential. Score what the team is aiming for when fully executed, not just the pixels you see today. **But keep the bar honest:** do not award 70+ unless BOTH the ritual and the defensible wedge are articulated in a concrete, believable way.
 
 ════════════════════════════════════════════
@@ -583,7 +589,8 @@ Respond with ONLY a valid JSON object — no prose, no markdown fences:
   "personaFitScore": <integer 0-100 — how well does it fit Laura's actual daily life and mental model?>,
   "engagementChallenge": "<1-2 sentences: honest answer to 'why would Laura open this weekly when no alert fires?'>",
   "competitorGap": "<1 sentence: what competitor could most easily replicate this and how soon?>",
-  "wouldLauraOpenWeekly": <true | false>
+  "wouldLauraOpenWeekly": <true | false>,
+  "improvementIdeas": ["<Specific action Norton should take to strengthen this>", "<Another concrete improvement>", "<Optional third idea>"]
 }
 Verdict MUST match score band exactly: 85-100 → LOVES IT | 70-84 → LIKES IT | 50-69 → MEH | 30-49 → SKEPTICAL | 0-29 → REJECTS IT`;
 
@@ -622,6 +629,11 @@ Verdict MUST match score band exactly: 85-100 → LOVES IT | 70-84 → LIKES IT 
       lauraEngagementChallenge: result.engagementChallenge  ?? null,
       lauraCompetitorGap:       result.competitorGap        ?? null,
       lauraWouldOpenWeekly:     result.wouldLauraOpenWeekly ?? null,
+      lauraImprovementIdeas: Array.isArray(result.improvementIdeas)
+        ? result.improvementIdeas.map(item => typeof item === 'string' ? item.trim() : '').filter(Boolean).slice(0, 4)
+        : typeof result.improvementIdeas === 'string'
+          ? result.improvementIdeas.split(/\n|\u2022|-/).map(part => part.trim()).filter(Boolean).slice(0, 4)
+          : null,
     };
   } catch {
     return null;
