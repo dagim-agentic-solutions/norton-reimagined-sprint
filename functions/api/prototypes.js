@@ -510,7 +510,7 @@ function extractDeepText(html) {
   return combined.slice(0, 12000);
 }
 
-async function scoreLaura(prototype, fileContent, env) {
+export async function scoreLaura(prototype, fileContent, env) {
   // Scores a prototype against Laura using visual screenshots + deep text extraction.
   // Crawls all discovered screens, takes screenshots, sends to Claude Vision.
   if (!env.ANTHROPIC_API_KEY) return null;
